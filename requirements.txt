@@ -1,1 +1,8 @@
 streamlit
+anthropic
+supabase
+plotly
+networkx
+python-dotenv
+requests
+pandas
