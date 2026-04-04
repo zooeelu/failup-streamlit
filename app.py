@@ -32,6 +32,8 @@ with st.form("study_summary_form"):
     submitted = st.form_submit_button("Generate summary")
 
 if submitted:
+    summary_raw = ""
+
     try:
         with st.spinner("Generating summary..."):
             summary_raw = summarize_study(
@@ -44,6 +46,9 @@ if submitted:
                 p_value=p_value,
                 limitations=limitations,
             )
+
+        st.markdown("### Raw model output")
+        st.code(summary_raw)
 
         summary = json.loads(summary_raw)
 
@@ -70,4 +75,7 @@ if submitted:
 
     except Exception as e:
         st.error("Summary generation failed.")
+        if summary_raw:
+            st.markdown("### Raw model output")
+            st.code(summary_raw)
         st.code(str(e))
