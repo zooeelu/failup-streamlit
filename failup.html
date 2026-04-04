@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FailUp — Negative Research Repository</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #fafcfa;
+    --surface: #ffffff;
+    --surface2: #f4f8f6;
+    --sidebar-bg: #809bce;
+    --border: rgba(128,155,206,0.18);
+    --border2: rgba(149,184,209,0.40);
+    --accent: #5a7fb5;
+    --accent2: #3f6096;
+    --accent-dim: rgba(128,155,206,0.10);
+    --accent-glow: rgba(128,155,206,0.06);
+    --text: #1a2234;
+    --text2: #4a5a78;
+    --text3: #8a9ab8;
+    --red: #b06080;
+    --amber: #7a8a60;
+    --teal: #6aab9a;
+    --pastel-blue: #809bce;
+    --pastel-teal: #95b8d1;
+    --pastel-mint: #b8e0d2;
+    --pastel-green: #d6eadf;
+    --pastel-pink: #eac4d5;
+    --font-serif: 'Playfair Display', serif;
+    --font-sans: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --radius: 3px;
+    --radius-lg: 6px;
+    --radius-xl: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── PAPER TEXTURE BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── LAYOUT ── */
+  .shell { position: relative; z-index: 1; display: flex; height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 216px;
+    flex-shrink: 0;
+    border-right: none;
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+
+  .logo {
+    padding: 22px 18px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .logo-mark {
+    font-family: var(--font-serif);
+    font-size: 19px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+  }
+  .logo-sub {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.12em;
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+
+  .nav { padding: 12px 8px; flex: 1; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: rgba(255,255,255,0.65);
+    font-size: 12.5px;
+    font-weight: 500;
+    transition: all 0.12s;
+    margin-bottom: 1px;
+    letter-spacing: 0.01em;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.15); color: #ffffff; }
+  .nav-item.active {
+    background: rgba(255,255,255,0.22);
+    color: #ffffff;
+    border-left: 2px solid #eac4d5;
+    padding-left: 8px;
+  }
+  .nav-icon { width: 15px; text-align: center; font-size: 12px; opacity: 0.7; }
+
+  .sidebar-stats {
+    padding: 14px 16px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    font-family: var(--font-mono);
+  }
+  .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; align-items: center; }
+  .stat-label { font-size: 9px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.12em; }
+  .stat-val { font-size: 10.5px; font-weight: 500; color: #eac4d5; }
+
+  /* ── MAIN CONTENT ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 12px;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .topbar-title { font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--text); flex: 1; letter-spacing: 0.01em; }
+  .topbar-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .btn {
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(90,127,181,0.25);
+  }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(90,127,181,0.32); }
+  .btn-ghost {
+    background: #ffffff;
+    color: var(--text2);
+    border: 1.5px solid var(--border2);
+    font-weight: 600;
+  }
+  .btn-ghost:hover { background: var(--pastel-green); color: var(--accent); border-color: var(--border2); }
+
+  /* ── PAGE CONTENT ── */
+  .page { display: none; flex: 1; overflow-y: auto; padding: 28px 28px 40px; }
+  .page.active { display: block; }
+
+  /* ── DASHBOARD ── */
+  .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    transition: border-color 0.15s;
+  }
+  .metric-card:hover { border-color: var(--border2); }
+  .metric-label { font-family: var(--font-mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
+  .metric-val { font-family: var(--font-serif); font-size: 30px; font-weight: 600; color: var(--text); line-height: 1; }
+  .metric-sub { font-size: 11px; color: var(--text2); margin-top: 6px; }
+  .metric-card.accent .metric-val { color: var(--accent); }
+
+  .dash-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px; }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface2);
+  }
+  .panel-title { font-size: 12px; font-weight: 600; color: var(--text); letter-spacing: 0.02em; }
+  .panel-body { padding: 16px 18px; }
+
+  .trial-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+    margin: 0 -18px;
+  }
+  .trial-row:last-child { border-bottom: none; }
+  .trial-row:hover { background: var(--accent-glow); }
+  .trial-type {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    flex-shrink: 0;
+  }
+  .type-null { background: rgba(128,155,206,0.12); color: #5a7fb5; border: 1px solid rgba(128,155,206,0.25); }
+  .type-inconclusive { background: rgba(184,224,210,0.25); color: #3a8a72; border: 1px solid rgba(149,184,209,0.30); }
+  .type-opposite { background: rgba(234,196,213,0.25); color: #a05070; border: 1px solid rgba(234,196,213,0.40); }
+  .trial-name { flex: 1; font-size: 12px; color: var(--text); }
+  .trial-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); }
+
+  /* ── FAILURE GRAPH ── */
+  #graph-canvas { width: 100%; border-radius: var(--radius-lg); border: 1px solid var(--border); background: #e8f4f0; display: block; cursor: grab; }
+  .graph-controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-chip {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border2);
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text2);
+    background: var(--surface);
+    font-family: var(--font-sans);
+    transition: all 0.15s;
+  }
+  .filter-chip:hover, .filter-chip.active { background: var(--accent-dim); color: var(--accent); border-color: var(--border2); }
+  .graph-legend { display: flex; gap: 20px; margin-top: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text3); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* ── UPLOAD FORM ── */
+  .upload-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; }
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+  }
+  .form-section-title {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 12px;
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); background: var(--surface); }
+  .field select option { background: var(--surface); }
+  .field textarea { min-height: 80px; resize: vertical; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .result-selector { display: flex; gap: 8px; }
+  .result-opt {
+    flex: 1;
+    padding: 11px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-align: center;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text3);
+    background: var(--surface2);
+  }
+  .result-opt:hover { background: var(--accent-dim); color: var(--accent); border-color: var(--border2); }
+  .result-opt.selected-null { background: rgba(70,100,150,0.08); color: #3d5e8a; border-color: rgba(70,100,150,0.25); }
+  .result-opt.selected-inconclusive { background: rgba(130,95,30,0.08); color: #6a4e18; border-color: rgba(130,95,30,0.25); }
+  .result-opt.selected-opposite { background: rgba(140,55,45,0.08); color: #7a3020; border-color: rgba(140,55,45,0.25); }
+
+  .ai-preview {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    position: sticky;
+    top: 0;
+  }
+  .ai-preview-title {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ai-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .summary-block {
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-block:last-child { border-bottom: none; margin-bottom: 0; }
+  .summary-block-label { font-family: var(--font-mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .summary-block-text { font-size: 12px; color: var(--text2); line-height: 1.7; font-style: italic; }
+  .summary-placeholder { color: var(--text3); font-style: normal; }
+
+  /* ── SEARCH PAGE ── */
+  .search-bar-wrap { position: relative; margin-bottom: 20px; }
+  .search-bar {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px 14px 44px;
+    color: var(--text);
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-style: italic;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-bar:focus { border-color: var(--accent); }
+  .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 16px; }
+
+  .results-grid { display: grid; gap: 14px; }
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .result-card:hover { border-color: var(--border2); background: var(--accent-glow); }
+  .result-card-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .result-card-title { font-family: var(--font-serif); font-size: 15px; font-weight: 500; color: var(--text); flex: 1; line-height: 1.35; }
+  .result-card-body { font-size: 12px; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
+  .result-card-footer { display: flex; gap: 16px; }
+  .result-card-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); }
+  .contradiction-badge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    padding: 2px 9px;
+    border-radius: 4px;
+    background: rgba(140,55,45,0.08);
+    color: #7a3020;
+    border: 1px solid rgba(140,55,45,0.20);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-left: auto;
+  }
+
+  /* ── PROFILE ── */
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 20px;
+  }
+  .avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    border: 2px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .profile-name { font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: var(--text); }
+  .profile-meta { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .badges-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    background: var(--surface2);
+  }
+  .badge.earned { background: var(--accent-dim); color: var(--accent); border-color: var(--border2); }
+  .badge-icon { font-size: 12px; }
+
+  .contributions-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .contributions-table th { font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .contributions-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
+  .contributions-table tr:last-child td { border-bottom: none; }
+  .contributions-table tr:hover td { color: var(--text); background: var(--accent-glow); }
+  .doi-link { font-family: var(--font-mono); color: var(--accent); font-size: 10px; }
+
+  /* ── NOTIFICATION TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text);
+    z-index: 100;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    max-width: 300px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-title { font-weight: 600; color: var(--accent); margin-bottom: 3px; font-size: 13px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(30,20,10,0.45);
+    z-index: 50;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    width: 520px;
+    max-width: 90vw;
+    transform: scale(0.97); transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: scale(1); }
+  .modal-title { font-family: var(--font-serif); font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+  .modal-sub { font-size: 12px; color: var(--text2); margin-bottom: 20px; font-family: var(--font-mono); }
+  .modal-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .modal-section { margin-bottom: 14px; }
+  .modal-section-label { font-family: var(--font-mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+  .modal-close { float: right; background: var(--surface2); border: 1px solid var(--border); color: var(--text3); font-size: 14px; cursor: pointer; width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+
+  /* ── AUTOFILL CARD ── */
+  .autofill-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+  .autofill-icon {
+    font-size: 16px;
+    width: 38px; height: 38px;
+    border-radius: var(--radius);
+    background: var(--accent-dim);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: var(--accent);
+  }
+  .autofill-body { flex: 1; }
+  .autofill-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .autofill-sub { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 10px; }
+  .autofill-dropzone {
+    border: 1px dashed var(--border2);
+    border-radius: var(--radius);
+    padding: 9px 14px;
+    font-size: 12px; color: var(--text3);
+    cursor: pointer; transition: all 0.15s; text-align: center;
+    background: var(--surface);
+  }
+  .autofill-dropzone:hover, .autofill-dropzone.drag-over { border-color: var(--accent); background: var(--accent-glow); color: var(--text2); }
+  .autofill-progress { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin: 10px 0 5px; }
+  .autofill-progress-bar { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 0.4s ease; }
+  .autofill-status-text { font-size: 10px; color: var(--accent); font-family: var(--font-mono); }
+  .autofill-done { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--accent-dim); border: 1px solid var(--border2); border-radius: var(--radius); font-size: 12px; color: var(--accent); margin-top: 8px; }
+  .field input.autofilled, .field textarea.autofilled, .field select.autofilled { border-color: var(--accent) !important; background: var(--accent-glow) !important; }
+
+  /* ── STEP BAR ── */
+  .step-bar { display:flex; align-items:center; margin-bottom:24px; }
+  .step { display:flex; align-items:center; gap:8px; cursor:pointer; opacity:0.4; transition:opacity 0.2s; }
+  .step.active { opacity:1; }
+  .step.done { opacity:0.7; }
+  .step-num { width:24px; height:24px; border-radius:4px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:10px; color:var(--text3); flex-shrink:0; }
+  .step.active .step-num { background:var(--accent); color:#fdfaf5; border-color:var(--accent); }
+  .step.done .step-num { background:var(--accent-dim); color:var(--accent); border-color:var(--border2); }
+  .step-label { font-size:12px; font-weight:500; color:var(--text2); white-space:nowrap; }
+  .step.active .step-label { color:var(--text); }
+  .step-line { flex:1; height:1px; background:var(--border); margin:0 8px; min-width:12px; }
+
+  /* ── FORM STEPS ── */
+  .form-step { display:none; }
+  .form-step.active { display:block; }
+
+  /* ── DROP ZONES ── */
+  .drop-zone {
+    border: 1px dashed var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--surface2);
+  }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: var(--accent-glow); }
+  .dz-icon { font-size: 20px; color: var(--text3); margin-bottom: 8px; }
+  .dz-text { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+  .dz-sub { font-size: 11px; color: var(--text3); }
+  .file-list { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .file-chip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 12px; border-radius: 4px;
+    background: var(--accent-dim); border: 1px solid var(--border2);
+    font-size: 11px; color: var(--accent); font-family: var(--font-mono);
+  }
+  .file-chip-remove { cursor: pointer; color: var(--text3); font-size: 13px; }
+  .file-chip-remove:hover { color: var(--red); }
+
+  /* ── NF-INDEX CARD ── */
+  .nf-index-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    overflow: hidden;
+  }
+  .nf-index-left {
+    background: #e8f4f0;
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .nf-index-label { font-family: var(--font-mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+  .nf-index-score { font-family: var(--font-serif); font-size: 72px; font-weight: 600; color: var(--accent); line-height: 1; margin-bottom: 8px; }
+  .nf-index-sub { font-size: 11px; color: var(--text2); line-height: 1.5; }
+  .nf-index-right { padding: 22px 24px; }
+  .nf-index-explain-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .nf-index-explain { font-size: 12px; color: var(--text2); line-height: 1.7; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .nf-index-explain strong { color: var(--accent); font-weight: 600; }
+  .nf-breakdown { display: flex; flex-direction: column; gap: 8px; }
+  .nf-bar-row { display: flex; align-items: center; gap: 10px; }
+  .nf-bar-label { font-size: 11px; color: var(--text2); min-width: 110px; font-family: var(--font-mono); }
+  .nf-bar-track { flex: 1; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
+  .nf-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+  .nf-bar-val { font-size: 10px; color: var(--text3); font-family: var(--font-mono); min-width: 140px; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+  /* section header */
+  .page-header { margin-bottom: 22px; }
+  .page-header h1 { font-family: var(--font-serif); font-size: 24px; font-weight: 600; color: var(--text); margin-bottom: 4px; letter-spacing: 0.01em; }
+  .page-header p { font-size: 12.5px; color: var(--text2); }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">FailUp</div>
+      <div class="logo-sub">Negative research repository</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-item active" onclick="navigate('welcome')">
+        <span class="nav-icon">⌂</span> Welcome
+      </div>
+      <div class="nav-item" onclick="navigate('dashboard')">
+        <span class="nav-icon">◈</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="navigate('graph')">
+        <span class="nav-icon">⬡</span> Failure Graph
+      </div>
+      <div class="nav-item" onclick="navigate('upload')">
+        <span class="nav-icon">↑</span> Submit Finding
+      </div>
+      <div class="nav-item" onclick="navigate('search')">
+        <span class="nav-icon">◎</span> Search
+      </div>
+      <div class="nav-item" onclick="navigate('profile')">
+        <span class="nav-icon">◉</span> My Profile
+      </div>
+    </nav>
+    <div class="sidebar-stats">
+      <div class="stat-row"><span class="stat-label">Trials indexed</span><span class="stat-val">4,812</span></div>
+      <div class="stat-row"><span class="stat-label">Null results</span><span class="stat-val">3,204</span></div>
+      <div class="stat-row"><span class="stat-label">Graph nodes</span><span class="stat-val">18,440</span></div>
+      <div class="stat-row"><span class="stat-label">Contradictions</span><span class="stat-val" style="color:var(--red)">127</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Welcome to FailUp</div>
+      <span class="topbar-tag">✨ Beta v0.1</span>
+      <button class="btn btn-ghost" onclick="navigate('upload')">+ Submit finding</button>
+      <button class="btn btn-primary" onclick="navigate('graph')">Explore graph →</button>
+    </div>
+
+    <!-- WELCOME PAGE -->
+    <div class="page active" id="page-welcome">
+      <div class="page-header">
+        <h1>Welcome to FailUp</h1>
+        <p>A searchable repository for negative, null, and inconclusive biomedical research findings.</p>
+      </div>
+
+      <!-- Mission statement -->
+      <div style="background:linear-gradient(135deg,#dde8f8 0%,#e8f4f0 50%,#f0eef8 100%);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:24px;">
+        <div style="font-family:var(--font-serif);font-size:19px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.4;">Why do failed experiments matter?</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.9;max-width:720px;">
+          In biomedical research, <strong>negative and null results are rarely published</strong> — even though they carry enormous scientific value. This is called <em>publication bias</em>, and it means the research community keeps unknowingly repeating the same failed experiments, wasting time and funding that could go toward genuinely new directions.<br/><br/>
+          FailUp exists to fix that. By giving researchers a dedicated place to deposit, summarize, and share negative findings, we turn isolated failures into a <strong>shared, searchable body of scientific knowledge</strong>. Every null result you contribute helps someone else avoid a dead end.
+        </div>
+      </div>
+
+      <!-- How it works -->
+      <div style="margin-bottom:24px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;letter-spacing:0.02em;">How FailUp works</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;">
+            <div style="font-size:22px;margin-bottom:8px;">📤</div>
+            <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;">1. Submit your finding</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7;">Upload your study documents or fill in the structured form. Our AI reads your materials and generates a standardized IMRAD-style summary — you review and approve it before it's published.</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;">
+            <div style="font-size:22px;margin-bottom:8px;">🤖</div>
+            <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;">2. AI summarizes & classifies</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7;">Claude classifies the failure mode (target validity, underpowering, dosing, etc.), checks for contradictions with prior positive literature, and tags the study with ontology-based graph labels.</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;">
+            <div style="font-size:22px;margin-bottom:8px;">🔗</div>
+            <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;">3. Connects to the graph</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7;">Your finding is added as a node in the Failure Graph — linked to related trials by shared mechanisms, targets, and populations. Clusters reveal structural failure patterns across the literature.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation guide -->
+      <div style="margin-bottom:24px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;letter-spacing:0.02em;">Where to go from here</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:border-color 0.15s;" onclick="navigate('dashboard')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <span style="font-size:16px;">◈</span>
+              <span style="font-size:12.5px;font-weight:700;color:var(--accent);">Dashboard →</span>
+            </div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;">See recent submissions, active failure clusters, and platform-wide statistics. Your starting point for exploring what's already in the repository.</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:border-color 0.15s;" onclick="navigate('upload')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <span style="font-size:16px;">↑</span>
+              <span style="font-size:12.5px;font-weight:700;color:var(--accent);">Submit a Finding →</span>
+            </div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;">Deposit a negative, null, or inconclusive result. Takes ~5–10 minutes. You'll receive a citable DOI and contribute to the shared knowledge graph.</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:border-color 0.15s;" onclick="navigate('graph')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <span style="font-size:16px;">⬡</span>
+              <span style="font-size:12.5px;font-weight:700;color:var(--accent);">Failure Graph →</span>
+            </div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;">Explore the network of failed trials. Each node is a study; connections show shared mechanisms, targets, or populations. Bigger nodes = cluster hubs with many linked failures.</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:border-color 0.15s;" onclick="navigate('search')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <span style="font-size:16px;">◎</span>
+              <span style="font-size:12.5px;font-weight:700;color:var(--accent);">Search →</span>
+            </div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;">Search by drug target, mechanism, therapeutic area, or failure pattern. Find out if someone has already tried what you're considering — and what happened.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Beta note -->
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;font-size:12px;color:var(--text3);line-height:1.7;">
+        <strong style="color:var(--text2);">🔬 Beta v0.1 — prototype note:</strong> FailUp is currently an early-stage prototype. The data, graph, and AI summaries shown are illustrative examples. API integration for live AI summarization is coming in the next development phase. All feedback is welcome.
+      </div>
+    </div>
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page" id="page-dashboard">
+      <div class="page-header">
+        <h1>Overview</h1>
+        <p>A living map of what doesn't work — and what that means for what might.</p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card accent">
+          <div class="metric-label">New this week</div>
+          <div class="metric-val">84</div>
+          <div class="metric-sub">negative findings deposited</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Contradictions flagged</div>
+          <div class="metric-val" style="color:var(--red)">12</div>
+          <div class="metric-sub">vs prior positive literature</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">AI summaries generated</div>
+          <div class="metric-val">4,619</div>
+          <div class="metric-sub">avg. review time 4.2 min</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Duplicated efforts saved</div>
+          <div class="metric-val" style="color:var(--teal)">$2.1M</div>
+          <div class="metric-sub">estimated R&D cost avoided</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Recent submissions</span>
+            <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="navigate('search')">View all</button>
+          </div>
+          <div class="panel-body">
+            <div class="trial-row" onclick="openModal('trial1')">
+              <span class="trial-type type-null">Null</span>
+              <span class="trial-name">VEGF-A inhibition in treatment-resistant glioblastoma</span>
+              <span class="trial-meta">NCT04821944</span>
+            </div>
+            <div class="trial-row" onclick="openModal('trial2')">
+              <span class="trial-type type-opposite">Opposite</span>
+              <span class="trial-name">β-glucan supplementation in post-COVID fatigue syndrome</span>
+              <span class="trial-meta">NCT05192847</span>
+            </div>
+            <div class="trial-row" onclick="openModal('trial3')">
+              <span class="trial-type type-inconclusive">Inconclusive</span>
+              <span class="trial-name">Ketamine micro-dosing in treatment-resistant bipolar depression</span>
+              <span class="trial-meta">NCT04903028</span>
+            </div>
+            <div class="trial-row" onclick="openModal('trial1')">
+              <span class="trial-type type-null">Null</span>
+              <span class="trial-name">IL-6 receptor blockade in non-alcoholic steatohepatitis</span>
+              <span class="trial-meta">NCT05003141</span>
+            </div>
+            <div class="trial-row" onclick="openModal('trial2')">
+              <span class="trial-type type-null">Null</span>
+              <span class="trial-name">mTOR pathway inhibition in hormone-receptor positive breast cancer</span>
+              <span class="trial-meta">NCT04788992</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">Active failure clusters</span></div>
+          <div class="panel-body">
+            <div class="trial-row" onclick="navigate('graph')">
+              <span class="trial-name">PD-1/PD-L1 checkpoint blockade — solid tumors</span>
+              <span class="trial-meta" style="color:var(--accent)">38 trials</span>
+            </div>
+            <div class="trial-row" onclick="navigate('graph')">
+              <span class="trial-name">Tau protein targeting — Alzheimer's</span>
+              <span class="trial-meta" style="color:var(--accent)">21 trials</span>
+            </div>
+            <div class="trial-row" onclick="navigate('graph')">
+              <span class="trial-name">PCSK9 inhibition — LDL lowering</span>
+              <span class="trial-meta" style="color:var(--amber)">14 trials</span>
+            </div>
+            <div class="trial-row" onclick="navigate('graph')">
+              <span class="trial-name">sGC stimulators — heart failure with preserved EF</span>
+              <span class="trial-meta" style="color:var(--text3)">9 trials</span>
+            </div>
+            <div class="trial-row" onclick="navigate('graph')">
+              <span class="trial-name">Gut microbiome modulation — T2 diabetes</span>
+              <span class="trial-meta" style="color:var(--text3)">7 trials</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRAPH PAGE -->
+    <div class="page" id="page-graph">
+      <div class="page-header">
+        <h1>Failure Graph</h1>
+        <p>A visual map of how failed trials connect — by shared mechanisms, drug targets, and patient populations.</p>
+      </div>
+
+      <!-- What is this / How to read it -->
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-bottom:18px;">
+        <div style="background:linear-gradient(135deg,#dde8f8,#e8f4f0);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px 20px;">
+          <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:8px;">📊 What this graph shows</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.8;">
+            Each <strong>circle (node)</strong> represents a submitted study. The <strong>lines (edges)</strong> between nodes mean those studies share something in common — the same drug target, biological mechanism, or patient population.<br/><br/>
+            When many studies cluster together and all failed, that's a signal: this target or approach may have a <strong>structural problem</strong> that goes beyond any single trial. The graph makes those patterns visible at a glance.<br/><br/>
+            <strong>Larger nodes</strong> are cluster hubs — studies that share connections with many others. <strong>Glowing nodes</strong> have contradiction flags, meaning a prior positive result exists somewhere in the literature.
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 20px;">
+          <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:10px;">🖱️ How to use it</div>
+          <div style="font-size:12px;color:var(--text2);line-height:2.0;">
+            <div style="margin-bottom:5px;">• <strong>Filter by area</strong> using the chips below — narrow to oncology, neurology, etc.</div>
+            <div style="margin-bottom:5px;">• <strong>Click any node</strong> to open that study's full summary</div>
+            <div style="margin-bottom:5px;">• <strong>Hover a node</strong> to highlight its direct connections</div>
+            <div style="margin-bottom:5px;">• <strong>Drag</strong> to pan around the graph</div>
+            <div style="margin-bottom:5px;">• <strong>Contradiction nodes</strong> (green) indicate a conflict with prior positive literature — worth investigating</div>
+            <div>• <strong>Submit your own finding</strong> to add a node to this graph</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="graph-controls">
+        <button class="filter-chip active" onclick="toggleChip(this)">All</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Oncology</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Neurology</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Cardiology</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Immunology</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Null only</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Contradictions</button>
+      </div>
+      <canvas id="graph-canvas" height="440"></canvas>
+      <div class="graph-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div> Null result</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div> Inconclusive</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f472b6"></div> Opposite effect</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#9b72cf"></div> Cluster hub</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div> Contradiction flagged</div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--text3);font-style:italic;">
+        Note: This graph is a prototype illustration. In the full version, nodes and edges are generated automatically from submitted studies using AI-extracted ontology tags.
+      </div>
+    </div>
+
+    <!-- UPLOAD PAGE -->
+    <div class="page" id="page-upload">
+      <div class="page-header">
+        <h1>Submit a Negative Finding</h1>
+        <p>All submissions receive a citable DOI, contribute to the failure graph, and increment your NF-index.</p>
+      </div>
+
+      <!-- Step indicator -->
+      <div class="step-bar">
+        <div class="step active" id="step-ind-1" onclick="goStep(1)"><span class="step-num">1</span><span class="step-label">Study identity</span></div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-2" onclick="goStep(2)"><span class="step-num">2</span><span class="step-label">Upload documents</span></div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-3" onclick="goStep(3)"><span class="step-num">3</span><span class="step-label">Methods & results</span></div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-4" onclick="goStep(4)"><span class="step-num">4</span><span class="step-label">Supplemental materials</span></div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-5" onclick="goStep(5)"><span class="step-num">5</span><span class="step-label">Review & submit</span></div>
+      </div>
+
+      <div class="upload-layout">
+        <div>
+
+          <!-- ═══ STEP 1: Study Identity ═══ -->
+          <div class="form-step active" id="form-step-1">
+            <div class="form-card">
+              <div class="form-section-title">Study identity</div>
+              <div class="field-row">
+                <div class="field">
+                  <label>Study type</label>
+                  <select onchange="updatePreview()" id="f-type">
+                    <option>Randomized clinical trial</option>
+                    <option>Non-randomized controlled trial</option>
+                    <option>Observational (cohort)</option>
+                    <option>Observational (case-control)</option>
+                    <option>Cross-sectional</option>
+                    <option>Preclinical (in vivo)</option>
+                    <option>Preclinical (in vitro)</option>
+                    <option>Systematic review / meta-analysis</option>
+                    <option>Basket / platform trial</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Trial phase</label>
+                  <select onchange="updatePreview()" id="f-phase">
+                    <option>Phase III</option><option>Phase II/III</option>
+                    <option>Phase II</option><option>Phase I/II</option>
+                    <option>Phase I</option><option>Phase IV</option>
+                    <option>Not applicable</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label>Full study title</label>
+                <input type="text" id="f-title" placeholder="e.g. VEGF-A inhibition plus standard of care vs placebo in treatment-resistant glioblastoma" oninput="updatePreview()"/>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label>ClinicalTrials.gov ID (if applicable)</label>
+                  <input type="text" id="f-nct" placeholder="NCT00000000" oninput="updatePreview()"/>
+                </div>
+                <div class="field">
+                  <label>Other registry ID</label>
+                  <input type="text" placeholder="EudraCT / ISRCTN / ANZCTR"/>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label>Sponsoring institution</label>
+                  <input type="text" placeholder="e.g. Memorial Sloan Kettering"/>
+                </div>
+                <div class="field">
+                  <label>Funding source</label>
+                  <select>
+                    <option>Academic / government grant</option>
+                    <option>Industry funded</option>
+                    <option>Mixed (academic + industry)</option>
+                    <option>Investigator-initiated</option>
+                    <option>Charity / foundation</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label>Publication status</label>
+                <select>
+                  <option>Unpublished — depositing here only</option>
+                  <option>Preprint (provide link below)</option>
+                  <option>Published in journal (provide DOI below)</option>
+                  <option>Under review</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Existing DOI or preprint link (if any)</label>
+                <input type="text" placeholder="https://doi.org/... or https://medrxiv.org/..."/>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:8px">
+                <button class="btn btn-primary" style="flex:1" onclick="goStep(2)">Next: Upload documents →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══ STEP 2: Upload Primary Documents ═══ -->
+          <div class="form-step" id="form-step-2">
+
+            <!-- Explainer banner -->
+            <div style="background:var(--pastel-blue);background:linear-gradient(135deg,#dde8f8,#e8f4f0);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:16px;">
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">⚡ Upload your study documents here — the AI will do the rest</div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:10px">
+                Upload any combination of your <strong>manuscript, study protocol, and/or results report</strong>. You can upload multiple files at once. The AI will read all of them together and automatically populate the fields in <strong>Step 3 (Methods &amp; Results)</strong> — including study design, sample size, outcomes, statistics, adverse events, and limitations.<br/><br/>
+                After uploading, you'll still walk through Step 3 to <strong>review every populated field, correct anything the AI got wrong, and fill in anything it missed</strong>. Think of this as a first draft, not a final answer.<br/><br/>
+                <strong>This step is optional.</strong> If you prefer to enter everything manually, just click "Skip — I'll enter details manually" below.
+              </div>
+              <div style="font-size:11px;color:var(--text3);background:rgba(255,255,255,0.6);border-radius:var(--radius);padding:8px 12px;margin-bottom:12px;">
+                <strong>What gets auto-populated in Step 3:</strong> Sample size · Randomization &amp; blinding · Therapeutic area · Intervention &amp; comparator · Patient population · Dropout rate · Demographics · Primary &amp; secondary outcomes · p-values · Effect estimates · Adverse events · Key limitations · Hypothesized failure reason
+              </div>
+            </div>
+
+            <!-- Upload dropzone -->
+            <div class="autofill-card" id="autofill-card" style="margin-bottom:14px">
+              <div class="autofill-icon">📂</div>
+              <div class="autofill-body">
+                <div class="autofill-title">Upload manuscript, protocol, and/or results report</div>
+                <div class="autofill-sub" style="margin-bottom:10px">Multiple files accepted (PDF or DOCX). The AI will read all uploaded files together to populate your methods &amp; results fields.</div>
+                <div class="autofill-dropzone" id="af-dz" ondragover="dzDrag(event,this)" ondragleave="dzLeave(this)" ondrop="afDrop(event)" onclick="document.getElementById('af-input').click()">
+                  <input type="file" id="af-input" accept=".pdf,.doc,.docx" multiple style="display:none" onchange="afFileChosen(this)"/>
+                  <span id="af-dz-text">Drop PDF or DOCX files here, or click to browse — multiple files accepted</span>
+                </div>
+                <div id="af-status" style="display:none">
+                  <div class="autofill-progress"><div class="autofill-progress-bar" id="af-bar"></div></div>
+                  <div class="autofill-status-text" id="af-status-text">Reading documents…</div>
+                </div>
+                <div id="af-done" style="display:none" class="autofill-done">✓ Documents uploaded — fields in Step 3 will be pre-populated. Review and correct them before submitting.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:4px">
+              <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+              <button class="btn btn-ghost" style="flex:1" onclick="skipUpload()">Skip — I'll enter details manually →</button>
+              <button class="btn btn-primary" onclick="goStep(3)">Documents uploaded — continue →</button>
+            </div>
+          </div>
+
+          <!-- ═══ STEP 3: Methods & Results ═══ -->
+          <div class="form-step" id="form-step-3">
+
+            <!-- Smart instruction banner — changes based on whether docs were uploaded -->
+            <div id="methods-banner-uploaded" style="display:none;background:linear-gradient(135deg,#dde8f8,#e8f0f8);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px;">
+              <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:4px">✅ Fields below have been pre-populated from your uploaded documents</div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.7;">Please <strong>review every field carefully</strong>. AI extraction is helpful but not perfect — it may misread numbers, miss nuance, or leave fields blank if the information wasn't clearly stated in your documents. Correct anything that's wrong and fill in anything that's missing before continuing.</div>
+            </div>
+            <div id="methods-banner-manual" style="background:linear-gradient(135deg,#e8f4f0,#f0f8e8);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px;">
+              <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:4px">📝 Enter your methods and results below</div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.7;">Fill in as much detail as you can — the more complete your entries, the stronger and more accurate the AI summary will be. All fields are optional, but richer input leads to richer output. If you realize you have a document you'd like to upload instead, <button onclick="goStep(2)" style="background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">go back to Step 2</button>.</div>
+            </div>
+            <div class="form-card" style="margin-bottom:14px">
+              <div class="form-section-title">Study design <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3);font-family:var(--font-sans);font-size:10px">— enter any applicable information</span></div>
+              <div class="field-row">
+                <div class="field">
+                  <label>Sample size enrolled (n)</label>
+                  <input type="text" id="f-n" placeholder="e.g. 340" oninput="updatePreview()"/>
+                </div>
+                <div class="field">
+                  <label>Planned n (power calculation)</label>
+                  <input type="text" id="f-nplan" placeholder="e.g. 400 (80% power)"/>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label>Randomization &amp; blinding</label>
+                  <select id="f-design">
+                    <option>Double-blind RCT — 1:1</option>
+                    <option>Double-blind RCT — other ratio</option>
+                    <option>Single-blind RCT</option>
+                    <option>Open-label RCT</option>
+                    <option>Non-randomized</option>
+                    <option>Not applicable</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Therapeutic area</label>
+                  <select id="f-area" onchange="updatePreview()">
+                    <option>Oncology</option><option>Neurology</option>
+                    <option>Cardiology</option><option>Immunology</option>
+                    <option>Hepatology</option><option>Psychiatry</option>
+                    <option>Infectious disease</option><option>Endocrinology</option>
+                    <option>Respiratory</option><option>Rare disease</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label>Intervention &amp; comparator</label>
+                <textarea id="f-intervention" placeholder="Drug name, dose, route, duration. Include comparator arm." style="min-height:60px" oninput="updatePreview()"></textarea>
+              </div>
+              <div class="field">
+                <label>Patient population</label>
+                <textarea id="f-population" placeholder="Key inclusion/exclusion criteria and enrollment context." style="min-height:60px"></textarea>
+              </div>
+              <div class="field-row">
+                <div class="field"><label>Dropout rate</label><input type="text" id="f-dropout" placeholder="e.g. 14%"/></div>
+                <div class="field"><label>% female</label><input type="text" id="f-female" placeholder="e.g. 48%"/></div>
+                <div class="field"><label>Median age</label><input type="text" id="f-age" placeholder="e.g. 58 yrs"/></div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <div class="form-section-title">Result classification</div>
+              <div class="result-selector" id="result-selector">
+                <div class="result-opt" onclick="selectResult('null',this)">Null<br/><span style="font-size:10px;color:var(--text3)">No significant effect</span></div>
+                <div class="result-opt" onclick="selectResult('inconclusive',this)">Inconclusive<br/><span style="font-size:10px;color:var(--text3)">Insufficient power</span></div>
+                <div class="result-opt" onclick="selectResult('opposite',this)">Opposite<br/><span style="font-size:10px;color:var(--text3)">Contrary to hypothesis</span></div>
+              </div>
+
+              <div class="form-section-title" style="margin-top:18px">Primary outcome</div>
+              <div class="field">
+                <label>Pre-specified primary endpoint</label>
+                <input type="text" id="f-outcome" placeholder="e.g. Overall survival at 24 months" oninput="updatePreview()"/>
+              </div>
+              <div class="field-row">
+                <div class="field"><label>Primary p-value</label><input type="text" id="f-pval" placeholder="e.g. p = 0.43" oninput="updatePreview()"/></div>
+                <div class="field"><label>Effect estimate</label><input type="text" id="f-es" placeholder="e.g. HR 1.02 (95% CI 0.88–1.18)" oninput="updatePreview()"/></div>
+              </div>
+              <div class="field">
+                <label>Secondary outcomes (summary)</label>
+                <textarea placeholder="e.g. PFS HR 1.05 (p=0.61); ORR 12% vs 11% (p=0.84)" style="min-height:56px"></textarea>
+              </div>
+              <div class="field-row">
+                <div class="field"><label>Grade 3–4 adverse events</label><input type="text" placeholder="e.g. 28% vs 14%"/></div>
+                <div class="field"><label>Treatment-related deaths</label><input type="text" placeholder="e.g. 2 (1.2%)"/></div>
+              </div>
+              <div class="field">
+                <label>Key limitations</label>
+                <textarea id="f-limits" placeholder="Methodological limitations, underpowering, dropout, etc." style="min-height:70px" oninput="updatePreview()"></textarea>
+              </div>
+              <div class="field">
+                <label>Hypothesized reason for failure</label>
+                <select oninput="updatePreview()">
+                  <option>Target validity — mechanism not rate-limiting in this indication</option>
+                  <option>Patient selection — population too heterogeneous or wrong biomarker</option>
+                  <option>Dosing / pharmacokinetics — insufficient exposure at target site</option>
+                  <option>Underpowered — type II error likely</option>
+                  <option>Outcome measurement — endpoint did not capture true biological effect</option>
+                  <option>Off-target effects — confounding mechanism</option>
+                  <option>Timing — intervention started too late in disease course</option>
+                  <option>Unknown / unclear</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:8px">
+                <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+                <button class="btn btn-primary" style="flex:1" onclick="goStep(4)">Next: Supplemental materials →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══ STEP 4: Supplemental Materials ═══ -->
+          <div class="form-step" id="form-step-4">
+
+            <div style="background:linear-gradient(135deg,#f0eefc,#e8f4f0);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:16px;">
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">📎 Supplemental materials — optional but encouraged</div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.8;">
+                This step is for any <strong>additional files</strong> that weren't part of your primary documents in Step 2 and that might help the AI generate a stronger, more complete summary. There's no wrong answer here — upload whatever you think is relevant.<br/><br/>
+                <strong>Examples of useful supplemental materials:</strong> statistical analysis plan (SAP), ethics approval, IRB documentation, raw data exports, appendices, subgroup analyses, safety reports, correspondence with regulators, or any other supporting context.<br/><br/>
+                If you already uploaded everything in Step 2, you can skip this step entirely.
+              </div>
+            </div>
+
+            <div class="form-card">
+              <div class="form-section-title">Supplemental file upload <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3);font-family:var(--font-sans);font-size:10px">— all optional, multiple files accepted</span></div>
+              <div class="field">
+                <label>Statistical analysis plan, ethics approval, appendices, raw data, or other supporting files</label>
+                <div class="drop-zone" id="dz-supp" ondragover="dzDrag(event,this)" ondragleave="dzLeave(this)" ondrop="dzDrop(event,this,'dz-supp','dz-supp-list')" onclick="document.getElementById('fi-supp').click()">
+                  <div class="dz-icon">+</div>
+                  <div class="dz-text">Drag & drop or click to browse — multiple files accepted</div>
+                  <div class="dz-sub">PDF, DOCX, CSV, XLSX, PNG, JPG · No limit on number of files</div>
+                  <input type="file" id="fi-supp" multiple style="display:none" onchange="fileChosen(this,'dz-supp','dz-supp-list')"/>
+                </div>
+                <div class="file-list" id="dz-supp-list"></div>
+              </div>
+
+              <div class="form-section-title" style="margin-top:18px">Visibility &amp; access</div>
+              <div class="field">
+                <label>Access level</label>
+                <select>
+                  <option>Public — immediately visible to all FailUp users</option>
+                  <option>Institutional — visible to verified researchers only</option>
+                  <option>Embargoed — metadata public, full data after embargo period</option>
+                  <option>Private — indexed in graph but details restricted</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Data sharing statement</label>
+                <textarea placeholder="e.g. De-identified participant-level data available on reasonable request to corresponding author." style="min-height:56px"></textarea>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:8px">
+                <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+                <button class="btn btn-primary" style="flex:1" onclick="goStep(5)">Next: Review &amp; submit →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══ STEP 5: Review & Submit ═══ -->
+          <div class="form-step" id="form-step-5">
+            <div class="form-card">
+              <div class="form-section-title">Declaration &amp; submission</div>
+              <div style="border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;font-size:12.5px;color:var(--text2);line-height:1.9;background:var(--surface2)">
+                <div style="font-weight:600;color:var(--text);margin-bottom:10px;font-size:13px">By submitting you confirm:</div>
+                <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;cursor:pointer">
+                  <input type="checkbox" style="margin-top:3px;flex-shrink:0"/> I am an author or authorized representative for this study
+                </label>
+                <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;cursor:pointer">
+                  <input type="checkbox" style="margin-top:3px;flex-shrink:0"/> No patient-level identifiable data is included in uploaded files
+                </label>
+                <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;cursor:pointer">
+                  <input type="checkbox" style="margin-top:3px;flex-shrink:0"/> The AI-generated summary will be reviewed by me before publication
+                </label>
+                <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer">
+                  <input type="checkbox" style="margin-top:3px;flex-shrink:0"/> I agree to FailUp's data sharing and attribution terms
+                </label>
+              </div>
+              <div style="background:var(--accent-dim);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin-bottom:16px">
+                <div style="font-family:var(--font-mono);font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">On submission you will receive</div>
+                <div style="font-size:12px;color:var(--text2);line-height:2.1">
+                  ✓ Citable DOI (10.5281/fu.xxxxxxx) &nbsp;&nbsp; ✓ ORCID credit entry<br/>
+                  ✓ Failure graph node created &nbsp;&nbsp; ✓ Transparency badge<br/>
+                  ✓ NF-index incremented &nbsp;&nbsp; ✓ AI summary draft generated<br/>
+                  ✓ Contradiction scan initiated &nbsp;&nbsp; ✓ Ontology auto-tagging
+                </div>
+              </div>
+              <div style="display:flex;gap:10px">
+                <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
+                <button class="btn btn-primary" style="flex:1;padding:11px" onclick="submitForm()">Generate AI summary &amp; submit →</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: AI Summary Preview -->
+        <div>
+          <div class="ai-preview">
+            <div class="ai-preview-title"><div class="ai-dot"></div> Summary structure preview</div>
+            <div id="preview-disclaimer" style="background:var(--pastel-pink);border:1px solid rgba(234,196,213,0.6);border-radius:var(--radius);padding:9px 12px;margin-bottom:14px;font-size:11px;color:var(--text2);line-height:1.6;">
+              <strong style="color:var(--text)">📋 Template preview — manual entry mode.</strong> The structure below reflects what your final summary will look like based on what you've typed so far. The real AI-generated summary runs after you submit.
+            </div>
+            <div class="summary-block">
+              <div class="summary-block-label">Background &amp; objective</div>
+              <div class="summary-block-text" id="prev-background"><span class="summary-placeholder">Complete Step 1 to generate a live preview.</span></div>
+            </div>
+            <div class="summary-block">
+              <div class="summary-block-label">Key findings</div>
+              <div class="summary-block-text" id="prev-findings"><span class="summary-placeholder">Result classification and statistics will appear here.</span></div>
+            </div>
+            <div class="summary-block">
+              <div class="summary-block-label">Failure mode classification</div>
+              <div class="summary-block-text" id="prev-failure"><span class="summary-placeholder">FailUp will auto-tag by mechanism, target, and population.</span></div>
+            </div>
+            <div class="summary-block">
+              <div class="summary-block-label">Contradiction check</div>
+              <div class="summary-block-text" id="prev-contradiction"><span class="summary-placeholder">AI will scan for conflicting prior positive results.</span></div>
+            </div>
+            <div class="summary-block">
+              <div class="summary-block-label">Graph tags (auto-generated)</div>
+              <div class="summary-block-text" id="prev-tags"><span class="summary-placeholder">MeSH terms, ontology IDs, and graph links will appear here.</span></div>
+            </div>
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+              <div class="summary-block-label" style="margin-bottom:6px">NF-index impact</div>
+              <div style="font-size:12px;color:var(--text2)">This submission will increment your <span style="color:var(--accent);font-weight:600">NF-index</span> if it receives ≥1 citation from another FailUp entry.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH PAGE -->
+    <div class="page" id="page-search">
+      <div class="page-header">
+        <h1>Search the failure graph</h1>
+        <p>Query by mechanism, target, pathway, population, or failure pattern — not just by keyword.</p>
+      </div>
+      <div class="search-bar-wrap">
+        <span class="search-icon">◎</span>
+        <input class="search-bar" type="text" placeholder="e.g. "PD-1 checkpoint blockade pancreatic cancer"" oninput="filterResults(this.value)"/>
+      </div>
+      <div class="results-grid" id="results-list">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div class="page" id="page-profile">
+
+      <!-- Profile header -->
+      <div class="profile-header">
+        <div class="avatar">SR</div>
+        <div style="flex:1">
+          <div class="profile-name">Dr. Sophia Renard</div>
+          <div class="profile-meta">Oncology · Memorial Sloan Kettering · ORCID 0000-0002-4821-3394</div>
+          <div class="profile-meta" style="margin-top:4px">PhD, MD · Principal Investigator · 14 years research experience</div>
+          <div class="badges-grid">
+            <div class="badge earned"><span class="badge-icon">◈</span> Transparency Pioneer</div>
+            <div class="badge earned"><span class="badge-icon">⬡</span> 5 Null Results</div>
+            <div class="badge earned"><span class="badge-icon">↑</span> Early Adopter</div>
+            <div class="badge earned"><span class="badge-icon">◉</span> Contradiction Hunter</div>
+            <div class="badge"><span class="badge-icon">◎</span> 10 Null Results</div>
+            <div class="badge"><span class="badge-icon">★</span> Graph Builder</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NF-INDEX HERO CARD -->
+      <div class="nf-index-card" style="margin-bottom:20px">
+        <div class="nf-index-left">
+          <div class="nf-index-label">NF-index</div>
+          <div class="nf-index-score">4</div>
+          <div class="nf-index-sub">4 negative findings each cited ≥4 times</div>
+        </div>
+        <div class="nf-index-right">
+          <div class="nf-index-explain-title">How the NF-index works</div>
+          <div class="nf-index-explain">
+            Analogous to the h-index, your <strong>NF-index</strong> is the largest number <em>n</em> such that you have published <em>n</em> negative findings that have each been cited at least <em>n</em> times within FailUp.
+            <br/><br/>
+            A citation occurs when another researcher's submission references your finding as prior evidence, a failed comparator, or a contradiction. It rewards <em>impact of negative work</em>, not just volume.
+          </div>
+          <div class="nf-breakdown">
+            <div class="nf-bar-row"><span class="nf-bar-label">VEGF-A / GBM</span><div class="nf-bar-track"><div class="nf-bar-fill" style="width:87%"></div></div><span class="nf-bar-val">7 citations</span></div>
+            <div class="nf-bar-row"><span class="nf-bar-label">mTOR / HR+ BC</span><div class="nf-bar-track"><div class="nf-bar-fill" style="width:100%"></div></div><span class="nf-bar-val">12 citations</span></div>
+            <div class="nf-bar-row"><span class="nf-bar-label">IL-6 / NASH</span><div class="nf-bar-track"><div class="nf-bar-fill" style="width:25%"></div></div><span class="nf-bar-val">3 citations</span></div>
+            <div class="nf-bar-row"><span class="nf-bar-label">PD-L1 / NSCLC</span><div class="nf-bar-track"><div class="nf-bar-fill" style="width:50%"></div></div><span class="nf-bar-val">4 citations ← threshold</span></div>
+            <div class="nf-bar-row"><span class="nf-bar-label">PCSK9 / FH</span><div class="nf-bar-track"><div class="nf-bar-fill" style="width:10%"></div></div><span class="nf-bar-val">1 citation</span></div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:10px">Next milestone: NF-index 5 requires one more finding with ≥5 citations. You need <span style="color:var(--amber)">1 more citation</span> on your PCSK9 submission.</div>
+        </div>
+      </div>
+
+      <!-- Stats grid -->
+      <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px">
+        <div class="metric-card accent">
+          <div class="metric-label">NF-index</div>
+          <div class="metric-val">4</div>
+          <div class="metric-sub">transparency impact score</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Submissions</div>
+          <div class="metric-val">5</div>
+          <div class="metric-sub">negative findings shared</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total citations</div>
+          <div class="metric-val">27</div>
+          <div class="metric-sub">across all submissions</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Graph nodes</div>
+          <div class="metric-val" style="color:var(--teal)">48</div>
+          <div class="metric-sub">created from your data</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Contradictions found</div>
+          <div class="metric-val" style="color:var(--red)">2</div>
+          <div class="metric-sub">flagged by your submissions</div>
+        </div>
+      </div>
+
+      <!-- Contributions table -->
+      <div class="panel" style="margin-bottom:18px">
+        <div class="panel-head">
+          <span class="panel-title">My contributions</span>
+          <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono)">5 submissions · 27 total citations</span>
+        </div>
+        <div class="panel-body" style="padding:0">
+          <table class="contributions-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Phase</th>
+                <th>DOI</th>
+                <th>Citations</th>
+                <th>NF contribution</th>
+                <th>Submitted</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>VEGF-A inhibition in treatment-resistant glioblastoma</td>
+                <td><span class="trial-type type-null">Null</span></td>
+                <td style="color:var(--text3)">III</td>
+                <td><span class="doi-link">10.5281/fg.4821944</span></td>
+                <td style="color:var(--accent)">7</td>
+                <td><span style="color:var(--accent);font-size:11px">✓ Counts (≥4)</span></td>
+                <td>Mar 2025</td>
+              </tr>
+              <tr>
+                <td>mTOR inhibition in HR+ breast cancer — adjuvant</td>
+                <td><span class="trial-type type-null">Null</span></td>
+                <td style="color:var(--text3)">III</td>
+                <td><span class="doi-link">10.5281/fg.4788992</span></td>
+                <td style="color:var(--accent)">12</td>
+                <td><span style="color:var(--accent);font-size:11px">✓ Counts (≥4)</span></td>
+                <td>Nov 2024</td>
+              </tr>
+              <tr>
+                <td>PD-L1 blockade in advanced NSCLC — 2nd line</td>
+                <td><span class="trial-type type-null">Null</span></td>
+                <td style="color:var(--text3)">II/III</td>
+                <td><span class="doi-link">10.5281/fg.4677881</span></td>
+                <td style="color:var(--accent)">4</td>
+                <td><span style="color:var(--accent);font-size:11px">✓ Counts (=4)</span></td>
+                <td>Sep 2024</td>
+              </tr>
+              <tr>
+                <td>IL-6 receptor blockade in NASH — Phase II</td>
+                <td><span class="trial-type type-inconclusive">Inconclusive</span></td>
+                <td style="color:var(--text3)">II</td>
+                <td><span class="doi-link">10.5281/fg.5003141</span></td>
+                <td style="color:var(--amber)">3</td>
+                <td><span style="color:var(--text3);font-size:11px">✗ Below threshold</span></td>
+                <td>Jan 2025</td>
+              </tr>
+              <tr>
+                <td>PCSK9 inhibition in familial hypercholesterolaemia subgroup</td>
+                <td><span class="trial-type type-inconclusive">Inconclusive</span></td>
+                <td style="color:var(--text3)">II</td>
+                <td><span class="doi-link">10.5281/fg.5119204</span></td>
+                <td style="color:var(--text3)">1</td>
+                <td><span style="color:var(--amber);font-size:11px">→ Need 4 more</span></td>
+                <td>Feb 2025</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Activity & impact panels -->
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">Recent citation activity</span></div>
+          <div class="panel-body">
+            <div class="trial-row">
+              <span class="trial-name" style="font-size:12px">Zhang et al. cited your VEGF-A/GBM finding as prior failed comparator</span>
+              <span class="trial-meta">2 days ago</span>
+            </div>
+            <div class="trial-row">
+              <span class="trial-name" style="font-size:12px">BEACON-3 trial submission references your mTOR null result</span>
+              <span class="trial-meta">1 week ago</span>
+            </div>
+            <div class="trial-row">
+              <span class="trial-name" style="font-size:12px">Contradiction flagged: your PD-L1 result vs Kim et al. 2023 positive</span>
+              <span class="trial-meta" style="color:var(--red)">2 weeks ago</span>
+            </div>
+            <div class="trial-row">
+              <span class="trial-name" style="font-size:12px">mTOR/HR+ submission added to Oncology failure cluster — 12 nodes</span>
+              <span class="trial-meta">3 weeks ago</span>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">NF-index trajectory</span></div>
+          <div class="panel-body">
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.08em">Score over time</div>
+            <div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:8px">
+              <div style="flex:1;background:var(--accent-dim);border-radius:3px 3px 0 0;height:20%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:9px;color:var(--text3);padding-bottom:4px">1</span></div>
+              <div style="flex:1;background:var(--accent-dim);border-radius:3px 3px 0 0;height:20%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:9px;color:var(--text3);padding-bottom:4px">1</span></div>
+              <div style="flex:1;background:var(--accent-dim);border-radius:3px 3px 0 0;height:50%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:9px;color:var(--text3);padding-bottom:4px">2</span></div>
+              <div style="flex:1;background:var(--accent-dim);border-radius:3px 3px 0 0;height:75%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:9px;color:var(--text3);padding-bottom:4px">3</span></div>
+              <div style="flex:1;background:var(--accent);border-radius:3px 3px 0 0;height:100%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:9px;color:#ffffff;padding-bottom:4px;font-weight:600">4</span></div>
+            </div>
+            <div style="display:flex;gap:6px;font-size:10px;color:var(--text3)">
+              <div style="flex:1;text-align:center">Nov 24</div>
+              <div style="flex:1;text-align:center">Dec 24</div>
+              <div style="flex:1;text-align:center">Jan 25</div>
+              <div style="flex:1;text-align:center">Feb 25</div>
+              <div style="flex:1;text-align:center">Mar 25</div>
+            </div>
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">
+              <span style="color:var(--accent)">Top 8%</span> of FailUp researchers by NF-index. Field average: 1.2
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-title" id="toast-title">Success</div>
+  <div id="toast-body">Your finding has been submitted.</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
+    <div class="modal-title" id="modal-title">Study detail</div>
+    <div class="modal-sub" id="modal-sub"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ── NAVIGATION ──
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const titles = { welcome:'Welcome to FailUp', dashboard:'Dashboard', graph:'Failure Graph', upload:'Submit Finding', search:'Search', profile:'My Profile' };
+  document.getElementById('topbar-title').textContent = titles[page] || page;
+  const navItems = document.querySelectorAll('.nav-item');
+  const idx = { welcome:0, dashboard:1, graph:2, upload:3, search:4, profile:5 };
+  if (idx[page] !== undefined) navItems[idx[page]].classList.add('active');
+  if (page === 'graph') setTimeout(drawGraph, 100);
+  if (page === 'search') renderResults('');
+}
+
+// ── GRAPH ──
+const nodes = [
+  {x:320,y:200,r:20,color:'#9b72cf',label:'PD-1/PD-L1',type:'hub'},
+  {x:190,y:130,r:12,color:'#60a5fa',label:'NSCLC',type:'null'},
+  {x:420,y:110,r:11,color:'#60a5fa',label:'Pancreatic',type:'null'},
+  {x:160,y:260,r:10,color:'#f472b6',label:'Melanoma',type:'opposite'},
+  {x:460,y:270,r:11,color:'#60a5fa',label:'Bladder',type:'null'},
+  {x:340,y:310,r:9, color:'#34d399',label:'Conflict',type:'contra'},
+  {x:540,y:180,r:13,color:'#fb923c',label:'Tau/AD',type:'hub'},
+  {x:610,y:110,r:9, color:'#60a5fa',label:'Phase III',type:'null'},
+  {x:600,y:260,r:8, color:'#fbbf24',label:'Biomarker',type:'inconclusive'},
+  {x:80, y:180,r:12,color:'#fb923c',label:'NASH/IL-6',type:'hub'},
+  {x:55, y:290,r:9, color:'#60a5fa',label:'Phase II',type:'null'},
+  {x:140,y:330,r:8, color:'#fbbf24',label:'Dosing',type:'inconclusive'},
+  {x:300,y:380,r:10,color:'#60a5fa',label:'VEGF-A',type:'null'},
+  {x:200,y:400,r:8, color:'#f472b6',label:'GBM',type:'opposite'},
+  {x:400,y:390,r:9, color:'#fbbf24',label:'HER2+',type:'inconclusive'},
+  {x:500,y:340,r:8, color:'#60a5fa',label:'mTOR',type:'null'},
+  {x:240,y:60, r:8, color:'#a78bfa',label:'Gut/T2D',type:'null'},
+  {x:420,y:50, r:9, color:'#fbbf24',label:'PCSK9',type:'inconclusive'},
+];
+const edges = [
+  [0,1],[0,2],[0,3],[0,4],[0,5],[6,7],[6,8],[9,10],[9,11],[0,12],[12,13],[12,14],[15,4],[16,1],[17,6]
+];
+
+function drawGraph() {
+  const canvas = document.getElementById('graph-canvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = 440;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  ctx.clearRect(0,0,W,H);
+
+  // scale nodes to canvas
+  const scaleX = W / 680;
+  const scaleY = H / 460;
+
+  // edges
+  edges.forEach(([a,b]) => {
+    const na = nodes[a], nb = nodes[b];
+    ctx.beginPath();
+    ctx.moveTo(na.x * scaleX, na.y * scaleY);
+    ctx.lineTo(nb.x * scaleX, nb.y * scaleY);
+    ctx.strokeStyle = 'rgba(100,90,75,0.12)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // nodes
+  nodes.forEach(n => {
+    const x = n.x * scaleX, y = n.y * scaleY;
+    // glow
+    if (n.type === 'hub' || n.type === 'contra') {
+      ctx.beginPath();
+      ctx.arc(x, y, n.r + 8, 0, Math.PI * 2);
+      ctx.fillStyle = n.color + '18';
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(x, y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = n.color + '28';
+    ctx.fill();
+    ctx.strokeStyle = n.color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.font = `10px 'DM Mono', monospace`;
+    ctx.fillStyle = n.color;
+    ctx.textAlign = 'center';
+    ctx.fillText(n.label, x, y + n.r + 13);
+  });
+}
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('page-graph').classList.contains('active')) drawGraph();
+});
+
+// ── STEP NAVIGATION ──
+let currentStep = 1;
+let documentsUploaded = false;
+
+function goStep(n) {
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.step').forEach((s,i) => {
+    s.classList.remove('active','done');
+    if (i+1 === n) s.classList.add('active');
+    else if (i+1 < n) s.classList.add('done');
+  });
+  const el = document.getElementById('form-step-' + n);
+  if (el) el.classList.add('active');
+  currentStep = n;
+  // When entering Step 3, show appropriate banner
+  if (n === 3) {
+    document.getElementById('methods-banner-uploaded').style.display = documentsUploaded ? 'block' : 'none';
+    document.getElementById('methods-banner-manual').style.display = documentsUploaded ? 'none' : 'block';
+  }
+  // Update preview panel disclaimer based on upload state
+  updatePreviewDisclaimer();
+  document.getElementById('page-upload').scrollTo({top:0,behavior:'smooth'});
+}
+
+function skipUpload() {
+  documentsUploaded = false;
+  goStep(3);
+}
+
+function updatePreviewDisclaimer() {
+  const el = document.getElementById('preview-disclaimer');
+  if (!el) return;
+  if (documentsUploaded) {
+    el.innerHTML = '<strong style="color:var(--text)">📋 Template preview — documents uploaded.</strong> Fields are pre-populated from your documents. The final AI summary runs after submission and will incorporate everything you\'ve provided.';
+  } else {
+    el.innerHTML = '<strong style="color:var(--text)">📋 Template preview — manual entry mode.</strong> The structure below reflects what your final summary will look like based on what you\'ve typed so far. The real AI-generated summary runs after you submit.';
+  }
+}
+
+// ── DROP ZONES ──
+function dzDrag(e, el) { e.preventDefault(); el.classList.add('drag-over'); }
+function dzLeave(el) { el.classList.remove('drag-over'); }
+function dzDrop(e, el, dzId, listId) {
+  e.preventDefault(); el.classList.remove('drag-over');
+  addFiles(e.dataTransfer.files, listId);
+}
+function fileChosen(input, dzId, listId) { addFiles(input.files, listId); }
+function addFiles(files, listId) {
+  const list = document.getElementById(listId);
+  Array.from(files).forEach(f => {
+    const chip = document.createElement('div');
+    chip.className = 'file-chip';
+    chip.innerHTML = `<span>${f.name}</span><span class="file-chip-remove" onclick="this.parentElement.remove()">✕</span>`;
+    list.appendChild(chip);
+  });
+}
+
+// ── AUTOFILL FROM DOCUMENT ──
+const autofillData = {
+  title: 'VEGF-A inhibition plus standard of care vs placebo in treatment-resistant glioblastoma: a Phase III RCT',
+  nct: 'NCT04821944',
+  n: '340',
+  nplan: '400 (80% power, α=0.05)',
+  intervention: 'Bevacizumab 10mg/kg IV q2w + temozolomide 150mg/m² vs temozolomide + placebo. 12-month treatment period.',
+  population: 'Adults with recurrent GBM, ECOG PS 0–2, bevacizumab-naive, measurable disease per RANO criteria. 18 sites across USA and Europe.',
+  dropout: '14% overall (9% intervention, 19% placebo)',
+  female: '46%',
+  age: '58 years',
+  outcome: 'Overall survival at 24 months',
+  pval: 'p = 0.43',
+  es: 'HR 1.02 (95% CI 0.88–1.18)',
+  limits: 'Underpowered — 340 enrolled vs 400 required. Dropout disproportionate in placebo arm. Heterogeneous tumour grade. Blood–brain barrier penetration not assessed.',
+};
+
+const afSteps = [
+  { pct: 15, text: 'Parsing document structure…' },
+  { pct: 32, text: 'Extracting study metadata…' },
+  { pct: 52, text: 'Identifying trial design & population…' },
+  { pct: 71, text: 'Extracting statistical results…' },
+  { pct: 88, text: 'Cross-referencing ClinicalTrials.gov…' },
+  { pct: 100, text: 'Complete — review highlighted fields' },
+];
+
+function afDrop(e) {
+  e.preventDefault();
+  document.getElementById('af-dz').classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) runAutofill(e.dataTransfer.files[0]);
+}
+function afFileChosen(input) {
+  if (input.files[0]) runAutofill(input.files[0]);
+}
+function runAutofill(file) {
+  const statusDiv = document.getElementById('af-status');
+  const bar = document.getElementById('af-bar');
+  const statusText = document.getElementById('af-status-text');
+  document.getElementById('af-dz-text').textContent = '📄 ' + file.name;
+  statusDiv.style.display = 'block';
+  bar.style.width = '0%';
+  let step = 0;
+  function next() {
+    if (step >= afSteps.length) { applyAutofill(); return; }
+    bar.style.width = afSteps[step].pct + '%';
+    statusText.textContent = afSteps[step].text;
+    step++;
+    setTimeout(next, step === afSteps.length ? 500 : 400);
+  }
+  next();
+}
+function applyAutofill() {
+  const map = {
+    'f-title': autofillData.title, 'f-nct': autofillData.nct,
+    'f-n': autofillData.n, 'f-nplan': autofillData.nplan,
+    'f-intervention': autofillData.intervention, 'f-population': autofillData.population,
+    'f-dropout': autofillData.dropout, 'f-female': autofillData.female,
+    'f-age': autofillData.age, 'f-outcome': autofillData.outcome,
+    'f-pval': autofillData.pval, 'f-es': autofillData.es, 'f-limits': autofillData.limits,
+  };
+  Object.keys(map).forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = map[id];
+      el.classList.add('autofilled');
+      el.dispatchEvent(new Event('input'));
+    }, i * 70);
+  });
+  setTimeout(() => {
+    const areaEl = document.getElementById('f-area');
+    if (areaEl) { areaEl.value = 'Oncology'; areaEl.classList.add('autofilled'); areaEl.dispatchEvent(new Event('change')); }
+    document.getElementById('af-status').style.display = 'none';
+    const doneEl = document.getElementById('af-done');
+    if (doneEl) doneEl.style.display = 'flex';
+    documentsUploaded = true;
+    updatePreviewDisclaimer();
+    updatePreview();
+  }, Object.keys(map).length * 70 + 200);
+}
+
+let selectedResult = null;
+function selectResult(type, el) {
+  document.querySelectorAll('.result-opt').forEach(o => { o.className = 'result-opt'; });
+  el.classList.add('selected-' + type);
+  selectedResult = type;
+  updatePreview();
+}
+
+function updatePreview() {
+  const title = document.getElementById('f-title')?.value || '';
+  const outcome = document.getElementById('f-outcome')?.value || '';
+  const pval = document.getElementById('f-pval')?.value || '';
+  const es = document.getElementById('f-es')?.value || '';
+  const limits = document.getElementById('f-limits')?.value || '';
+  const area = document.getElementById('f-area')?.value || '';
+
+  const bg = document.getElementById('prev-background');
+  const fi = document.getElementById('prev-findings');
+  const fa = document.getElementById('prev-failure');
+  const co = document.getElementById('prev-contradiction');
+  const tg = document.getElementById('prev-tags');
+
+  if (title) {
+    bg.innerHTML = `This ${selectedResult || ''} result study investigated <em>${title}</em>. ${outcome ? 'The pre-specified primary outcome was: ' + outcome + '.' : ''}`;
+  } else {
+    bg.innerHTML = '<span class="summary-placeholder">Fill in study details to generate a live preview…</span>';
+  }
+
+  if (selectedResult && (pval || es)) {
+    const typeMap = { null: 'No statistically significant effect was observed', inconclusive: 'Results were inconclusive due to insufficient statistical power', opposite: 'An effect contrary to the original hypothesis was detected' };
+    fi.innerHTML = `${typeMap[selectedResult]}. ${pval ? 'Primary outcome: ' + pval + '.' : ''} ${es ? 'Effect estimate: ' + es + '.' : ''} ${limits ? '<br/>Key limitations: ' + limits : ''}`;
+  } else if (selectedResult) {
+    fi.innerHTML = `Result classified as <em>${selectedResult}</em>. Add statistics in Step 3 to complete.`;
+  } else {
+    fi.innerHTML = '<span class="summary-placeholder">Select a result type in Step 3 to populate findings.</span>';
+  }
+
+  if (title && area) {
+    fa.innerHTML = `AI will classify this as a <em>${area.toLowerCase()}</em> study and tag by molecular target, failure mode, and population subgroup, linking it to related graph nodes.`;
+  } else {
+    fa.innerHTML = '<span class="summary-placeholder">FailUp will auto-tag by mechanism, target, and population.</span>';
+  }
+
+  if (title && selectedResult === 'opposite') {
+    co.innerHTML = `<span style="color:var(--red)">⚠ Potential contradiction detected.</span> Prior positive results likely exist in this area. Full cross-reference will run on submission.`;
+  } else if (title) {
+    co.innerHTML = `Preliminary scan: no obvious contradictions. Full PubMed cross-reference runs on submission.`;
+  } else {
+    co.innerHTML = '<span class="summary-placeholder">AI will scan for conflicting prior positive results.</span>';
+  }
+
+  if (tg) {
+    if (title && area) {
+      tg.innerHTML = `MeSH: <em>${area}</em> · Target: auto-detected · Population: from inclusion criteria · Failure mode: from Step 3 · Graph cluster: auto-assigned`;
+    } else {
+      tg.innerHTML = '<span class="summary-placeholder">MeSH terms, ontology IDs, and graph links will appear here.</span>';
+    }
+  }
+}
+
+function submitForm() {
+  showToast('Finding submitted', 'DOI assigned: 10.5281/fu.' + Math.floor(Math.random()*9000000+1000000) + ' · NF-index updated · Transparency badge added.');
+  setTimeout(() => { goStep(1); navigate('dashboard'); }, 2400);
+}
+
+// ── SEARCH ──
+const allResults = [
+  { title: 'VEGF-A inhibition in treatment-resistant glioblastoma', type: 'null', body: 'Phase III RCT (n=340). Primary endpoint of overall survival at 24 months not met (p=0.43, HR 1.02). Hypothesized anti-angiogenic effect did not translate across blood–brain barrier in this population.', meta: 'NCT04821944 · Oncology · 2025', contradiction: false },
+  { title: 'β-glucan supplementation in post-COVID fatigue syndrome', type: 'opposite', body: 'Randomized crossover (n=120). Contrary to hypothesis, β-glucan arm showed 12% worsening of fatigue scores at 12 weeks (p=0.03). Possible immune overstimulation mechanism proposed.', meta: 'NCT05192847 · Immunology · 2025', contradiction: true },
+  { title: 'Ketamine micro-dosing in treatment-resistant bipolar depression', type: 'inconclusive', body: 'Underpowered Phase II (n=62 vs required n=180). MADRS score improvement trend observed but CI crosses null (p=0.11). Dropout rate 22%. Inconclusive — larger trial warranted.', meta: 'NCT04903028 · Psychiatry · 2024', contradiction: false },
+  { title: 'IL-6 receptor blockade in non-alcoholic steatohepatitis', type: 'null', body: 'Phase II (n=210). No significant reduction in liver fibrosis at 48 weeks (p=0.38). Histological endpoints unchanged. Suggests IL-6 pathway not rate-limiting in NASH progression.', meta: 'NCT05003141 · Hepatology · 2024', contradiction: false },
+  { title: 'mTOR pathway inhibition in HR+ breast cancer — adjuvant setting', type: 'null', body: 'Phase III (n=1,240). Disease-free survival HR 0.97 (95% CI 0.84–1.12, p=0.71). Everolimus did not improve outcomes in unselected HR+ adjuvant population.', meta: 'NCT04788992 · Oncology · 2024', contradiction: true },
+  { title: 'Tau-targeting immunotherapy in early Alzheimer\'s disease', type: 'inconclusive', body: 'Phase II (n=280). CSF tau levels reduced 18% (p=0.04) but cognitive endpoints (ADAS-Cog) showed no improvement. Biomarker-clinical dissociation. Target engagement confirmed; cognitive benefit unclear.', meta: 'NCT04677114 · Neurology · 2024', contradiction: false },
+];
+
+function renderResults(query) {
+  const list = document.getElementById('results-list');
+  const q = query.toLowerCase();
+  const filtered = q ? allResults.filter(r => r.title.toLowerCase().includes(q) || r.body.toLowerCase().includes(q) || r.meta.toLowerCase().includes(q)) : allResults;
+  list.innerHTML = filtered.map(r => `
+    <div class="result-card" onclick="openModal('search')">
+      <div class="result-card-head">
+        <span class="trial-type type-${r.type}">${r.type}</span>
+        <div class="result-card-title">${r.title}</div>
+        ${r.contradiction ? '<span class="contradiction-badge">⚠ Contradiction</span>' : ''}
+      </div>
+      <div class="result-card-body">${r.body}</div>
+      <div class="result-card-footer">
+        <span class="result-card-meta">${r.meta}</span>
+        <span class="result-card-meta" style="color:var(--accent);margin-left:auto">View in graph →</span>
+      </div>
+    </div>`).join('');
+}
+
+function filterResults(val) { renderResults(val); }
+
+// ── MODAL ──
+const modalData = {
+  trial1: {
+    title: 'VEGF-A inhibition in treatment-resistant glioblastoma',
+    sub: 'NCT04821944 · Phase III · Null result',
+    body: `
+      <div class="modal-section"><div class="modal-section-label">Background</div>VEGF-A driven angiogenesis was hypothesized to sustain tumor vasculature in recurrent GBM. This Phase III trial investigated bevacizumab plus standard of care vs placebo.</div>
+      <div class="modal-section"><div class="modal-section-label">Primary outcome</div>Overall survival at 24 months. Not met: HR 1.02 (95% CI 0.88–1.18), p=0.43.</div>
+      <div class="modal-section"><div class="modal-section-label">Failure mode (AI-classified)</div>Target validity — anti-angiogenic effect did not translate across the blood–brain barrier. Population heterogeneity also implicated.</div>
+      <div class="modal-section"><div class="modal-section-label">Contradiction check</div><span style="color:var(--accent)">✓ No contradictions detected.</span> Consistent with two prior Phase II null results in this population.</div>
+      <div class="modal-section"><div class="modal-section-label">DOI</div><span style="color:var(--accent);font-family:var(--font-mono);font-size:12px">10.5281/fg.4821944</span></div>`
+  },
+  trial2: {
+    title: 'β-glucan supplementation in post-COVID fatigue syndrome',
+    sub: 'NCT05192847 · RCT · Opposite effect',
+    body: `
+      <div class="modal-section"><div class="modal-section-label">Background</div>β-glucan was hypothesized to reduce fatigue via immunomodulation in post-COVID syndrome. Crossover design, n=120.</div>
+      <div class="modal-section"><div class="modal-section-label">Primary outcome</div>Fatigue severity score at 12 weeks. <span style="color:var(--red)">Opposite effect observed:</span> 12% worsening in β-glucan arm (p=0.03).</div>
+      <div class="modal-section"><div class="modal-section-label">Failure mode (AI-classified)</div>Immune overstimulation. Proposed mechanism: β-glucan exacerbates neuroinflammatory component of post-COVID fatigue.</div>
+      <div class="modal-section"><div class="modal-section-label">Contradiction check</div><span style="color:var(--red)">⚠ Contradiction flagged.</span> Three prior observational studies reported benefit in healthy populations. AI flagged for editorial review.</div>
+      <div class="modal-section"><div class="modal-section-label">DOI</div><span style="color:var(--accent);font-family:var(--font-mono);font-size:12px">10.5281/fg.5192847</span></div>`
+  },
+  trial3: {
+    title: 'Ketamine micro-dosing in treatment-resistant bipolar depression',
+    sub: 'NCT04903028 · Phase II · Inconclusive',
+    body: `
+      <div class="modal-section"><div class="modal-section-label">Background</div>Micro-dose ketamine (0.1mg/kg) was trialed as a mood stabilizer adjunct in bipolar I/II with treatment-resistant depression.</div>
+      <div class="modal-section"><div class="modal-section-label">Primary outcome</div>MADRS improvement at 6 weeks. Trend observed (−4.2 points) but CI crosses null (p=0.11). Study was underpowered (n=62 vs required n=180).</div>
+      <div class="modal-section"><div class="modal-section-label">Failure mode (AI-classified)</div>Insufficient power — not a true null. Signal warrants adequately powered replication. Dropout rate (22%) also reduces confidence.</div>
+      <div class="modal-section"><div class="modal-section-label">Contradiction check</div><span style="color:var(--accent)">✓ No contradictions detected.</span> Consistent with mixed ketamine literature in this subpopulation.</div>
+      <div class="modal-section"><div class="modal-section-label">DOI</div><span style="color:var(--accent);font-family:var(--font-mono);font-size:12px">10.5281/fg.4903028</span></div>`
+  },
+  search: {
+    title: 'Study detail',
+    sub: 'FailUp repository entry',
+    body: `<div class="modal-section"><div class="modal-section-label">Full detail</div>Click any result card on the dashboard for a specific study modal. Search results link directly to the failure graph node.</div>`
+  }
+};
+
+function openModal(id) {
+  const d = modalData[id] || modalData.trial1;
+  document.getElementById('modal-title').textContent = d.title;
+  document.getElementById('modal-sub').textContent = d.sub;
+  document.getElementById('modal-body').innerHTML = d.body;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(e) { if (e.target === document.getElementById('modal')) document.getElementById('modal').classList.remove('open'); }
+
+// ── TOAST ──
+function showToast(title, body) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-body').textContent = body;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
+
+// ── CHIPS ──
+function toggleChip(el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  drawGraph();
+}
+
+// Init
+renderResults('');
+</script>
+</body>
+</html>
