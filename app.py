@@ -1,3 +1,4 @@
+import json
 import streamlit as st
 import streamlit.components.v1 as components
 from modules.claude_api import summarize_study
@@ -33,7 +34,7 @@ with st.form("study_summary_form"):
 if submitted:
     try:
         with st.spinner("Generating summary..."):
-            summary = summarize_study(
+            summary_raw = summarize_study(
                 title=title,
                 study_type=study_type,
                 result_type=result_type,
@@ -44,8 +45,28 @@ if submitted:
                 limitations=limitations,
             )
 
+        summary = json.loads(summary_raw)
+
         st.success("Summary generated.")
-        st.write(summary)
+
+        st.markdown("### Background")
+        st.write(summary.get("background", ""))
+
+        st.markdown("### Findings")
+        st.write(summary.get("findings", ""))
+
+        st.markdown("### Main limitation")
+        st.write(summary.get("main_limitation", ""))
+
+        st.markdown("### Failure mode")
+        st.write(summary.get("failure_mode", ""))
+
+        st.markdown("### Contradiction check")
+        st.write(summary.get("contradiction_check", ""))
+
+        st.markdown("### Graph tags")
+        graph_tags = summary.get("graph_tags", {})
+        st.json(graph_tags)
 
     except Exception as e:
         st.error("Summary generation failed.")
