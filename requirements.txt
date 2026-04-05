@@ -6,3 +6,4 @@ networkx
 python-dotenv
 requests
 pandas
+flask
