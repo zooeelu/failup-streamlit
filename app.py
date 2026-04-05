@@ -184,7 +184,6 @@ NEGATIVE_TITLE_HINTS = [
     "primary end point was not met",
     "primary endpoint was not met",
     "limited benefit",
-    "ineffective",
     "did not prolong",
     "did not improve survival",
     "not superior"
@@ -369,7 +368,7 @@ def curate_failure_with_claude(
         max_tokens=400,
         system=(
             "You are a scientific screening assistant for FailUp. "
-            "Your task is to decide whether a record is a genuine failure-related study record suitable for the FailUp graph. "
+            "Your task is to decide whether a record is a genuine failure-related study record suitable for the FailUp repository. "
             "Return only valid raw JSON. No markdown. No extra words. "
             "Be conservative. If the evidence is weak, choose uncertain."
         ),
@@ -450,7 +449,7 @@ Extra context: {short_context}
 
 
 # ---------------------------
-# Graph helpers
+# Graph helpers (kept for backend compatibility)
 # ---------------------------
 
 def normalize_result_type(value):
@@ -504,7 +503,7 @@ def record_to_study_node(record):
 def collect_graph_records(submissions, imported_trials=None, pubmed_articles=None):
     all_records = []
 
-    # Manual submissions always go into graph
+    # Manual submissions always eligible
     for sub in submissions or []:
         all_records.append({
             "id": f"manual-{sub.get('id')}",
@@ -518,7 +517,6 @@ def collect_graph_records(submissions, imported_trials=None, pubmed_articles=Non
             "source_label": SOURCE_LABELS["manual"]
         })
 
-    # CT.gov only if curated_failure
     for trial in imported_trials or []:
         if not is_graph_eligible_imported(trial):
             continue
@@ -538,7 +536,6 @@ def collect_graph_records(submissions, imported_trials=None, pubmed_articles=Non
             "source_label": SOURCE_LABELS["ctgov_curated"]
         })
 
-    # PubMed only if curated_failure
     for article in pubmed_articles or []:
         if not is_graph_eligible_imported(article):
             continue
@@ -657,10 +654,7 @@ def build_overview_graph(study_nodes):
         for (source_id, target_id), weight in edge_weights.items()
     ]
 
-    return {
-        "nodes": overview_nodes,
-        "edges": overview_edges
-    }
+    return {"nodes": overview_nodes, "edges": overview_edges}
 
 
 def build_graph_data(submissions, imported_trials=None, pubmed_articles=None):
