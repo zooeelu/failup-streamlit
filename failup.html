@@ -499,12 +499,15 @@
     padding: 28px;
     width: 520px;
     max-width: 90vw;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
     transform: scale(0.97); transition: transform 0.2s;
   }
   .modal-overlay.open .modal { transform: scale(1); }
   .modal-title { font-family: var(--font-serif); font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
   .modal-sub { font-size: 12px; color: var(--text2); margin-bottom: 20px; font-family: var(--font-mono); }
-  .modal-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .modal-body { font-size: 13px; color: var(--text2); line-height: 1.7; overflow-y: auto; padding-right: 6px; }
   .modal-section { margin-bottom: 14px; }
   .modal-section-label { font-family: var(--font-mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
   .modal-close { float: right; background: var(--surface2); border: 1px solid var(--border); color: var(--text3); font-size: 14px; cursor: pointer; width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
@@ -1080,30 +1083,8 @@
               <div class="field-row">
                 <div class="field"><label>Primary p-value</label><input type="text" id="f-pval" placeholder="e.g. p = 0.43" oninput="updatePreview()"/></div>
                 <div class="field">
-                  <label>Effect estimate type</label>
-                  <select id="f-es-type" onchange="toggleEsOther()">
-                    <option value="">— select type —</option>
-                    <option value="HR">Hazard Ratio (HR)</option>
-                    <option value="OR">Odds Ratio (OR)</option>
-                    <option value="RR">Risk Ratio / Relative Risk (RR)</option>
-                    <option value="RD">Risk Difference / Absolute Risk Reduction</option>
-                    <option value="MD">Mean Difference (MD)</option>
-                    <option value="SMD">Standardised Mean Difference (SMD)</option>
-                    <option value="β">Regression Coefficient (β)</option>
-                    <option value="IRR">Incidence Rate Ratio (IRR)</option>
-                    <option value="NNT">Number Needed to Treat (NNT)</option>
-                    <option value="other">Other — specify below</option>
-                  </select>
-                </div>
-              </div>
-              <div class="field-row">
-                <div class="field" id="f-es-other-wrap" style="display:none">
-                  <label>Specify estimate type</label>
-                  <input type="text" id="f-es-other" placeholder="e.g. Area Under Curve, Cohen's d…"/>
-                </div>
-                <div class="field">
-                  <label>Effect estimate value &amp; 95% CI</label>
-                  <input type="text" id="f-es" placeholder="e.g. 1.02 (95% CI 0.88–1.18)" oninput="updatePreview()"/>
+                  <label>Effect estimate</label>
+                  <input type="text" id="f-es" placeholder="e.g. HR 1.02 (95% CI 0.88–1.18)" oninput="updatePreview()"/>
                 </div>
               </div>
               <div class="field">
@@ -1941,14 +1922,6 @@ function applyAutofill(fields, fileNames) {
   setSelectIfOptionExists('f-phase', fields.phase || '');
   setSelectIfOptionExists('f-design', fields.design || '');
   setSelectIfOptionExists('f-area', fields.area || fields.therapeutic_area || '');
-  setSelectIfOptionExists('f-es-type', fields.effect_estimate_type || '');
-
-  if ((fields.effect_estimate_type || '') === 'other') {
-    toggleEsOther();
-    setFieldValue('f-es-other', fields.effect_estimate_other || '');
-  } else {
-    toggleEsOther();
-  }
 
   applySelectedResult((fields.result_type || '').toLowerCase());
 
@@ -2046,10 +2019,6 @@ function resetForm() {
   updatePreview();
 }
 
-function toggleEsOther() {
-  const val = document.getElementById('f-es-type').value;
-  document.getElementById('f-es-other-wrap').style.display = val === 'other' ? 'block' : 'none';
-}
 
 function computeNFIndex(citationCounts) {
   const sorted = [...citationCounts].sort((a, b) => b - a);
@@ -2201,12 +2170,7 @@ async function submitForm() {
   const population = document.getElementById('f-population')?.value || '';
   const primary_outcome = document.getElementById('f-outcome')?.value || '';
   const p_value = document.getElementById('f-pval')?.value || '';
-  const esType = document.getElementById('f-es-type')?.value || '';
-  const esOther = document.getElementById('f-es-other')?.value || '';
-  const esValue = document.getElementById('f-es')?.value || '';
-  const effect_estimate = esType === 'other'
-    ? `${esOther}: ${esValue}`
-    : esType ? `${esType}: ${esValue}` : esValue;
+  const effect_estimate = document.getElementById('f-es')?.value || '';
   const limitations = document.getElementById('f-limits')?.value || '';
 
   if (!title || !intervention || !population || !primary_outcome) {
