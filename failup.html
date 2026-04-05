@@ -1788,84 +1788,171 @@ function addFiles(files, listId) {
 }
 
 // ── AUTOFILL FROM DOCUMENT ──
-const autofillData = {
-  title: 'VEGF-A inhibition plus standard of care vs placebo in treatment-resistant glioblastoma: a Phase III RCT',
-  nct: 'NCT04821944',
-  n: '340',
-  nplan: '400 (80% power, α=0.05)',
-  intervention: 'Bevacizumab 10mg/kg IV q2w + temozolomide 150mg/m² vs temozolomide + placebo. 12-month treatment period.',
-  population: 'Adults with recurrent GBM, ECOG PS 0–2, bevacizumab-naive, measurable disease per RANO criteria. 18 sites across USA and Europe.',
-  dropout: '14% overall (9% intervention, 19% placebo)',
-  female: '46%',
-  age: '58 years',
-  outcome: 'Overall survival at 24 months',
-  pval: 'p = 0.43',
-  es: 'HR 1.02 (95% CI 0.88–1.18)',
-  limits: 'Underpowered — 340 enrolled vs 400 required. Dropout disproportionate in placebo arm. Heterogeneous tumour grade. Blood–brain barrier penetration not assessed.',
-};
-
 const afSteps = [
-  { pct: 15, text: 'Parsing document structure…' },
-  { pct: 32, text: 'Extracting study metadata…' },
-  { pct: 52, text: 'Identifying trial design & population…' },
-  { pct: 71, text: 'Extracting statistical results…' },
-  { pct: 88, text: 'Cross-referencing ClinicalTrials.gov…' },
-  { pct: 100, text: 'Complete — review highlighted fields' },
+  { pct: 12, text: 'Uploading documents…' },
+  { pct: 28, text: 'Extracting text from files…' },
+  { pct: 48, text: 'Identifying study metadata…' },
+  { pct: 68, text: 'Extracting methods and outcomes…' },
+  { pct: 86, text: 'Finalising structured fields…' },
 ];
+
+let afProgressTimer = null;
+
+function formatAutofillFileLabel(files) {
+  const names = Array.from(files || []).map(f => f.name).filter(Boolean);
+  if (!names.length) return 'Drop PDF or DOCX files here, or click to browse — multiple files accepted';
+  if (names.length === 1) return `📄 ${names[0]}`;
+  if (names.length === 2) return `📄 ${names[0]} + ${names[1]}`;
+  return `📄 ${names[0]} + ${names.length - 1} more files`;
+}
 
 function afDrop(e) {
   e.preventDefault();
   document.getElementById('af-dz').classList.remove('drag-over');
-  if (e.dataTransfer.files[0]) runAutofill(e.dataTransfer.files[0]);
+  if (e.dataTransfer.files && e.dataTransfer.files.length) runAutofill(e.dataTransfer.files);
 }
+
 function afFileChosen(input) {
-  if (input.files[0]) runAutofill(input.files[0]);
+  if (input.files && input.files.length) runAutofill(input.files);
 }
-function runAutofill(file) {
+
+function startAutofillProgress() {
   const statusDiv = document.getElementById('af-status');
   const bar = document.getElementById('af-bar');
   const statusText = document.getElementById('af-status-text');
-  document.getElementById('af-dz-text').textContent = '📄 ' + file.name;
   statusDiv.style.display = 'block';
   bar.style.width = '0%';
   let step = 0;
-  function next() {
-    if (step >= afSteps.length) { applyAutofill(); return; }
+  if (afProgressTimer) clearInterval(afProgressTimer);
+  afProgressTimer = setInterval(() => {
+    if (step >= afSteps.length) {
+      clearInterval(afProgressTimer);
+      afProgressTimer = null;
+      return;
+    }
     bar.style.width = afSteps[step].pct + '%';
     statusText.textContent = afSteps[step].text;
     step++;
-    setTimeout(next, step === afSteps.length ? 500 : 400);
-  }
-  next();
+  }, 550);
 }
-function applyAutofill() {
-  const map = {
-    'f-title': autofillData.title, 'f-nct': autofillData.nct,
-    'f-n': autofillData.n, 'f-nplan': autofillData.nplan,
-    'f-intervention': autofillData.intervention, 'f-population': autofillData.population,
-    'f-dropout': autofillData.dropout, 'f-female': autofillData.female,
-    'f-age': autofillData.age, 'f-outcome': autofillData.outcome,
-    'f-pval': autofillData.pval, 'f-es': autofillData.es, 'f-limits': autofillData.limits,
-  };
-  Object.keys(map).forEach((id, i) => {
-    setTimeout(() => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.value = map[id];
-      el.classList.add('autofilled');
-      el.dispatchEvent(new Event('input'));
-    }, i * 70);
-  });
-  setTimeout(() => {
-    const areaEl = document.getElementById('f-area');
-    if (areaEl) { areaEl.value = 'Oncology'; areaEl.classList.add('autofilled'); areaEl.dispatchEvent(new Event('change')); }
+
+function stopAutofillProgress(successText) {
+  const bar = document.getElementById('af-bar');
+  const statusText = document.getElementById('af-status-text');
+  if (afProgressTimer) {
+    clearInterval(afProgressTimer);
+    afProgressTimer = null;
+  }
+  bar.style.width = '100%';
+  statusText.textContent = successText || 'Complete — review highlighted fields';
+}
+
+function setFieldValue(id, value, eventName='input') {
+  const el = document.getElementById(id);
+  if (!el || value === undefined || value === null || value === '') return;
+  el.value = value;
+  el.classList.add('autofilled');
+  el.dispatchEvent(new Event(eventName, { bubbles: true }));
+}
+
+function setSelectIfOptionExists(id, value) {
+  const el = document.getElementById(id);
+  if (!el || !value) return;
+  const optionExists = Array.from(el.options).some(opt => opt.value === value || opt.text === value);
+  if (!optionExists) return;
+  el.value = value;
+  el.classList.add('autofilled');
+  el.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function applySelectedResult(type) {
+  if (!type) return;
+  const optionMap = { null: 0, inconclusive: 1, opposite: 2 };
+  const options = document.querySelectorAll('#result-selector .result-opt');
+  const idx = optionMap[type];
+  if (idx === undefined || !options[idx]) return;
+  selectResult(type, options[idx]);
+}
+
+async function runAutofill(fileList) {
+  const files = Array.from(fileList || []).filter(Boolean);
+  if (!files.length) return;
+
+  document.getElementById('af-dz-text').textContent = formatAutofillFileLabel(files);
+  document.getElementById('af-done').style.display = 'none';
+  startAutofillProgress();
+
+  const formData = new FormData();
+  files.forEach(file => formData.append('files', file));
+
+  try {
+    const response = await fetch('/extract-study-fields', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Unable to extract study fields from the uploaded files.');
+    }
+
+    stopAutofillProgress('Complete — review highlighted fields');
+    applyAutofill(result.fields || {}, result.file_names || files.map(f => f.name));
+  } catch (error) {
+    console.error(error);
+    if (afProgressTimer) {
+      clearInterval(afProgressTimer);
+      afProgressTimer = null;
+    }
     document.getElementById('af-status').style.display = 'none';
-    const doneEl = document.getElementById('af-done');
-    if (doneEl) doneEl.style.display = 'flex';
-    documentsUploaded = true;
+    documentsUploaded = false;
     updatePreviewDisclaimer();
-    updatePreview();
-  }, Object.keys(map).length * 70 + 200);
+    showToast('Upload autofill failed', error.message || 'Could not read those files.');
+  }
+}
+
+function applyAutofill(fields, fileNames) {
+  setFieldValue('f-title', fields.title || '');
+  setFieldValue('f-nct', fields.nct || '');
+  setFieldValue('f-n', fields.n || '');
+  setFieldValue('f-nplan', fields.nplan || '');
+  setFieldValue('f-intervention', fields.intervention || '');
+  setFieldValue('f-population', fields.population || '');
+  setFieldValue('f-dropout', fields.dropout || '');
+  setFieldValue('f-female', fields.female || '');
+  setFieldValue('f-age', fields.age || '');
+  setFieldValue('f-outcome', fields.outcome || '');
+  setFieldValue('f-pval', fields.pval || '');
+  setFieldValue('f-es', fields.effect_estimate || '');
+  setFieldValue('f-limits', fields.limitations || '');
+
+  setSelectIfOptionExists('f-type', fields.study_type || '');
+  setSelectIfOptionExists('f-phase', fields.phase || '');
+  setSelectIfOptionExists('f-design', fields.design || '');
+  setSelectIfOptionExists('f-area', fields.therapeutic_area || '');
+  setSelectIfOptionExists('f-es-type', fields.effect_estimate_type || '');
+
+  if ((fields.effect_estimate_type || '') === 'other') {
+    toggleEsOther();
+    setFieldValue('f-es-other', fields.effect_estimate_other || '');
+  } else {
+    toggleEsOther();
+  }
+
+  applySelectedResult((fields.result_type || '').toLowerCase());
+
+  document.getElementById('af-status').style.display = 'none';
+  const doneEl = document.getElementById('af-done');
+  if (doneEl) {
+    const uploadedSummary = (fileNames || []).length
+      ? `✓ ${fileNames.length} document${fileNames.length !== 1 ? 's' : ''} read — fields in Step 3 were pre-populated. Review and correct them before submitting.`
+      : '✓ Documents uploaded — fields in Step 3 were pre-populated. Review and correct them before submitting.';
+    doneEl.textContent = uploadedSummary;
+    doneEl.style.display = 'flex';
+  }
+  documentsUploaded = true;
+  updatePreviewDisclaimer();
+  updatePreview();
 }
 
 let selectedResult = null;

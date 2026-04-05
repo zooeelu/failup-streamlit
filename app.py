@@ -2,10 +2,13 @@ import os
 import json
 import re
 from datetime import datetime
+from io import BytesIO
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
+import pdfplumber
 import requests
+from docx import Document
 from flask import Flask, send_file, request, jsonify
 from anthropic import Anthropic
 from dotenv import load_dotenv
@@ -115,6 +118,210 @@ def safe_title(value, fallback="Untitled"):
 def sanitize_graph_value(value, fallback="unspecified"):
     value = (value or "").strip()
     return value if value else fallback
+
+
+# ---------------------------
+# Upload extraction helpers
+# ---------------------------
+
+ALLOWED_UPLOAD_EXTENSIONS = {".pdf", ".doc", ".docx"}
+MAX_EXTRACTED_TEXT_CHARS = 25000
+
+
+def allowed_upload_file(filename):
+    return Path(filename or "").suffix.lower() in ALLOWED_UPLOAD_EXTENSIONS
+
+
+def extract_text_from_pdf_bytes(file_bytes):
+    chunks = []
+    with pdfplumber.open(BytesIO(file_bytes)) as pdf:
+        for page in pdf.pages:
+            page_text = page.extract_text() or ""
+            if page_text.strip():
+                chunks.append(page_text.strip())
+    return "\n\n".join(chunks).strip()
+
+
+def extract_text_from_docx_bytes(file_bytes):
+    doc = Document(BytesIO(file_bytes))
+    parts = []
+
+    for paragraph in doc.paragraphs:
+        text = (paragraph.text or "").strip()
+        if text:
+            parts.append(text)
+
+    for table in doc.tables:
+        for row in table.rows:
+            row_text = " | ".join((cell.text or "").strip() for cell in row.cells if (cell.text or "").strip())
+            if row_text:
+                parts.append(row_text)
+
+    return "\n".join(parts).strip()
+
+
+def extract_text_from_uploaded_file(storage):
+    filename = storage.filename or "uploaded_file"
+    suffix = Path(filename).suffix.lower()
+    file_bytes = storage.read()
+    storage.stream.seek(0)
+
+    if suffix == ".pdf":
+        return extract_text_from_pdf_bytes(file_bytes)
+    if suffix in {".doc", ".docx"}:
+        return extract_text_from_docx_bytes(file_bytes)
+
+    raise ValueError(f"Unsupported file type: {suffix}")
+
+
+def build_uploaded_document_context(files):
+    documents = []
+
+    for storage in files:
+        filename = storage.filename or "uploaded_file"
+        if not allowed_upload_file(filename):
+            raise ValueError(f"Unsupported file type for {filename}. Please upload PDF or DOCX files.")
+
+        extracted = extract_text_from_uploaded_file(storage)
+        if extracted:
+            documents.append(
+                f"FILE: {filename}\n"
+                f"BEGIN_CONTENT\n{extracted[:MAX_EXTRACTED_TEXT_CHARS]}\nEND_CONTENT"
+            )
+
+    return "\n\n".join(documents)
+
+
+def heuristic_extract_fields(text):
+    clean_text = text or ""
+    compact_text = re.sub(r"\s+", " ", clean_text).strip()
+    lines = [line.strip() for line in clean_text.splitlines() if line.strip()]
+
+    nct_match = re.search(r"\bNCT\d{8}\b", clean_text, flags=re.IGNORECASE)
+    sample_match = re.search(r"(?:sample size|enrolled|enrollment|randomized|participants|subjects)\D{0,15}(\d{2,5})", clean_text, flags=re.IGNORECASE)
+    planned_match = re.search(r"(?:planned|target)\s+(?:sample size|enrollment|n)\D{0,15}(\d{2,5})", clean_text, flags=re.IGNORECASE)
+    pval_match = re.search(r"\bp\s*[=<>]\s*0?\.?\d+[\d]*", clean_text, flags=re.IGNORECASE)
+    hr_match = re.search(r"\b(HR|OR|RR|IRR|MD|SMD|β)\s*[:=]?\s*[^\n.;]{1,80}", clean_text, flags=re.IGNORECASE)
+
+    title = ""
+    for line in lines[:12]:
+        if len(line) >= 20 and not re.match(r"^(abstract|background|methods|results|introduction)\b", line, flags=re.IGNORECASE):
+            title = line
+            break
+
+    return {
+        "title": title,
+        "nct": nct_match.group(0).upper() if nct_match else "",
+        "study_type": "",
+        "phase": "",
+        "n": sample_match.group(1) if sample_match else "",
+        "nplan": planned_match.group(1) if planned_match else "",
+        "design": "",
+        "therapeutic_area": "",
+        "intervention": "",
+        "population": "",
+        "dropout": "",
+        "female": "",
+        "age": "",
+        "result_type": "",
+        "outcome": "",
+        "pval": pval_match.group(0) if pval_match else "",
+        "effect_estimate_type": hr_match.group(1).upper() if hr_match else "",
+        "effect_estimate_other": "",
+        "effect_estimate": hr_match.group(0) if hr_match else "",
+        "limitations": compact_text[:400] if compact_text else ""
+    }
+
+
+def extract_study_fields_with_claude(document_text, file_names):
+    fallback = heuristic_extract_fields(document_text)
+
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=1200,
+        system=(
+            "You extract structured study metadata from uploaded research documents for a submission form. "
+            "Return only valid raw JSON with the exact requested keys. "
+            "Do not invent details. If a field is not clearly supported by the documents, return an empty string. "
+            "Use concise values that can be inserted directly into HTML form fields. "
+            "When possible, map values to the form's existing choices exactly.\n"
+            "Allowed study_type values: Randomized clinical trial; Non-randomized controlled trial; Observational (cohort); Observational (case-control); Cross-sectional; Preclinical (in vivo); Preclinical (in vitro); Systematic review / meta-analysis; Basket / platform trial.\n"
+            "Allowed phase values: Phase III; Phase II/III; Phase II; Phase I/II; Phase I; Phase IV; Not applicable.\n"
+            "Allowed design values: Double-blind RCT — 1:1; Double-blind RCT — other ratio; Single-blind RCT; Open-label RCT; Non-randomized; Not applicable.\n"
+            "Allowed therapeutic_area values: Oncology; Neurology; Cardiology; Immunology; Hepatology; Psychiatry; Infectious disease; Endocrinology; Respiratory; Rare disease; Other.\n"
+            "Allowed result_type values: null; inconclusive; opposite.\n"
+            "Allowed effect_estimate_type values: HR; OR; RR; RD; MD; SMD; β; IRR; NNT; other."
+        ),
+        messages=[
+            {
+                "role": "user",
+                "content": f"""
+Return ONLY valid JSON with exactly these keys:
+title
+nct
+study_type
+phase
+n
+nplan
+design
+therapeutic_area
+intervention
+population
+dropout
+female
+age
+result_type
+outcome
+pval
+effect_estimate_type
+effect_estimate_other
+effect_estimate
+limitations
+
+Instructions:
+- Use empty strings for anything not clearly stated.
+- Keep intervention, population, outcome, and limitations concise but informative.
+- For n and nplan, return only the value as text that fits the form field.
+- For female and age, return concise display text such as "46%" or "58 years".
+- For pval, keep the original statistical notation if reported.
+- For effect_estimate, include the estimate and confidence interval if available.
+- If the estimate type is not one of the allowed values, set effect_estimate_type to "other" and fill effect_estimate_other.
+
+Uploaded files: {", ".join(file_names)}
+
+Fallback guesses from regex (use only if supported by document text):
+{json.dumps(fallback, ensure_ascii=False)}
+
+Document text:
+{document_text}
+"""
+            }
+        ]
+    )
+
+    data = safe_parse_json(response.content[0].text)
+
+    expected_keys = [
+        "title", "nct", "study_type", "phase", "n", "nplan", "design",
+        "therapeutic_area", "intervention", "population", "dropout", "female",
+        "age", "result_type", "outcome", "pval", "effect_estimate_type",
+        "effect_estimate_other", "effect_estimate", "limitations"
+    ]
+
+    normalized = {}
+    for key in expected_keys:
+        value = data.get(key, fallback.get(key, ""))
+        normalized[key] = value.strip() if isinstance(value, str) else str(value or "").strip()
+
+    if normalized["result_type"] not in {"null", "inconclusive", "opposite"}:
+        normalized["result_type"] = fallback.get("result_type", "")
+
+    allowed_effect_types = {"", "HR", "OR", "RR", "RD", "MD", "SMD", "β", "IRR", "NNT", "other"}
+    if normalized["effect_estimate_type"] not in allowed_effect_types:
+        normalized["effect_estimate_other"] = normalized["effect_estimate_type"]
+        normalized["effect_estimate_type"] = "other"
+
+    return normalized
 
 
 # ---------------------------
@@ -838,6 +1045,43 @@ def summarize():
             "doi": doi,
             "summary": summary,
             "record": record
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route("/extract-study-fields", methods=["POST"])
+def extract_study_fields():
+    files = request.files.getlist("files")
+    files = [f for f in files if f and (f.filename or "").strip()]
+
+    if not files:
+        return jsonify({
+            "success": False,
+            "error": "No files were uploaded."
+        }), 400
+
+    try:
+        document_text = build_uploaded_document_context(files)
+        if not document_text.strip():
+            return jsonify({
+                "success": False,
+                "error": "The uploaded files did not contain extractable text."
+            }), 400
+
+        extracted_fields = extract_study_fields_with_claude(
+            document_text=document_text,
+            file_names=[f.filename or "uploaded_file" for f in files]
+        )
+
+        return jsonify({
+            "success": True,
+            "fields": extracted_fields,
+            "file_names": [f.filename or "uploaded_file" for f in files]
         })
 
     except Exception as e:
