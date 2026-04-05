@@ -8,3 +8,5 @@ requests
 pandas
 flask
 gunicorn
+pdfplumber
+python-docx
