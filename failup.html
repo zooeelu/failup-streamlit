@@ -243,7 +243,7 @@
   .trial-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); }
 
   /* ── FAILURE GRAPH ── */
-  #graph-canvas { width: 100%; border-radius: var(--radius-lg); border: 1px solid var(--border); background: #e8f4f0; display: block; cursor: grab; }
+  /* graph-canvas removed — replaced by failure summary view */
   .graph-controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
   .filter-chip {
     padding: 6px 16px;
@@ -408,6 +408,10 @@
   .source-manual { background: rgba(184,224,210,0.22); color: #3a8a72; border-color: rgba(149,184,209,0.30); }
   .source-ctgov_imported { background: rgba(128,155,206,0.10); color: var(--accent); border-color: rgba(128,155,206,0.22); }
   .source-ctgov_enriched { background: rgba(234,196,213,0.18); color: #9a5171; border-color: rgba(234,196,213,0.36); }
+  .source-pubmed_imported { background: rgba(149,184,209,0.16); color: #4d6f92; border-color: rgba(149,184,209,0.36); }
+  .source-pubmed_enriched { background: rgba(184,224,210,0.22); color: #3a8a72; border-color: rgba(149,184,209,0.30); }
+  .source-ctgov_curated { background: rgba(234,196,213,0.20); color: #9a5171; border-color: rgba(234,196,213,0.42); }
+  .source-pubmed_curated { background: rgba(214,234,223,0.75); color: #4f7a63; border-color: rgba(122,138,96,0.30); }
 
   /* ── PROFILE ── */
   .profile-header {
@@ -641,7 +645,7 @@
         <span class="nav-icon">◈</span> Dashboard
       </div>
       <div class="nav-item" onclick="navigate('graph')">
-        <span class="nav-icon">⬡</span> Failure Graph
+        <span class="nav-icon">⬡</span> Failure Summary
       </div>
       <div class="nav-item" onclick="navigate('upload')">
         <span class="nav-icon">↑</span> Submit Finding
@@ -668,7 +672,7 @@
       <div class="topbar-title" id="topbar-title">Welcome to FailUp</div>
       <span class="topbar-tag">✨ Beta v0.1</span>
       <button class="btn btn-ghost" onclick="navigate('upload')">+ Submit finding</button>
-      <button class="btn btn-primary" onclick="navigate('graph')">Explore graph →</button>
+      <button class="btn btn-primary" onclick="navigate('graph')">Explore summaries →</button>
     </div>
 
     <!-- WELCOME PAGE -->
@@ -704,7 +708,7 @@
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;">
             <div style="font-size:22px;margin-bottom:8px;">🔗</div>
             <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;">3. Connects to the graph</div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.7;">Your finding is added as a node in the Failure Graph — linked to related trials by shared mechanisms, targets, and populations. Clusters reveal structural failure patterns across the literature.</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7;">Your finding is added to the Failure Summary — grouped alongside related trials by shared mechanisms, targets, and populations. Patterns across failures become visible as the repository grows.</div>
           </div>
         </div>
       </div>
@@ -730,9 +734,9 @@
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:border-color 0.15s;" onclick="navigate('graph')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
               <span style="font-size:16px;">⬡</span>
-              <span style="font-size:12.5px;font-weight:700;color:var(--accent);">Failure Graph →</span>
+              <span style="font-size:12.5px;font-weight:700;color:var(--accent);">Failure Summary →</span>
             </div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.6;">Explore the network of failed trials. Each node is a study; connections show shared mechanisms, targets, or populations. Bigger nodes = cluster hubs with many linked failures.</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;">Browse all submissions grouped by failure mode and therapeutic area. See how studies relate, spot patterns across failures, and click any card to read the full AI-generated summary.</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:border-color 0.15s;" onclick="navigate('search')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
@@ -819,58 +823,37 @@
       </div>
     </div>
 
-    <!-- GRAPH PAGE -->
+    <!-- FAILURE SUMMARY PAGE -->
     <div class="page" id="page-graph">
       <div class="page-header">
-        <h1>Failure Graph</h1>
-        <p>A visual map of how failed trials connect — by shared mechanisms, drug targets, and patient populations.</p>
+        <h1>Failure Summary</h1>
+        <p>Patterns across submitted studies — grouped by failure mode, therapeutic area, and result type.</p>
       </div>
 
-      <!-- What is this / How to read it -->
-      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-bottom:18px;">
-        <div style="background:linear-gradient(135deg,#dde8f8,#e8f4f0);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px 20px;">
-          <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:8px;">📊 What this graph shows</div>
-          <div style="font-size:12px;color:var(--text2);line-height:1.8;">
-            Each <strong>circle (node)</strong> represents a submitted study. The <strong>lines (edges)</strong> between nodes mean those studies share something in common — the same drug target, biological mechanism, or patient population.<br/><br/>
-            When many studies cluster together and all failed, that's a signal: this target or approach may have a <strong>structural problem</strong> that goes beyond any single trial. The graph makes those patterns visible at a glance.<br/><br/>
-            <strong>Larger nodes</strong> are cluster hubs — studies that share connections with many others. <strong>Glowing nodes</strong> have contradiction flags, meaning a prior positive result exists somewhere in the literature.
-          </div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 20px;">
-          <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:10px;">🖱️ How to use it</div>
-          <div style="font-size:12px;color:var(--text2);line-height:2.0;">
-            <div style="margin-bottom:5px;">• <strong>Overview mode</strong> shows concept nodes — therapeutic areas (left), targets (center), mechanisms (right)</div>
-            <div style="margin-bottom:5px;">• <strong>Click any concept node</strong> to drill in and see the individual studies in that cluster</div>
-            <div style="margin-bottom:5px;">• <strong>Click any study node</strong> to open that study's full summary</div>
-            <div style="margin-bottom:5px;">• <strong>Use the breadcrumb</strong> above the graph to return to overview</div>
-            <div style="margin-bottom:5px;">• <strong>Contradiction nodes</strong> (green glow) indicate a conflict with prior positive literature</div>
-            <div>• <strong>Submit your own finding</strong> to add nodes to this graph</div>
-          </div>
+      <!-- Explainer -->
+      <div style="background:linear-gradient(135deg,#dde8f8,#e8f4f0);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:18px;">
+        <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;">📋 What this page shows</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.8;">
+          This page summarises all submissions in the repository — showing how failures cluster by <strong>failure mode</strong>, <strong>therapeutic area</strong>, and <strong>result type</strong>. Use the filters below to narrow by category. Click any study card to read its full AI-generated summary.
         </div>
       </div>
 
-      <div class="graph-controls">
-        <button class="filter-chip active" data-filter="all" onclick="toggleChip(this)">All graphed records</button>
-        <button class="filter-chip" data-filter="manual" onclick="toggleChip(this)">Manual submissions</button>
-        <button class="filter-chip" data-filter="ctgov_enriched" onclick="toggleChip(this)">AI-enriched CT.gov</button>
-        <button class="filter-chip" data-filter="pubmed_enriched" onclick="toggleChip(this)">AI-enriched PubMed</button>
-        <button class="filter-chip" data-filter="contradictions" onclick="toggleChip(this)">Contradictions</button>
+      <!-- Filter chips -->
+      <div class="graph-controls" id="summary-filter-bar">
+        <button class="filter-chip active" data-filter="all" onclick="toggleSummaryChip(this)">All</button>
+        <button class="filter-chip" data-filter="null" onclick="toggleSummaryChip(this)">Null result</button>
+        <button class="filter-chip" data-filter="inconclusive" onclick="toggleSummaryChip(this)">Inconclusive</button>
+        <button class="filter-chip" data-filter="opposite" onclick="toggleSummaryChip(this)">Opposite effect</button>
       </div>
-      <div id="graph-breadcrumb" style="font-size:11px;font-family:var(--font-mono);color:var(--text3);margin-bottom:8px;min-height:16px;">
-        <span style="color:var(--text3)">Overview</span>
-      </div>
-      <canvas id="graph-canvas" height="440"></canvas>
-      <div class="graph-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div> Null result</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div> Inconclusive</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#f472b6"></div> Opposite effect</div>
-        <div class="legend-item"><span class="source-badge source-manual">Manual</span></div>
-        <div class="legend-item"><span class="source-badge source-ctgov_enriched">AI-enriched CT.gov</span></div>
-        <div class="legend-item"><span class="source-badge source-ctgov_enriched">AI-enriched PubMed</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div> Contradiction flagged</div>
-      </div>
-      <div style="margin-top:12px;font-size:11px;color:var(--text3);font-style:italic;">
-        Note: Only manual submissions and AI-enriched records appear in the graph. Raw imported records are available in Search.
+
+      <!-- Breakdown stats row -->
+      <div id="summary-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
+
+      <!-- Failure mode groups -->
+      <div id="summary-groups"></div>
+
+      <div style="margin-top:16px;font-size:11px;color:var(--text3);font-style:italic;">
+        Showing manual submissions, curated failure records from imported sources, and demo data.
       </div>
     </div>
 
@@ -878,7 +861,7 @@
     <div class="page" id="page-upload">
       <div class="page-header">
         <h1>Submit a Negative Finding</h1>
-        <p>All submissions receive a citable DOI, contribute to the failure graph, and increment your NF-index.</p>
+        <p>All submissions receive a citable DOI, contribute to the failure summary, and increment your NF-index.</p>
       </div>
 
       <!-- Step indicator -->
@@ -1354,7 +1337,7 @@
     <!-- SEARCH PAGE -->
     <div class="page" id="page-search">
       <div class="page-header">
-        <h1>Search the failure graph</h1>
+        <h1>Search the failure repository</h1>
         <p>Query by mechanism, target, pathway, population, or failure pattern — not just by keyword.</p>
       </div>
       <div class="search-bar-wrap">
@@ -1540,470 +1523,201 @@ function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
-  const titles = { welcome:'Welcome to FailUp', dashboard:'Dashboard', graph:'Failure Graph', upload:'Submit Finding', search:'Search', profile:'My Profile' };
+  const titles = { welcome:'Welcome to FailUp', dashboard:'Dashboard', graph:'Failure Summary', upload:'Submit Finding', search:'Search', profile:'My Profile' };
   document.getElementById('topbar-title').textContent = titles[page] || page;
   const navItems = document.querySelectorAll('.nav-item');
   const idx = { welcome:0, dashboard:1, graph:2, upload:3, search:4, profile:5 };
   if (idx[page] !== undefined) navItems[idx[page]].classList.add('active');
-  if (page === 'graph') setTimeout(loadGraphData, 100);
+  if (page === 'graph') renderFailureSummary();
   if (page === 'search') renderResults('');
 }
 
-// ── GRAPH ──
-let graphNodes = [];
-let graphEdges = [];
-let graphNodePositions = [];
-let activeGraphFilter = 'all';
-
-let graphMode = 'overview';
-let activeConceptId = null;
-
-let overviewNodes = [];
-let overviewEdges = [];
-let overviewPositions = [];
-
-const graphColors = {
-  null: '#60a5fa',
-  inconclusive: '#fbbf24',
-  opposite: '#f472b6'
-};
-
-const conceptColors = {
-  therapeutic_area: '#809bce',
-  target:           '#6aab9a',
-  mechanism:        '#b06080'
-};
+// ── FAILURE SUMMARY ──
+let activeSummaryFilter = 'all';
 
 const sourceLabels = {
-  manual:          'Manual submission',
-  ctgov_imported:  'Imported CT.gov',
-  ctgov_enriched:  'AI-enriched CT.gov',
-  pubmed_imported: 'Imported PubMed',
-  pubmed_enriched: 'AI-enriched PubMed'
+  manual:           'Manual submission',
+  ctgov_imported:   'Imported CT.gov',
+  ctgov_enriched:   'AI-tagged CT.gov',
+  ctgov_curated:    'Curated failure record (CT.gov)',
+  pubmed_imported:  'Imported PubMed',
+  pubmed_enriched:  'AI-tagged PubMed',
+  pubmed_curated:   'Curated failure record (PubMed)'
 };
 
-// ── DATA LOADING ────────────────────────────────────────────────
-async function loadGraphData() {
-  try {
-    const response = await fetch('/graph-data');
-    if (!response.ok) {
-      graphNodes = []; graphEdges = []; overviewNodes = []; overviewEdges = [];
-      drawGraph(); return;
-    }
+const demoSummaryData = [
+  { title:'VEGF-A inhibition in treatment-resistant glioblastoma', result_type:'null', therapeutic_area:'Oncology', failure_mode:'Target validity — mechanism not rate-limiting in this indication', background:'Bevacizumab plus standard of care was hypothesised to sustain anti-angiogenic pressure in recurrent GBM. Phase III RCT, n=340.', findings:'Primary endpoint (OS at 24 months) not met: HR 1.02 (95% CI 0.88–1.18), p=0.43. No significant difference in PFS or ORR.', main_limitation:'Anti-angiogenic effect did not translate across the blood–brain barrier in this population. Study may have been underpowered (n=340 vs planned n=400).', contradiction_check:'No contradictions detected. Consistent with two prior Phase II null results in this population.', graph_tags:{ mechanism:'Anti-angiogenesis', target:'VEGF-A', population:'Recurrent GBM adults', therapeutic_area:'Oncology' } },
+  { title:'β-glucan supplementation in post-COVID fatigue syndrome', result_type:'opposite', therapeutic_area:'Immunology', failure_mode:'Off-target effects — confounding mechanism', background:'β-glucan was hypothesised to reduce fatigue via immunomodulation in post-COVID syndrome. Crossover RCT, n=120.', findings:'Opposite effect observed: 12% worsening of fatigue scores at 12 weeks in β-glucan arm (p=0.03).', main_limitation:'Possible immune overstimulation in post-COVID neuroinflammatory context. Crossover design may have introduced carry-over bias.', contradiction_check:'Contradiction flagged — three prior observational studies reported benefit in healthy populations. AI flagged for editorial review.', graph_tags:{ mechanism:'Immunomodulation', target:'β-glucan receptor', population:'Post-COVID adults', therapeutic_area:'Immunology' } },
+  { title:'Ketamine micro-dosing in treatment-resistant bipolar depression', result_type:'inconclusive', therapeutic_area:'Psychiatry', failure_mode:'Underpowered — type II error likely', background:'Micro-dose ketamine (0.1mg/kg) trialled as mood stabiliser adjunct in bipolar I/II with treatment-resistant depression. Phase II, n=62.', findings:'MADRS improvement trend observed (−4.2 points) but CI crosses null (p=0.11). Study required n=180 for 80% power.', main_limitation:'Critically underpowered — enrolled 62 of 180 required participants. Dropout rate 22% further reduced effective sample.', contradiction_check:'No contradictions detected. Consistent with mixed ketamine literature in this subpopulation.', graph_tags:{ mechanism:'NMDA receptor antagonism', target:'NMDA receptor', population:'Bipolar I/II adults', therapeutic_area:'Psychiatry' } },
+  { title:'IL-6 receptor blockade in non-alcoholic steatohepatitis', result_type:'null', therapeutic_area:'Hepatology', failure_mode:'Target validity — mechanism not rate-limiting in this indication', background:'IL-6 receptor blockade hypothesised to reduce hepatic inflammation and fibrosis in NASH. Phase II, n=210.', findings:'No significant reduction in liver fibrosis at 48 weeks (p=0.38). Histological endpoints unchanged across arms.', main_limitation:'IL-6 pathway may not be rate-limiting in NASH progression. Biopsy-based endpoints introduce sampling variability.', contradiction_check:'No contradictions detected.', graph_tags:{ mechanism:'IL-6 receptor blockade', target:'IL-6R', population:'NASH adults with F2–F3 fibrosis', therapeutic_area:'Hepatology' } },
+  { title:'mTOR pathway inhibition in HR+ breast cancer — adjuvant setting', result_type:'null', therapeutic_area:'Oncology', failure_mode:'Patient selection — population too heterogeneous or wrong biomarker', background:'Everolimus added to standard adjuvant endocrine therapy in unselected HR+ breast cancer. Phase III, n=1,240.', findings:'Disease-free survival HR 0.97 (95% CI 0.84–1.12, p=0.71). No improvement in unselected population.', main_limitation:'Biomarker-unselected population — mTOR pathway activation not confirmed prior to enrolment. Effect may exist in a molecular subgroup.', contradiction_check:'Contradiction flagged — prior Phase II data suggested benefit in PIK3CA-mutant subgroup. AI flagged for subgroup analysis review.', graph_tags:{ mechanism:'mTOR pathway inhibition', target:'mTORC1', population:'HR+ breast cancer, adjuvant', therapeutic_area:'Oncology' } },
+  { title:'Tau-targeting immunotherapy in early Alzheimer\'s disease', result_type:'inconclusive', therapeutic_area:'Neurology', failure_mode:'Outcome measurement — endpoint did not capture true biological effect', background:'Anti-tau antibody in early Alzheimer\'s disease. Phase II, n=280. CSF tau used as pharmacodynamic marker.', findings:'CSF tau reduced 18% (p=0.04) but cognitive endpoints (ADAS-Cog) showed no improvement at 18 months.', main_limitation:'Biomarker-clinical dissociation — target engagement confirmed but cognitive benefit unclear. Trial duration may have been insufficient.', contradiction_check:'No contradictions detected.', graph_tags:{ mechanism:'Tau immunotherapy', target:'Tau protein', population:'Early AD, MCI stage', therapeutic_area:'Neurology' } },
+];
 
-    const ct = response.headers.get('content-type') || '';
-    if (!ct.includes('application/json')) {
-      graphNodes = []; graphEdges = []; overviewNodes = []; overviewEdges = [];
-      drawGraph(); return;
-    }
+function getAllSummaryData() {
+  const fromSaved = (savedSubmissions || []).map(sub => ({
+    title: sub.title || 'Untitled',
+    result_type: (sub.result_type || 'null').toLowerCase(),
+    therapeutic_area: sub.summary?.graph_tags?.therapeutic_area || 'Unspecified',
+    failure_mode: sub.summary?.failure_mode || 'Unknown / unclear',
+    background: sub.summary?.background || '',
+    findings: sub.summary?.findings || '',
+    main_limitation: sub.summary?.main_limitation || '',
+    contradiction_check: sub.summary?.contradiction_check || '',
+    graph_tags: sub.summary?.graph_tags || {},
+    source: 'manual'
+  }));
 
-    const result = await response.json();
-    if (!result.success || !result.graph) {
-      graphNodes = []; graphEdges = []; overviewNodes = []; overviewEdges = [];
-      drawGraph(); return;
-    }
+  const fromCtgov = (importedTrials || [])
+    .filter(trial => {
+      const c = trial.curation || {};
+      return c.review_status === 'curated_failure' && c.graph_worthy === true;
+    })
+    .map(trial => ({
+      title: trial.title || trial.nct_id || 'Untitled CT.gov trial',
+      result_type: (trial.curation?.failure_class || trial.result_type || 'inconclusive').toLowerCase(),
+      therapeutic_area: trial.summary?.graph_tags?.therapeutic_area || (trial.conditions || [])[0] || 'Unspecified',
+      failure_mode: trial.summary?.failure_mode || 'Unknown / unclear',
+      background: trial.summary?.background || trial.brief_summary || '',
+      findings: trial.summary?.findings || trial.brief_summary || '',
+      main_limitation: trial.summary?.main_limitation || '',
+      contradiction_check: trial.summary?.contradiction_check || '',
+      graph_tags: trial.summary?.graph_tags || {},
+      source: 'ctgov_curated'
+    }));
 
-    // Only graph meaningful records — raw imported records go to search only
-    const allowedSources = new Set(['manual', 'ctgov_enriched', 'pubmed_enriched']);
+  const fromPubmed = (importedPubmed || [])
+    .filter(article => {
+      const c = article.curation || {};
+      return c.review_status === 'curated_failure' && c.graph_worthy === true;
+    })
+    .map(article => ({
+      title: article.title || article.pmid || 'Untitled PubMed article',
+      result_type: (article.curation?.failure_class || article.result_type || 'inconclusive').toLowerCase(),
+      therapeutic_area: article.summary?.graph_tags?.therapeutic_area || (article.mesh_terms || [])[0] || 'Unspecified',
+      failure_mode: article.summary?.failure_mode || 'Unknown / unclear',
+      background: article.summary?.background || article.abstract || '',
+      findings: article.summary?.findings || article.abstract || '',
+      main_limitation: article.summary?.main_limitation || '',
+      contradiction_check: article.summary?.contradiction_check || '',
+      graph_tags: article.summary?.graph_tags || {},
+      source: 'pubmed_curated'
+    }));
 
-    const allStudyNodes = result.graph.studies?.nodes || result.graph.nodes || [];
-    const allowedNodeIds = new Set(
-      allStudyNodes.filter(n => allowedSources.has(n.source)).map(n => n.id)
-    );
-
-    graphNodes = allStudyNodes.filter(n => allowedNodeIds.has(n.id));
-
-    const allStudyEdges = result.graph.studies?.edges || result.graph.edges || [];
-    graphEdges = allStudyEdges.filter(e =>
-      allowedNodeIds.has(e.source) && allowedNodeIds.has(e.target)
-    );
-
-    // Use backend overview graph directly
-    const rawOverviewNodes = result.graph.overview?.nodes || [];
-    const rawOverviewEdges = result.graph.overview?.edges || [];
-
-    // Keep only overview concepts that connect to graphed study nodes
-    overviewNodes = rawOverviewNodes
-      .map(n => {
-        const keptStudyIds = (n.study_ids || []).filter(id => allowedNodeIds.has(id));
-        return { ...n, study_ids: keptStudyIds, count: keptStudyIds.length };
-      })
-      .filter(n => n.count > 0);
-
-    const overviewNodeIds = new Set(overviewNodes.map(n => n.id));
-    overviewEdges = rawOverviewEdges.filter(e =>
-      overviewNodeIds.has(e.source) && overviewNodeIds.has(e.target)
-    );
-
-    drawGraph();
-  } catch (err) {
-    console.error('Graph load failed:', err);
-    graphNodes = []; graphEdges = []; overviewNodes = []; overviewEdges = [];
-    drawGraph();
-  }
+  return [...fromSaved, ...fromCtgov, ...fromPubmed, ...demoSummaryData];
 }
 
+function renderFailureSummary() {
+  const all = getAllSummaryData();
+  const filtered = activeSummaryFilter === 'all'
+    ? all
+    : all.filter(s => normalizeType(s.result_type) === activeSummaryFilter);
 
-
-// ── LAYOUT HELPERS ───────────────────────────────────────────────
-function generateOverviewPositions(nodes, W, H) {
-  const groups = {
-    therapeutic_area: nodes
-      .filter(n => n.kind === 'therapeutic_area')
-      .sort((a, b) => (b.count || 0) - (a.count || 0))
-      .slice(0, 8),
-    target: nodes
-      .filter(n => n.kind === 'target')
-      .sort((a, b) => (b.count || 0) - (a.count || 0))
-      .slice(0, 10),
-    mechanism: nodes
-      .filter(n => n.kind === 'mechanism')
-      .sort((a, b) => (b.count || 0) - (a.count || 0))
-      .slice(0, 8)
-  };
-
-  const visibleIds = new Set([
-    ...groups.therapeutic_area.map(n => n.id),
-    ...groups.target.map(n => n.id),
-    ...groups.mechanism.map(n => n.id)
-  ]);
-
-  const positions = [];
-
-  function placeColumn(list, x) {
-    const topPad = 30, bottomPad = 30;
-    const usableH = H - topPad - bottomPad;
-    const gap = usableH / Math.max(list.length, 1);
-    list.forEach((node, i) => {
-      positions.push({ id: node.id, x, y: topPad + gap * i + gap / 2 });
-    });
+  // Stats row
+  const statsEl = document.getElementById('summary-stats');
+  if (statsEl) {
+    const counts = { null:0, inconclusive:0, opposite:0 };
+    all.forEach(s => { const t = normalizeType(s.result_type); if (counts[t] !== undefined) counts[t]++; });
+    const contradictions = all.filter(s => s.contradiction_check && !s.contradiction_check.toLowerCase().includes('no contradiction')).length;
+    statsEl.innerHTML = [
+      { label:'Total studies', val: all.length, color:'var(--accent)' },
+      { label:'Null results', val: counts.null, color:'#60a5fa' },
+      { label:'Inconclusive', val: counts.inconclusive, color:'#fbbf24' },
+      { label:'Opposite effects', val: counts.opposite, color:'var(--pastel-pink)' },
+    ].map(s => `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">${s.label}</div>
+        <div style="font-family:var(--font-serif);font-size:28px;font-weight:600;color:${s.color};line-height:1;">${s.val}</div>
+      </div>`).join('');
   }
 
-  placeColumn(groups.therapeutic_area, W * 0.18);
-  placeColumn(groups.target,           W * 0.50);
-  placeColumn(groups.mechanism,        W * 0.82);
+  // Group by failure mode
+  const groupsEl = document.getElementById('summary-groups');
+  if (!groupsEl) return;
 
-  return { positions, visibleIds };
-}
-
-function generateStudyPositions(nodes, W, H) {
-  if (!nodes.length) return [];
-  const positions = [];
-  const cx = W / 2, cy = H / 2;
-  const radius = Math.min(
-    Math.max(160, nodes.length * 18),
-    Math.min(W, H) * 0.42
-  );
-  nodes.forEach((node, i) => {
-    const angle = (2 * Math.PI * i) / nodes.length;
-    positions.push({ id: node.id, x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) });
-  });
-  return positions;
-}
-
-// ── FILTER HELPERS ───────────────────────────────────────────────
-function getVisibleStudyNodes() {
-  let nodes = [...graphNodes];
-
-  if (activeGraphFilter === 'manual') {
-    nodes = nodes.filter(n => n.source === 'manual');
-  } else if (activeGraphFilter === 'ctgov_enriched') {
-    nodes = nodes.filter(n => n.source === 'ctgov_enriched');
-  } else if (activeGraphFilter === 'pubmed_enriched') {
-    nodes = nodes.filter(n => n.source === 'pubmed_enriched');
-  } else if (activeGraphFilter === 'contradictions') {
-    nodes = nodes.filter(n => n.has_contradiction);
-  }
-
-  if (activeConceptId) {
-    const concept = overviewNodes.find(n => n.id === activeConceptId);
-    if (concept) {
-      const ids = new Set(concept.study_ids || []);
-      nodes = nodes.filter(n => ids.has(n.id));
-    }
-  }
-
-  return nodes
-    .sort((a, b) => (b.degree || 0) - (a.degree || 0))
-    .slice(0, 24);
-}
-
-// ── DRAW ─────────────────────────────────────────────────────────
-function drawGraph() {
-  const canvas = document.getElementById('graph-canvas');
-  if (!canvas) return;
-
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.offsetWidth;
-  const H = 440;
-  canvas.width  = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.height = H + 'px';
-
-  const ctx = canvas.getContext('2d');
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.scale(dpr, dpr);
-  ctx.clearRect(0, 0, W, H);
-
-  if (graphMode === 'overview') {
-    drawOverview(ctx, W, H);
-  } else {
-    drawStudyMode(ctx, W, H);
-  }
-}
-
-function drawOverview(ctx, W, H) {
-  updateGraphBreadcrumb();
-
-  if (!overviewNodes.length) {
-    ctx.fillStyle = '#8a9ab8';
-    ctx.font = '14px Inter, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('No graph data yet. Submit or enrich records to create graph nodes.', W / 2, H / 2);
-    overviewPositions = [];
-    graphNodePositions = [];
+  if (!filtered.length) {
+    groupsEl.innerHTML = `<div style="font-size:13px;color:var(--text3);padding:24px 0;">No studies match the current filter.</div>`;
     return;
   }
 
-  const layout = generateOverviewPositions(overviewNodes, W, H);
-  overviewPositions = layout.positions;
-  graphNodePositions = overviewPositions;
-
-  const visibleIds   = layout.visibleIds;
-  const visibleNodes = overviewNodes.filter(n => visibleIds.has(n.id));
-  const visibleEdges = overviewEdges.filter(e => visibleIds.has(e.source) && visibleIds.has(e.target));
-
-  // Column headers
-  const headers = [
-    { label: 'THERAPEUTIC AREA', x: W * 0.18, color: conceptColors.therapeutic_area },
-    { label: 'TARGET',           x: W * 0.50, color: conceptColors.target           },
-    { label: 'MECHANISM',        x: W * 0.82, color: conceptColors.mechanism        }
-  ];
-  headers.forEach(({ label, x, color }) => {
-    ctx.font = "bold 10px 'JetBrains Mono', monospace";
-    ctx.fillStyle = color;
-    ctx.textAlign = 'center';
-    ctx.fillText(label, x, 16);
+  const groups = {};
+  filtered.forEach(s => {
+    const mode = s.failure_mode || 'Unknown / unclear';
+    if (!groups[mode]) groups[mode] = [];
+    groups[mode].push(s);
   });
 
-  // Backend overview edges
-  visibleEdges.forEach(edge => {
-    const src = overviewPositions.find(p => p.id === edge.source);
-    const tgt = overviewPositions.find(p => p.id === edge.target);
-    if (!src || !tgt) return;
-    ctx.beginPath();
-    ctx.moveTo(src.x, src.y);
-    ctx.lineTo(tgt.x, tgt.y);
-    ctx.strokeStyle = `rgba(128,155,206,${Math.min(0.08 + (edge.weight || 1) * 0.03, 0.22)})`;
-    ctx.lineWidth = 0.8 + Math.min(edge.weight || 1, 4) * 0.25;
-    ctx.stroke();
-  });
+  const typeColors = { null:'#60a5fa', inconclusive:'#e6a817', opposite:'#c47090' };
+  const typeLabels = { null:'Null', inconclusive:'Inconclusive', opposite:'Opposite' };
 
-  // Concept nodes
-  visibleNodes.forEach(node => {
-    const pos = overviewPositions.find(p => p.id === node.id);
-    if (!pos) return;
-
-    const color  = conceptColors[node.kind] || '#809bce';
-    const radius = 10 + Math.min(node.count || 1, 10);
-
-    ctx.beginPath();
-    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = color + '18';
-    ctx.fill();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-
-    ctx.font = 'bold 10px Inter, sans-serif';
-    ctx.fillStyle = color;
-    ctx.textAlign = 'center';
-    ctx.fillText(String(node.count || 0), pos.x, pos.y + 3);
-
-    const label = node.title || node.label || node.value || 'Concept';
-    ctx.font = "10px 'JetBrains Mono', monospace";
-    ctx.fillStyle = '#4a5a78';
-    ctx.fillText(
-      label.length > 18 ? label.slice(0, 18) + '…' : label,
-      pos.x, pos.y + radius + 12
-    );
-  });
+  groupsEl.innerHTML = Object.entries(groups).map(([mode, studies]) => `
+    <div style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--border);">
+        <div style="background:var(--accent-dim);border:1px solid var(--border2);border-radius:var(--radius);padding:4px 10px;font-family:var(--font-mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;">
+          ${escapeHtml(mode.split('—')[0].trim())}
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--text);">${escapeHtml(mode)}</div>
+        <div style="margin-left:auto;font-size:11px;color:var(--text3);font-family:var(--font-mono);">${studies.length} study${studies.length !== 1 ? ' | studies' : ''}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;">
+        ${studies.map((s, i) => {
+          const type = normalizeType(s.result_type);
+          const color = typeColors[type] || '#8a9ab8';
+          const hasContradiction = s.contradiction_check && !s.contradiction_check.toLowerCase().startsWith('no contradiction') && !s.contradiction_check.toLowerCase().includes('not assessed');
+          return `
+          <div onclick="openSummaryCard(${JSON.stringify(s).replace(/"/g, '&quot;')})" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s;" onmouseover="this.style.borderColor='${color}';this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+            <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;">
+              <span style="flex-shrink:0;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:0.07em;background:${color}22;color:${color};border:1px solid ${color}44;">${typeLabels[type] || type}</span>
+              ${hasContradiction ? '<span style="flex-shrink:0;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;background:rgba(176,96,128,0.12);color:var(--red);border:1px solid rgba(176,96,128,0.25);">⚠ Contradiction</span>' : ''}
+            </div>
+            <div style="font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.4;">${escapeHtml(s.title)}</div>
+            <div style="font-size:11.5px;color:var(--text2);line-height:1.7;margin-bottom:10px;">${escapeHtml((s.findings || '').substring(0, 160))}${(s.findings || '').length > 160 ? '…' : ''}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3);">${escapeHtml(s.graph_tags?.therapeutic_area || s.therapeutic_area || '')}</span>
+              <span style="font-size:11px;color:var(--accent);">Read summary →</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
 }
 
-function drawStudyMode(ctx, W, H) {
-  updateGraphBreadcrumb();
-
-  const studyNodes = getVisibleStudyNodes();
-  const studyNodeIds = new Set(studyNodes.map(n => n.id));
-  const studyEdges   = graphEdges.filter(e => studyNodeIds.has(e.source) && studyNodeIds.has(e.target));
-
-  if (!studyNodes.length) {
-    ctx.fillStyle = '#8a9ab8';
-    ctx.font = '14px Inter, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('No studies found for this concept.', W / 2, H / 2);
-    graphNodePositions = [];
-    return;
-  }
-
-  graphNodePositions = generateStudyPositions(studyNodes, W, H);
-
-  // Edges
-  studyEdges.forEach(edge => {
-    const src = graphNodePositions.find(n => n.id === edge.source);
-    const tgt = graphNodePositions.find(n => n.id === edge.target);
-    if (!src || !tgt) return;
-    ctx.beginPath();
-    ctx.moveTo(src.x, src.y);
-    ctx.lineTo(tgt.x, tgt.y);
-    ctx.strokeStyle = 'rgba(90,127,181,0.20)';
-    ctx.lineWidth = 1 + (edge.weight || 1) * 0.6;
-    ctx.stroke();
-  });
-
-  // Study nodes
-  studyNodes.forEach(node => {
-    const pos = graphNodePositions.find(n => n.id === node.id);
-    if (!pos) return;
-
-    const color = graphColors[node.type] || '#60a5fa';
-    const hasContra = (node.contradiction_check || '').toLowerCase() !==
-      'not assessed from provided information.';
-    const radius = 12 + ((node.failure_mode && node.failure_mode !== 'unknown') ? 3 : 0);
-
-    if (hasContra) {
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, radius + 8, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(52,211,153,0.16)';
-      ctx.fill();
-    }
-
-    ctx.beginPath();
-    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = color + '28';
-    ctx.fill();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-
-    ctx.font = "10px 'JetBrains Mono', monospace";
-    ctx.fillStyle = color;
-    ctx.textAlign = 'center';
-    ctx.fillText(node.label || 'Study', pos.x, pos.y + radius + 14);
-
-    ctx.font = "9px 'JetBrains Mono', monospace";
-    ctx.fillStyle = '#8a9ab8';
-    ctx.fillText(
-      node.source_label || sourceLabels[node.source] || '',
-      pos.x, pos.y + radius + 26
-    );
-  });
-}
-
-// ── BREADCRUMB / MODE UI ─────────────────────────────────────────
-function updateGraphBreadcrumb() {
-  const bc = document.getElementById('graph-breadcrumb');
-  if (!bc) return;
-  if (graphMode === 'overview') {
-    bc.innerHTML = '<span style="color:var(--text3)">Overview</span>';
-  } else {
-    const concept = overviewNodes.find(n => n.id === activeConceptId);
-    const label   = concept ? concept.value : 'Studies';
-    bc.innerHTML = `
-      <span style="color:var(--accent);cursor:pointer;text-decoration:underline"
-            onclick="exitStudyMode()">Overview</span>
-      <span style="color:var(--text3)"> › ${escapeHtml(label)}</span>`;
-  }
-}
-
-function exitStudyMode() {
-  graphMode       = 'overview';
-  activeConceptId = null;
-  drawGraph();
-}
-
-// ── CLICK HANDLING ───────────────────────────────────────────────
-function handleGraphClick(event) {
-  const canvas = document.getElementById('graph-canvas');
-  if (!canvas) return;
-
-  const rect   = canvas.getBoundingClientRect();
-  const clickX = event.clientX - rect.left;
-  const clickY = event.clientY - rect.top;
-
-  if (graphMode === 'overview') {
-    // Click on a concept node → drill into study mode
-    for (const node of overviewNodes) {
-      const pos = overviewPositions.find(p => p.id === node.id);
-      if (!pos) continue;
-      const radius = 14 + Math.min(node.count * 2, 14);
-      const dx = clickX - pos.x, dy = clickY - pos.y;
-      if (Math.sqrt(dx * dx + dy * dy) <= radius + 4) {
-        graphMode       = 'study';
-        activeConceptId = node.id;
-        drawGraph();
-        return;
-      }
-    }
-  } else {
-    // Click on a study node → open modal
-    const studyNodes = getVisibleStudyNodes();
-    for (const node of studyNodes) {
-      const pos = graphNodePositions.find(p => p.id === node.id);
-      if (!pos) continue;
-      const radius = 12 + ((node.failure_mode && node.failure_mode !== 'unknown') ? 3 : 0);
-      const dx = clickX - pos.x, dy = clickY - pos.y;
-      if (Math.sqrt(dx * dx + dy * dy) <= radius + 4) {
-        openGraphNodeModal(node.id);
-        return;
-      }
-    }
-  }
-}
-
-function openGraphNodeModal(nodeId) {
-  const node = graphNodes.find(n => n.id === nodeId);
-  if (!node) return;
-  const tags = node.graph_tags || {};
-  document.getElementById('modal-title').textContent = node.title || 'Saved submission';
-  document.getElementById('modal-sub').textContent =
-    `${node.doi || ''} · ${node.type || 'result'} · ${node.failure_mode || 'unknown'}`;
+function openSummaryCard(s) {
+  if (typeof s === 'string') { try { s = JSON.parse(s); } catch(e) { return; } }
+  const type = normalizeType(s.result_type);
+  const typeColors = { null:'#60a5fa', inconclusive:'#e6a817', opposite:'#c47090' };
+  const color = typeColors[type] || '#8a9ab8';
+  document.getElementById('modal-title').textContent = s.title || 'Study summary';
+  document.getElementById('modal-sub').textContent = `${s.therapeutic_area || ''} · ${s.result_type || ''} result`;
   document.getElementById('modal-body').innerHTML = `
-    <div class="modal-section">
-      <div class="modal-section-label">Source</div>
-      ${escapeHtml(node.source_label || sourceLabels[node.source] || 'Unknown source')}
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-label">Failure mode</div>
-      ${escapeHtml(node.failure_mode || 'unknown')}
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-label">Contradiction check</div>
-      ${escapeHtml(node.contradiction_check || 'Not available.')}
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-label">Graph tags</div>
-      <span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">
-        Mechanism: ${escapeHtml(tags.mechanism || 'unspecified')} ·
-        Target: ${escapeHtml(tags.target || 'unspecified')} ·
-        Population: ${escapeHtml(tags.population || 'unspecified')} ·
-        Therapeutic area: ${escapeHtml(tags.therapeutic_area || 'unspecified')}
+    <div class="modal-section"><div class="modal-section-label">Background</div>${escapeHtml(s.background || 'Not available.')}</div>
+    <div class="modal-section"><div class="modal-section-label">Key findings</div>${escapeHtml(s.findings || 'Not available.')}</div>
+    <div class="modal-section"><div class="modal-section-label">Main limitation</div>${escapeHtml(s.main_limitation || 'Not available.')}</div>
+    <div class="modal-section"><div class="modal-section-label">Failure mode</div>${escapeHtml(s.failure_mode || 'Not available.')}</div>
+    <div class="modal-section"><div class="modal-section-label">Contradiction check</div>${escapeHtml(s.contradiction_check || 'Not available.')}</div>
+    <div class="modal-section"><div class="modal-section-label">Tags</div>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--accent);">
+        Mechanism: ${escapeHtml(s.graph_tags?.mechanism || 'unspecified')} ·
+        Target: ${escapeHtml(s.graph_tags?.target || 'unspecified')} ·
+        Population: ${escapeHtml(s.graph_tags?.population || 'unspecified')}
       </span>
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-label">DOI / ID</div>
-      <span style="color:var(--accent);font-family:var(--font-mono);font-size:12px">${escapeHtml(node.doi || '')}</span>
     </div>`;
   document.getElementById('modal').classList.add('open');
 }
 
+function toggleSummaryChip(el) {
+  document.querySelectorAll('#summary-filter-bar .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeSummaryFilter = el.dataset.filter || 'all';
+  renderFailureSummary();
+}
+
 window.addEventListener('resize', () => {
-  if (document.getElementById('page-graph').classList.contains('active')) drawGraph();
+  if (document.getElementById('page-graph').classList.contains('active')) renderFailureSummary();
 });
 
 window.addEventListener('load', () => {
-  const canvas = document.getElementById('graph-canvas');
-  if (canvas) canvas.addEventListener('click', handleGraphClick);
+  // no canvas listener needed
 });
 
 // ── STEP NAVIGATION ──
@@ -2451,7 +2165,7 @@ async function submitForm() {
     const summary = result.summary;
     const doi = result.doi;
     await loadSavedSubmissions();
-    await loadGraphData();
+    renderFailureSummary();
 
     // Complete progress bar
     bar.style.width = '100%';
@@ -2508,6 +2222,7 @@ async function submitForm() {
 // ── SAVED SUBMISSIONS + SEARCH ──
 let savedSubmissions = [];
 let importedTrials = [];
+let importedPubmed = [];
 
 const demoResults = [
   { title: 'VEGF-A inhibition in treatment-resistant glioblastoma', type: 'null', body: 'Phase III RCT (n=340). Primary endpoint of overall survival at 24 months not met (p=0.43, HR 1.02). Hypothesized anti-angiogenic effect did not translate across blood–brain barrier in this population.', meta: 'NCT04821944 · Oncology · 2025', contradiction: false },
@@ -2558,8 +2273,12 @@ function formatImportedTrial(trial) {
       ? trial.brief_summary
       : `${conditionText || 'No condition listed.'} ${interventionText ? 'Interventions: ' + interventionText : ''}`;
 
+  const curation = trial.curation || {};
+
   let type = 'inconclusive';
-  if (trial.result_type) {
+  if (curation.failure_class) {
+    type = normalizeType(curation.failure_class);
+  } else if (trial.result_type) {
     type = normalizeType(trial.result_type);
   } else {
     const status = (trial.status || '').toLowerCase();
@@ -2570,7 +2289,12 @@ function formatImportedTrial(trial) {
     }
   }
 
-  const source = trial.summary ? 'ctgov_enriched' : 'ctgov_imported';
+  let source = 'ctgov_imported';
+  if (curation.review_status === 'curated_failure' && curation.graph_worthy === true) {
+    source = 'ctgov_curated';
+  } else if (trial.summary) {
+    source = 'ctgov_enriched';
+  }
 
   return {
     id: `ctgov-${trial.id}`,
@@ -2632,6 +2356,64 @@ async function loadImportedTrials() {
   renderResults('');
 }
 
+function formatImportedPubmedArticle(article) {
+  const title = article.title || article.pmid || 'Untitled imported article';
+  const body = article.summary?.findings
+    ? article.summary.findings
+    : article.abstract
+      ? article.abstract
+      : 'No abstract or summary available.';
+
+  const curation = article.curation || {};
+  let source = 'pubmed_imported';
+
+  if (curation.review_status === 'curated_failure' && curation.graph_worthy === true) {
+    source = 'pubmed_curated';
+  } else if (article.summary) {
+    source = 'pubmed_enriched';
+  }
+
+  const type = normalizeType(
+    curation.failure_class || article.result_type || 'inconclusive'
+  );
+
+  return {
+    id: `pubmed-${article.id}`,
+    pmid: article.pmid,
+    title,
+    type,
+    body,
+    meta: `${article.pmid || 'PubMed'} · ${article.journal || 'No journal'} · ${article.pub_date || 'No date'}`,
+    contradiction: (article.summary?.contradiction_check || '').toLowerCase() !== 'not assessed from provided information.' && !!article.summary,
+    imported: true,
+    source,
+    sourceLabel: sourceLabels[source],
+    raw: article,
+    isPubmed: true
+  };
+}
+
+async function loadImportedPubmed() {
+  try {
+    const response = await fetch('/pubmed-articles');
+    if (!response.ok) {
+      importedPubmed = [];
+    } else {
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        importedPubmed = [];
+      } else {
+        const result = await response.json();
+        importedPubmed = result.success ? (result.articles || []) : [];
+      }
+    }
+  } catch (error) {
+    importedPubmed = [];
+  }
+  renderResults('');
+  renderFailureSummary();
+}
+
 function renderDashboardRecent() {
   const container = document.getElementById('dashboard-recent-list');
   if (!container) return;
@@ -2657,10 +2439,11 @@ function renderResults(query) {
 
   const q = (query || '').toLowerCase();
 
-  const savedFormatted   = savedSubmissions.map(formatSavedSubmission);
-  const importedFormatted = importedTrials.map(formatImportedTrial);
+  const savedFormatted    = savedSubmissions.map(formatSavedSubmission);
+  const importedCtgov     = importedTrials.map(formatImportedTrial);
+  const importedPubmedFmt = importedPubmed.map(formatImportedPubmedArticle);
 
-  const combined = [...savedFormatted, ...importedFormatted, ...demoResults];
+  const combined = [...savedFormatted, ...importedCtgov, ...importedPubmedFmt, ...demoResults];
 
   const filtered = q
     ? combined.filter(r =>
@@ -2680,7 +2463,7 @@ function renderResults(query) {
     return `
       <div class="result-card" onclick="${
         isSaved    ? `openSavedSubmissionModal(${idx})` :
-        isImported ? `openImportedTrialModal(${idx})` :
+        isImported ? (r.isPubmed ? `openImportedPubmedModal(${idx})` : `openImportedTrialModal(${idx})`) :
                      `openModal('search')`
       }">
         <div class="result-card-head">
@@ -2786,6 +2569,34 @@ function openImportedTrialModal(renderedIndex) {
   document.getElementById('modal').classList.add('open');
 }
 
+function openImportedPubmedModal(renderedIndex) {
+  const result = window.currentRenderedResults?.[renderedIndex];
+  if (!result || !result.raw) return;
+
+  const article = result.raw;
+  const summary = article.summary || {};
+  const curation = article.curation || {};
+
+  document.getElementById('modal-title').textContent = article.title || 'Imported PubMed article';
+  document.getElementById('modal-sub').textContent =
+    `${article.pmid || ''} · ${article.journal || 'No journal'} · ${article.pub_date || 'No date'}`;
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-section"><div class="modal-section-label">Source</div>${escapeHtml(result.sourceLabel || 'Imported PubMed')}</div>
+    <div class="modal-section"><div class="modal-section-label">Article type</div>${escapeHtml(article.article_type || 'Not available')}</div>
+    <div class="modal-section"><div class="modal-section-label">Abstract</div>${escapeHtml(article.abstract || 'Not available')}</div>
+    <div class="modal-section"><div class="modal-section-label">AI findings</div>${escapeHtml(summary.findings || 'Not available')}</div>
+    <div class="modal-section"><div class="modal-section-label">Curation status</div>${escapeHtml(curation.review_status || 'Not curated')}</div>
+    <div class="modal-section"><div class="modal-section-label">Curation basis</div>${escapeHtml(curation.basis || 'Not available')}</div>
+    <div class="modal-section"><div class="modal-section-label">Link</div>
+      <a href="${escapeHtml(article.url || '#')}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-family:var(--font-mono);font-size:12px;">
+        ${escapeHtml(article.url || '')}
+      </a>
+    </div>`;
+
+  document.getElementById('modal').classList.add('open');
+}
+
 // ── MODAL ──
 const modalData = {
   trial1: {
@@ -2821,7 +2632,7 @@ const modalData = {
   search: {
     title: 'Study detail',
     sub: 'FailUp repository entry',
-    body: `<div class="modal-section"><div class="modal-section-label">Full detail</div>Click any result card on the dashboard for a specific study modal. Search results link directly to the failure graph node.</div>`
+    body: `<div class="modal-section"><div class="modal-section-label">Full detail</div>Click any result card on the dashboard for a specific study modal. Search results link directly to the failure summary.</div>`
   }
 };
 
@@ -2843,21 +2654,11 @@ function showToast(title, body) {
   setTimeout(() => t.classList.remove('show'), 5000);
 }
 
-// ── CHIPS ──
-function toggleChip(el) {
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  activeGraphFilter = el.dataset.filter || 'all';
-  // Reset to overview whenever a filter chip is changed
-  graphMode = 'overview';
-  activeConceptId = null;
-  drawGraph();
-}
-
 // Init
 loadSavedSubmissions();
 loadImportedTrials();
-loadGraphData();
+loadImportedPubmed();
+renderFailureSummary();
 </script>
 </body>
 </html>

@@ -124,19 +124,27 @@ def sanitize_graph_value(value, fallback="unspecified"):
 SOURCE_LABELS = {
     "manual": "Manual submission",
     "ctgov_imported": "Imported CT.gov",
-    "ctgov_enriched": "Imported + AI tagged (CT.gov)",
+    "ctgov_enriched": "AI-tagged CT.gov",
+    "ctgov_curated": "Curated failure record (CT.gov)",
     "pubmed_imported": "Imported PubMed",
-    "pubmed_enriched": "Imported + AI tagged (PubMed)"
+    "pubmed_enriched": "AI-tagged PubMed",
+    "pubmed_curated": "Curated failure record (PubMed)"
 }
 
 
 def classify_trial_source(trial):
+    curation = trial.get("curation", {}) or {}
+    if curation.get("review_status") == "curated_failure" and curation.get("graph_worthy") is True:
+        return "ctgov_curated"
     if trial.get("summary"):
         return "ctgov_enriched"
     return "ctgov_imported"
 
 
 def classify_pubmed_source(article):
+    curation = article.get("curation", {}) or {}
+    if curation.get("review_status") == "curated_failure" and curation.get("graph_worthy") is True:
+        return "pubmed_curated"
     if article.get("summary"):
         return "pubmed_enriched"
     return "pubmed_imported"
@@ -175,7 +183,11 @@ NEGATIVE_TITLE_HINTS = [
     "ineffective",
     "primary end point was not met",
     "primary endpoint was not met",
-    "limited benefit"
+    "limited benefit",
+    "ineffective",
+    "did not prolong",
+    "did not improve survival",
+    "not superior"
 ]
 
 OPPOSITE_TITLE_HINTS = [
@@ -184,7 +196,8 @@ OPPOSITE_TITLE_HINTS = [
     "adverse",
     "toxicity",
     "increased risk",
-    "negative effect"
+    "negative effect",
+    "inferior"
 ]
 
 
@@ -246,7 +259,7 @@ def clean_model_json_text(raw_text):
     return text.strip()
 
 
-def safe_parse_summary_json(raw_text):
+def safe_parse_json(raw_text):
     text = clean_model_json_text(raw_text)
 
     try:
@@ -330,7 +343,110 @@ Limitations or context: {short_limitations}
     )
 
     raw_text = response.content[0].text
-    return safe_parse_summary_json(raw_text)
+    return safe_parse_json(raw_text)
+
+
+# ---------------------------
+# Claude curation
+# ---------------------------
+
+def curate_failure_with_claude(
+    title,
+    study_type,
+    result_type_hint,
+    source_type,
+    intervention,
+    population,
+    primary_outcome,
+    abstract_or_summary,
+    extra_context
+):
+    short_text = (abstract_or_summary or "")[:5000]
+    short_context = (extra_context or "")[:2500]
+
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=400,
+        system=(
+            "You are a scientific screening assistant for FailUp. "
+            "Your task is to decide whether a record is a genuine failure-related study record suitable for the FailUp graph. "
+            "Return only valid raw JSON. No markdown. No extra words. "
+            "Be conservative. If the evidence is weak, choose uncertain."
+        ),
+        messages=[
+            {
+                "role": "user",
+                "content": f"""
+Return ONLY valid JSON with these keys:
+review_status
+confidence
+basis
+graph_worthy
+failure_class
+
+Rules:
+- review_status must be one of:
+  "curated_failure"
+  "uncertain"
+  "not_failure"
+- confidence must be one of:
+  "high"
+  "medium"
+  "low"
+- graph_worthy must be true or false
+- failure_class must be one of:
+  "null"
+  "inconclusive"
+  "opposite"
+  "not_failure"
+- Be conservative.
+- Only choose "curated_failure" if the provided material supports that this is a failure-type record:
+  failed / null / negative / inconclusive / not meeting primary endpoint / opposite effect / trial stopped for a failure-related reason.
+- Do NOT assume that completed means failed.
+- If the record is a positive or clearly successful study, return "not_failure".
+- If evidence is too limited, return "uncertain".
+- basis should be 1-2 concise sentences explaining why.
+
+Title: {title}
+Source type: {source_type}
+Study type: {study_type}
+Current result type hint: {result_type_hint}
+Intervention: {intervention}
+Population: {population}
+Primary outcome: {primary_outcome}
+Abstract or summary: {short_text}
+Extra context: {short_context}
+"""
+            }
+        ]
+    )
+
+    raw_text = response.content[0].text
+    data = safe_parse_json(raw_text)
+
+    review_status = data.get("review_status", "uncertain")
+    if review_status not in {"curated_failure", "uncertain", "not_failure"}:
+        review_status = "uncertain"
+
+    confidence = data.get("confidence", "low")
+    if confidence not in {"high", "medium", "low"}:
+        confidence = "low"
+
+    failure_class = data.get("failure_class", "not_failure")
+    if failure_class not in {"null", "inconclusive", "opposite", "not_failure"}:
+        failure_class = "not_failure"
+
+    graph_worthy = bool(data.get("graph_worthy", False))
+    basis = data.get("basis", "No basis returned.")
+
+    return {
+        "review_status": review_status,
+        "confidence": confidence,
+        "basis": basis,
+        "graph_worthy": graph_worthy,
+        "failure_class": failure_class,
+        "reviewed_at": now_iso()
+    }
 
 
 # ---------------------------
@@ -359,6 +475,14 @@ def contradiction_flag(value):
     return bool(text and text != "not assessed from provided information.")
 
 
+def is_graph_eligible_imported(record):
+    curation = record.get("curation", {}) or {}
+    return (
+        curation.get("review_status") == "curated_failure" and
+        curation.get("graph_worthy") is True
+    )
+
+
 def record_to_study_node(record):
     tags = standardize_graph_tags(record.get("graph_tags", {}))
     return {
@@ -377,10 +501,10 @@ def record_to_study_node(record):
     }
 
 
-def collect_all_records(submissions, imported_trials=None, pubmed_articles=None):
+def collect_graph_records(submissions, imported_trials=None, pubmed_articles=None):
     all_records = []
 
-    # Manual submissions
+    # Manual submissions always go into graph
     for sub in submissions or []:
         all_records.append({
             "id": f"manual-{sub.get('id')}",
@@ -394,42 +518,44 @@ def collect_all_records(submissions, imported_trials=None, pubmed_articles=None)
             "source_label": SOURCE_LABELS["manual"]
         })
 
-    # CT.gov
+    # CT.gov only if curated_failure
     for trial in imported_trials or []:
-        source = classify_trial_source(trial)
-        graph_tags = trial.get("summary", {}).get("graph_tags")
-        if not graph_tags:
-            graph_tags = fallback_graph_tags_for_trial(trial)
+        if not is_graph_eligible_imported(trial):
+            continue
+
+        graph_tags = trial.get("summary", {}).get("graph_tags") or fallback_graph_tags_for_trial(trial)
+        failure_class = trial.get("curation", {}).get("failure_class") or trial.get("result_type") or infer_trial_result_type(trial)
 
         all_records.append({
             "id": f"ctgov-{trial.get('id')}",
             "title": safe_title(trial.get("title"), "Imported trial"),
-            "type": normalize_result_type(trial.get("result_type", infer_trial_result_type(trial))),
+            "type": normalize_result_type(failure_class),
             "doi": trial.get("nct_id", ""),
             "failure_mode": trial.get("summary", {}).get("failure_mode", "unknown"),
             "contradiction_check": trial.get("summary", {}).get("contradiction_check", ""),
             "graph_tags": graph_tags,
-            "source": source,
-            "source_label": SOURCE_LABELS[source]
+            "source": "ctgov_curated",
+            "source_label": SOURCE_LABELS["ctgov_curated"]
         })
 
-    # PubMed
+    # PubMed only if curated_failure
     for article in pubmed_articles or []:
-        source = classify_pubmed_source(article)
-        graph_tags = article.get("summary", {}).get("graph_tags")
-        if not graph_tags:
-            graph_tags = fallback_graph_tags_for_pubmed(article)
+        if not is_graph_eligible_imported(article):
+            continue
+
+        graph_tags = article.get("summary", {}).get("graph_tags") or fallback_graph_tags_for_pubmed(article)
+        failure_class = article.get("curation", {}).get("failure_class") or article.get("result_type") or infer_pubmed_result_type(article)
 
         all_records.append({
             "id": f"pubmed-{article.get('id')}",
             "title": safe_title(article.get("title"), "Imported article"),
-            "type": normalize_result_type(article.get("result_type", infer_pubmed_result_type(article))),
+            "type": normalize_result_type(failure_class),
             "doi": article.get("pmid", ""),
             "failure_mode": article.get("summary", {}).get("failure_mode", "unknown"),
             "contradiction_check": article.get("summary", {}).get("contradiction_check", ""),
             "graph_tags": graph_tags,
-            "source": source,
-            "source_label": SOURCE_LABELS[source]
+            "source": "pubmed_curated",
+            "source_label": SOURCE_LABELS["pubmed_curated"]
         })
 
     return all_records
@@ -453,7 +579,6 @@ def build_study_graph(all_records):
                 if v1 and v2 and v1 == v2 and v1 != "unspecified":
                     shared.append(field)
 
-            # stricter rule so the graph is less hairy
             strong_link = (
                 "target" in shared or
                 "mechanism" in shared or
@@ -539,11 +664,10 @@ def build_overview_graph(study_nodes):
 
 
 def build_graph_data(submissions, imported_trials=None, pubmed_articles=None):
-    all_records = collect_all_records(submissions, imported_trials, pubmed_articles)
+    all_records = collect_graph_records(submissions, imported_trials, pubmed_articles)
     studies = build_study_graph(all_records)
     overview = build_overview_graph(studies["nodes"])
 
-    # Keep legacy top-level keys so current frontend still works.
     return {
         "nodes": studies["nodes"],
         "edges": studies["edges"],
@@ -896,6 +1020,7 @@ def get_ctgov_trials():
     trials = load_trials()
     imported_count = sum(1 for t in trials if classify_trial_source(t) == "ctgov_imported")
     enriched_count = sum(1 for t in trials if classify_trial_source(t) == "ctgov_enriched")
+    curated_count = sum(1 for t in trials if classify_trial_source(t) == "ctgov_curated")
 
     return jsonify({
         "success": True,
@@ -903,11 +1028,13 @@ def get_ctgov_trials():
         "counts": {
             "total": len(trials),
             "ctgov_imported": imported_count,
-            "ctgov_enriched": enriched_count
+            "ctgov_enriched": enriched_count,
+            "ctgov_curated": curated_count
         },
         "label_map": {
             "ctgov_imported": SOURCE_LABELS["ctgov_imported"],
-            "ctgov_enriched": SOURCE_LABELS["ctgov_enriched"]
+            "ctgov_enriched": SOURCE_LABELS["ctgov_enriched"],
+            "ctgov_curated": SOURCE_LABELS["ctgov_curated"]
         }
     })
 
@@ -971,6 +1098,7 @@ def enrich_ctgov_trials():
 
         imported_count = sum(1 for t in trials if classify_trial_source(t) == "ctgov_imported")
         enriched_count = sum(1 for t in trials if classify_trial_source(t) == "ctgov_enriched")
+        curated_count = sum(1 for t in trials if classify_trial_source(t) == "ctgov_curated")
 
         return jsonify({
             "success": True,
@@ -979,11 +1107,101 @@ def enrich_ctgov_trials():
             "total_trials": len(trials),
             "counts": {
                 "ctgov_imported": imported_count,
-                "ctgov_enriched": enriched_count
+                "ctgov_enriched": enriched_count,
+                "ctgov_curated": curated_count
             },
             "label_map": {
                 "ctgov_imported": SOURCE_LABELS["ctgov_imported"],
-                "ctgov_enriched": SOURCE_LABELS["ctgov_enriched"]
+                "ctgov_enriched": SOURCE_LABELS["ctgov_enriched"],
+                "ctgov_curated": SOURCE_LABELS["ctgov_curated"]
+            },
+            "errors": errors
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route("/curate-ctgov-trials", methods=["POST"])
+def curate_ctgov_trials():
+    data = request.get_json() or {}
+    limit = safe_int(data.get("limit", 5), 5)
+
+    try:
+        trials = load_trials()
+        curated_count = 0
+        already_curated_seen = 0
+        errors = []
+
+        for trial in trials:
+            if curated_count >= limit:
+                break
+
+            if trial.get("curation"):
+                already_curated_seen += 1
+                continue
+
+            summary = trial.get("summary", {}) or {}
+            intervention_text = "; ".join(trial.get("interventions", []))
+            context_text = (
+                f"Status: {trial.get('status', '')}\n"
+                f"Phase: {trial.get('phase', '')}\n"
+                f"Conditions: {'; '.join(trial.get('conditions', []))}\n"
+                f"Summary findings: {summary.get('findings', '')}\n"
+                f"Main limitation: {summary.get('main_limitation', '')}\n"
+                f"Failure mode: {summary.get('failure_mode', '')}"
+            )
+
+            try:
+                curation = curate_failure_with_claude(
+                    title=trial.get("title", ""),
+                    study_type=trial.get("study_type", ""),
+                    result_type_hint=trial.get("result_type", infer_trial_result_type(trial)),
+                    source_type="ClinicalTrials.gov record",
+                    intervention=intervention_text,
+                    population=trial.get("population", ""),
+                    primary_outcome=trial.get("primary_outcome", ""),
+                    abstract_or_summary=trial.get("brief_summary", ""),
+                    extra_context=context_text
+                )
+
+                trial["curation"] = curation
+                if curation.get("review_status") == "curated_failure" and curation.get("failure_class") in {"null", "inconclusive", "opposite"}:
+                    trial["result_type"] = curation["failure_class"]
+
+                if curation.get("review_status") == "curated_failure" and curation.get("graph_worthy") is True:
+                    trial["source_status"] = "ctgov_curated"
+
+                curated_count += 1
+                save_trials(trials)
+
+            except Exception as trial_error:
+                errors.append({
+                    "title": trial.get("title", "Unknown title"),
+                    "error": str(trial_error)
+                })
+
+        imported_count = sum(1 for t in trials if classify_trial_source(t) == "ctgov_imported")
+        enriched_count = sum(1 for t in trials if classify_trial_source(t) == "ctgov_enriched")
+        curated_total = sum(1 for t in trials if classify_trial_source(t) == "ctgov_curated")
+
+        return jsonify({
+            "success": True,
+            "curated_count": curated_count,
+            "already_curated_seen": already_curated_seen,
+            "total_trials": len(trials),
+            "counts": {
+                "ctgov_imported": imported_count,
+                "ctgov_enriched": enriched_count,
+                "ctgov_curated": curated_total
+            },
+            "label_map": {
+                "ctgov_imported": SOURCE_LABELS["ctgov_imported"],
+                "ctgov_enriched": SOURCE_LABELS["ctgov_enriched"],
+                "ctgov_curated": SOURCE_LABELS["ctgov_curated"]
             },
             "errors": errors
         })
@@ -1117,6 +1335,7 @@ def get_pubmed_articles():
     articles = load_pubmed_articles()
     imported_count = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_imported")
     enriched_count = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_enriched")
+    curated_count = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_curated")
 
     return jsonify({
         "success": True,
@@ -1124,11 +1343,13 @@ def get_pubmed_articles():
         "counts": {
             "total": len(articles),
             "pubmed_imported": imported_count,
-            "pubmed_enriched": enriched_count
+            "pubmed_enriched": enriched_count,
+            "pubmed_curated": curated_count
         },
         "label_map": {
             "pubmed_imported": SOURCE_LABELS["pubmed_imported"],
-            "pubmed_enriched": SOURCE_LABELS["pubmed_enriched"]
+            "pubmed_enriched": SOURCE_LABELS["pubmed_enriched"],
+            "pubmed_curated": SOURCE_LABELS["pubmed_curated"]
         }
     })
 
@@ -1193,6 +1414,7 @@ def enrich_pubmed_articles():
 
         imported_count = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_imported")
         enriched_count = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_enriched")
+        curated_count = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_curated")
 
         return jsonify({
             "success": True,
@@ -1201,11 +1423,101 @@ def enrich_pubmed_articles():
             "total_articles": len(articles),
             "counts": {
                 "pubmed_imported": imported_count,
-                "pubmed_enriched": enriched_count
+                "pubmed_enriched": enriched_count,
+                "pubmed_curated": curated_count
             },
             "label_map": {
                 "pubmed_imported": SOURCE_LABELS["pubmed_imported"],
-                "pubmed_enriched": SOURCE_LABELS["pubmed_enriched"]
+                "pubmed_enriched": SOURCE_LABELS["pubmed_enriched"],
+                "pubmed_curated": SOURCE_LABELS["pubmed_curated"]
+            },
+            "errors": errors
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route("/curate-pubmed-articles", methods=["POST"])
+def curate_pubmed_articles():
+    data = request.get_json() or {}
+    limit = safe_int(data.get("limit", 5), 5)
+
+    try:
+        articles = load_pubmed_articles()
+        curated_count = 0
+        already_curated_seen = 0
+        errors = []
+
+        for article in articles:
+            if curated_count >= limit:
+                break
+
+            if article.get("curation"):
+                already_curated_seen += 1
+                continue
+
+            summary = article.get("summary", {}) or {}
+            context_text = (
+                f"Journal: {article.get('journal', '')}\n"
+                f"Publication date: {article.get('pub_date', '')}\n"
+                f"Article type: {article.get('article_type', '')}\n"
+                f"Summary findings: {summary.get('findings', '')}\n"
+                f"Main limitation: {summary.get('main_limitation', '')}\n"
+                f"Failure mode: {summary.get('failure_mode', '')}\n"
+                f"MeSH terms: {', '.join(article.get('mesh_terms', []) or [])}"
+            )
+
+            try:
+                curation = curate_failure_with_claude(
+                    title=article.get("title", ""),
+                    study_type=article.get("article_type", ""),
+                    result_type_hint=article.get("result_type", infer_pubmed_result_type(article)),
+                    source_type="PubMed record",
+                    intervention="Not explicitly structured in PubMed metadata.",
+                    population="Not explicitly structured in PubMed metadata.",
+                    primary_outcome="Not explicitly structured in PubMed metadata.",
+                    abstract_or_summary=article.get("abstract", ""),
+                    extra_context=context_text
+                )
+
+                article["curation"] = curation
+                if curation.get("review_status") == "curated_failure" and curation.get("failure_class") in {"null", "inconclusive", "opposite"}:
+                    article["result_type"] = curation["failure_class"]
+
+                if curation.get("review_status") == "curated_failure" and curation.get("graph_worthy") is True:
+                    article["source_status"] = "pubmed_curated"
+
+                curated_count += 1
+                save_pubmed_articles(articles)
+
+            except Exception as article_error:
+                errors.append({
+                    "title": article.get("title", "Unknown title"),
+                    "error": str(article_error)
+                })
+
+        imported_count = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_imported")
+        enriched_count = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_enriched")
+        curated_total = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_curated")
+
+        return jsonify({
+            "success": True,
+            "curated_count": curated_count,
+            "already_curated_seen": already_curated_seen,
+            "total_articles": len(articles),
+            "counts": {
+                "pubmed_imported": imported_count,
+                "pubmed_enriched": enriched_count,
+                "pubmed_curated": curated_total
+            },
+            "label_map": {
+                "pubmed_imported": SOURCE_LABELS["pubmed_imported"],
+                "pubmed_enriched": SOURCE_LABELS["pubmed_enriched"],
+                "pubmed_curated": SOURCE_LABELS["pubmed_curated"]
             },
             "errors": errors
         })
@@ -1229,8 +1541,11 @@ def source_counts():
 
     ctgov_imported = sum(1 for t in trials if classify_trial_source(t) == "ctgov_imported")
     ctgov_enriched = sum(1 for t in trials if classify_trial_source(t) == "ctgov_enriched")
+    ctgov_curated = sum(1 for t in trials if classify_trial_source(t) == "ctgov_curated")
+
     pubmed_imported = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_imported")
     pubmed_enriched = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_enriched")
+    pubmed_curated = sum(1 for a in articles if classify_pubmed_source(a) == "pubmed_curated")
 
     return jsonify({
         "success": True,
@@ -1238,16 +1553,21 @@ def source_counts():
             "manual": len(submissions),
             "ctgov_imported": ctgov_imported,
             "ctgov_enriched": ctgov_enriched,
+            "ctgov_curated": ctgov_curated,
             "pubmed_imported": pubmed_imported,
             "pubmed_enriched": pubmed_enriched,
-            "total": len(submissions) + len(trials) + len(articles)
+            "pubmed_curated": pubmed_curated,
+            "graph_total": len(submissions) + ctgov_curated + pubmed_curated,
+            "library_total": len(submissions) + len(trials) + len(articles)
         },
         "label_map": {
             "manual": SOURCE_LABELS["manual"],
             "ctgov_imported": SOURCE_LABELS["ctgov_imported"],
             "ctgov_enriched": SOURCE_LABELS["ctgov_enriched"],
+            "ctgov_curated": SOURCE_LABELS["ctgov_curated"],
             "pubmed_imported": SOURCE_LABELS["pubmed_imported"],
-            "pubmed_enriched": SOURCE_LABELS["pubmed_enriched"]
+            "pubmed_enriched": SOURCE_LABELS["pubmed_enriched"],
+            "pubmed_curated": SOURCE_LABELS["pubmed_curated"]
         }
     })
 
