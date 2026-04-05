@@ -2,13 +2,10 @@ import os
 import json
 import re
 from datetime import datetime
-from io import BytesIO
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
-import pdfplumber
 import requests
-from docx import Document
 from flask import Flask, send_file, request, jsonify
 from anthropic import Anthropic
 from dotenv import load_dotenv
@@ -118,210 +115,6 @@ def safe_title(value, fallback="Untitled"):
 def sanitize_graph_value(value, fallback="unspecified"):
     value = (value or "").strip()
     return value if value else fallback
-
-
-# ---------------------------
-# Upload extraction helpers
-# ---------------------------
-
-ALLOWED_UPLOAD_EXTENSIONS = {".pdf", ".doc", ".docx"}
-MAX_EXTRACTED_TEXT_CHARS = 25000
-
-
-def allowed_upload_file(filename):
-    return Path(filename or "").suffix.lower() in ALLOWED_UPLOAD_EXTENSIONS
-
-
-def extract_text_from_pdf_bytes(file_bytes):
-    chunks = []
-    with pdfplumber.open(BytesIO(file_bytes)) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text() or ""
-            if page_text.strip():
-                chunks.append(page_text.strip())
-    return "\n\n".join(chunks).strip()
-
-
-def extract_text_from_docx_bytes(file_bytes):
-    doc = Document(BytesIO(file_bytes))
-    parts = []
-
-    for paragraph in doc.paragraphs:
-        text = (paragraph.text or "").strip()
-        if text:
-            parts.append(text)
-
-    for table in doc.tables:
-        for row in table.rows:
-            row_text = " | ".join((cell.text or "").strip() for cell in row.cells if (cell.text or "").strip())
-            if row_text:
-                parts.append(row_text)
-
-    return "\n".join(parts).strip()
-
-
-def extract_text_from_uploaded_file(storage):
-    filename = storage.filename or "uploaded_file"
-    suffix = Path(filename).suffix.lower()
-    file_bytes = storage.read()
-    storage.stream.seek(0)
-
-    if suffix == ".pdf":
-        return extract_text_from_pdf_bytes(file_bytes)
-    if suffix in {".doc", ".docx"}:
-        return extract_text_from_docx_bytes(file_bytes)
-
-    raise ValueError(f"Unsupported file type: {suffix}")
-
-
-def build_uploaded_document_context(files):
-    documents = []
-
-    for storage in files:
-        filename = storage.filename or "uploaded_file"
-        if not allowed_upload_file(filename):
-            raise ValueError(f"Unsupported file type for {filename}. Please upload PDF or DOCX files.")
-
-        extracted = extract_text_from_uploaded_file(storage)
-        if extracted:
-            documents.append(
-                f"FILE: {filename}\n"
-                f"BEGIN_CONTENT\n{extracted[:MAX_EXTRACTED_TEXT_CHARS]}\nEND_CONTENT"
-            )
-
-    return "\n\n".join(documents)
-
-
-def heuristic_extract_fields(text):
-    clean_text = text or ""
-    compact_text = re.sub(r"\s+", " ", clean_text).strip()
-    lines = [line.strip() for line in clean_text.splitlines() if line.strip()]
-
-    nct_match = re.search(r"\bNCT\d{8}\b", clean_text, flags=re.IGNORECASE)
-    sample_match = re.search(r"(?:sample size|enrolled|enrollment|randomized|participants|subjects)\D{0,15}(\d{2,5})", clean_text, flags=re.IGNORECASE)
-    planned_match = re.search(r"(?:planned|target)\s+(?:sample size|enrollment|n)\D{0,15}(\d{2,5})", clean_text, flags=re.IGNORECASE)
-    pval_match = re.search(r"\bp\s*[=<>]\s*0?\.?\d+[\d]*", clean_text, flags=re.IGNORECASE)
-    hr_match = re.search(r"\b(HR|OR|RR|IRR|MD|SMD|β)\s*[:=]?\s*[^\n.;]{1,80}", clean_text, flags=re.IGNORECASE)
-
-    title = ""
-    for line in lines[:12]:
-        if len(line) >= 20 and not re.match(r"^(abstract|background|methods|results|introduction)\b", line, flags=re.IGNORECASE):
-            title = line
-            break
-
-    return {
-        "title": title,
-        "nct": nct_match.group(0).upper() if nct_match else "",
-        "study_type": "",
-        "phase": "",
-        "n": sample_match.group(1) if sample_match else "",
-        "nplan": planned_match.group(1) if planned_match else "",
-        "design": "",
-        "therapeutic_area": "",
-        "intervention": "",
-        "population": "",
-        "dropout": "",
-        "female": "",
-        "age": "",
-        "result_type": "",
-        "outcome": "",
-        "pval": pval_match.group(0) if pval_match else "",
-        "effect_estimate_type": hr_match.group(1).upper() if hr_match else "",
-        "effect_estimate_other": "",
-        "effect_estimate": hr_match.group(0) if hr_match else "",
-        "limitations": compact_text[:400] if compact_text else ""
-    }
-
-
-def extract_study_fields_with_claude(document_text, file_names):
-    fallback = heuristic_extract_fields(document_text)
-
-    response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1200,
-        system=(
-            "You extract structured study metadata from uploaded research documents for a submission form. "
-            "Return only valid raw JSON with the exact requested keys. "
-            "Do not invent details. If a field is not clearly supported by the documents, return an empty string. "
-            "Use concise values that can be inserted directly into HTML form fields. "
-            "When possible, map values to the form's existing choices exactly.\n"
-            "Allowed study_type values: Randomized clinical trial; Non-randomized controlled trial; Observational (cohort); Observational (case-control); Cross-sectional; Preclinical (in vivo); Preclinical (in vitro); Systematic review / meta-analysis; Basket / platform trial.\n"
-            "Allowed phase values: Phase III; Phase II/III; Phase II; Phase I/II; Phase I; Phase IV; Not applicable.\n"
-            "Allowed design values: Double-blind RCT — 1:1; Double-blind RCT — other ratio; Single-blind RCT; Open-label RCT; Non-randomized; Not applicable.\n"
-            "Allowed therapeutic_area values: Oncology; Neurology; Cardiology; Immunology; Hepatology; Psychiatry; Infectious disease; Endocrinology; Respiratory; Rare disease; Other.\n"
-            "Allowed result_type values: null; inconclusive; opposite.\n"
-            "Allowed effect_estimate_type values: HR; OR; RR; RD; MD; SMD; β; IRR; NNT; other."
-        ),
-        messages=[
-            {
-                "role": "user",
-                "content": f"""
-Return ONLY valid JSON with exactly these keys:
-title
-nct
-study_type
-phase
-n
-nplan
-design
-therapeutic_area
-intervention
-population
-dropout
-female
-age
-result_type
-outcome
-pval
-effect_estimate_type
-effect_estimate_other
-effect_estimate
-limitations
-
-Instructions:
-- Use empty strings for anything not clearly stated.
-- Keep intervention, population, outcome, and limitations concise but informative.
-- For n and nplan, return only the value as text that fits the form field.
-- For female and age, return concise display text such as "46%" or "58 years".
-- For pval, keep the original statistical notation if reported.
-- For effect_estimate, include the estimate and confidence interval if available.
-- If the estimate type is not one of the allowed values, set effect_estimate_type to "other" and fill effect_estimate_other.
-
-Uploaded files: {", ".join(file_names)}
-
-Fallback guesses from regex (use only if supported by document text):
-{json.dumps(fallback, ensure_ascii=False)}
-
-Document text:
-{document_text}
-"""
-            }
-        ]
-    )
-
-    data = safe_parse_json(response.content[0].text)
-
-    expected_keys = [
-        "title", "nct", "study_type", "phase", "n", "nplan", "design",
-        "therapeutic_area", "intervention", "population", "dropout", "female",
-        "age", "result_type", "outcome", "pval", "effect_estimate_type",
-        "effect_estimate_other", "effect_estimate", "limitations"
-    ]
-
-    normalized = {}
-    for key in expected_keys:
-        value = data.get(key, fallback.get(key, ""))
-        normalized[key] = value.strip() if isinstance(value, str) else str(value or "").strip()
-
-    if normalized["result_type"] not in {"null", "inconclusive", "opposite"}:
-        normalized["result_type"] = fallback.get("result_type", "")
-
-    allowed_effect_types = {"", "HR", "OR", "RR", "RD", "MD", "SMD", "β", "IRR", "NNT", "other"}
-    if normalized["effect_estimate_type"] not in allowed_effect_types:
-        normalized["effect_estimate_other"] = normalized["effect_estimate_type"]
-        normalized["effect_estimate_type"] = "other"
-
-    return normalized
 
 
 # ---------------------------
@@ -496,13 +289,13 @@ def summarize_with_claude(
 
     response = client.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=500,
+        max_tokens=900,
         system=(
             "You are a scientific summarization assistant for FailUp. "
             "Return only valid raw JSON, with no markdown fences or extra text. "
-            "Be precise, neutral, concise, and cautious. "
+            "Write neutral, specific, well-structured summaries that are informative rather than skeletal. "
             "Do not speculate beyond what was provided. "
-            "If information is insufficient, say so plainly."
+            "If information is missing, say so plainly instead of inventing details."
         ),
         messages=[
             {
@@ -518,7 +311,21 @@ graph_tags
 
 Rules:
 - Return raw JSON only. No markdown. No backticks.
-- Keep each field concise.
+- Write informative, specific, well-structured prose.
+- Each text field should usually be 2-5 sentences when enough information is available.
+- Do not invent details. If something is not clearly reported, say so.
+- Use the study details below to make the summary concrete.
+- In background:
+  - briefly state the clinical or scientific rationale
+  - identify the study design and population when available
+- In findings:
+  - state the intervention and comparator when available
+  - state whether the primary endpoint was met
+  - include key quantitative details when available (sample size, survival, HR, OR, CI, p-value, response rate, etc.)
+  - explain why the result should be interpreted as null, inconclusive, opposite, or otherwise failure-relevant
+- In main_limitation:
+  - focus on the most important methodological or interpretive limitation
+  - be specific rather than generic
 - failure_mode must be one of:
   "target validity"
   "patient selection"
@@ -527,12 +334,15 @@ Rules:
   "outcome measurement"
   "off-target effects"
   "unknown"
-- contradiction_check should be "Not assessed from provided information."
+- contradiction_check should only reflect what can be assessed from the provided information.
+  If the provided information is insufficient, return exactly:
+  "Not assessed from provided information."
 - graph_tags must contain:
   mechanism
   target
   population
   therapeutic_area
+- graph_tags should be specific, short, and standardized where possible.
 
 Study title: {title}
 Study type: {study_type}
@@ -572,12 +382,12 @@ def curate_failure_with_claude(
 
     response = client.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=400,
+        max_tokens=550,
         system=(
             "You are a scientific screening assistant for FailUp. "
             "Your task is to decide whether a record is a genuine failure-related study record suitable for the FailUp repository. "
             "Return only valid raw JSON. No markdown. No extra words. "
-            "Be conservative. If the evidence is weak, choose uncertain."
+            "Be strict and conservative. If the evidence is weak or mixed, choose uncertain or not_failure rather than overcalling a failure."
         ),
         messages=[
             {
@@ -605,13 +415,32 @@ Rules:
   "inconclusive"
   "opposite"
   "not_failure"
-- Be conservative.
-- Only choose "curated_failure" if the provided material supports that this is a failure-type record:
-  failed / null / negative / inconclusive / not meeting primary endpoint / opposite effect / trial stopped for a failure-related reason.
+
+Be strict and conservative.
+
+Choose "curated_failure" ONLY if the provided material supports that this record is genuinely about a failed, null, negative, inconclusive, or nonconfirmatory finding, such as:
+- a primary endpoint was not met
+- no significant benefit was shown
+- the study is described as negative, null, failed, or inconclusive
+- the trial stopped for failure-related reasons
+- the intervention performed in the wrong direction in a clinically failure-relevant context
+
+Choose "not_failure" if any of the following apply:
+- the study is clearly positive or reports benefit
+- the prespecified endpoint was met
+- the paper is mainly mechanistic or preclinical and reports positive efficacy
+- the paper is a general review, narrative review, guideline, commentary, or overview rather than a specific failed study record
+- the result is promising, beneficial, supportive, or approval-enabling even if preliminary
+- "opposite" should NOT be used for surprisingly positive benefit
+
+Choose "uncertain" if the evidence is too limited to determine whether the record is truly failure-related.
+
+Additional guidance:
 - Do NOT assume that completed means failed.
-- If the record is a positive or clearly successful study, return "not_failure".
-- If evidence is too limited, return "uncertain".
-- basis should be 1-2 concise sentences explaining why.
+- Reviews should usually be "not_failure" unless they mainly synthesize failed, null, or inconclusive studies.
+- Single-arm studies that met their endpoint should usually be "not_failure".
+- A record can still be "curated_failure" if secondary signals were interesting but the main efficacy claim failed.
+- basis should be 1-3 concise sentences explaining the decision using evidence from the provided material.
 
 Title: {title}
 Source type: {source_type}
@@ -1045,43 +874,6 @@ def summarize():
             "doi": doi,
             "summary": summary,
             "record": record
-        })
-
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
-@app.route("/extract-study-fields", methods=["POST"])
-def extract_study_fields():
-    files = request.files.getlist("files")
-    files = [f for f in files if f and (f.filename or "").strip()]
-
-    if not files:
-        return jsonify({
-            "success": False,
-            "error": "No files were uploaded."
-        }), 400
-
-    try:
-        document_text = build_uploaded_document_context(files)
-        if not document_text.strip():
-            return jsonify({
-                "success": False,
-                "error": "The uploaded files did not contain extractable text."
-            }), 400
-
-        extracted_fields = extract_study_fields_with_claude(
-            document_text=document_text,
-            file_names=[f.filename or "uploaded_file" for f in files]
-        )
-
-        return jsonify({
-            "success": True,
-            "fields": extracted_fields,
-            "file_names": [f.filename or "uploaded_file" for f in files]
         })
 
     except Exception as e:
@@ -1683,6 +1475,7 @@ def enrich_pubmed_articles():
 def curate_pubmed_articles():
     data = request.get_json() or {}
     limit = safe_int(data.get("limit", 5), 5)
+    force_recurate = bool(data.get("force_recurate", False))
 
     try:
         articles = load_pubmed_articles()
@@ -1694,7 +1487,7 @@ def curate_pubmed_articles():
             if curated_count >= limit:
                 break
 
-            if article.get("curation"):
+            if article.get("curation") and not force_recurate:
                 already_curated_seen += 1
                 continue
 
@@ -1725,9 +1518,15 @@ def curate_pubmed_articles():
                 article["curation"] = curation
                 if curation.get("review_status") == "curated_failure" and curation.get("failure_class") in {"null", "inconclusive", "opposite"}:
                     article["result_type"] = curation["failure_class"]
+                elif curation.get("failure_class") == "not_failure":
+                    article["result_type"] = "not_failure"
 
                 if curation.get("review_status") == "curated_failure" and curation.get("graph_worthy") is True:
                     article["source_status"] = "pubmed_curated"
+                elif article.get("summary"):
+                    article["source_status"] = "pubmed_enriched"
+                else:
+                    article["source_status"] = "pubmed_imported"
 
                 curated_count += 1
                 save_pubmed_articles(articles)
