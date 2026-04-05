@@ -461,6 +461,9 @@
   .contributions-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
   .contributions-table tr:last-child td { border-bottom: none; }
   .contributions-table tr:hover td { color: var(--text); background: var(--accent-glow); }
+  .contributions-table tr.clickable-row { cursor: pointer; }
+  .contributions-table .study-link { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .contributions-table .study-link:hover { text-decoration: underline; }
   .doi-link { font-family: var(--font-mono); color: var(--accent); font-size: 10px; }
 
   /* ── NOTIFICATION TOAST ── */
@@ -1396,7 +1399,7 @@
 </div>
 
       <!-- Stats grid -->
-      <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px">
+      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
         <div class="metric-card accent">
           <div class="metric-label">NF-index</div>
           <div class="metric-val" id="profile-nf-index">4</div>
@@ -1411,11 +1414,6 @@
           <div class="metric-label">Total citations</div>
           <div class="metric-val" id="profile-citations">26</div>
           <div class="metric-sub">across all submissions</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Graph nodes</div>
-          <div class="metric-val" style="color:var(--teal)" id="profile-nodes">4</div>
-          <div class="metric-sub">created from your data</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">Contradictions found</div>
@@ -2086,7 +2084,6 @@ function updateProfileFromSavedSubmissions() {
   // Top stat cards
   const profileNFIndex     = document.getElementById('profile-nf-index');
   const profileSubmissions = document.getElementById('profile-submissions');
-  const profileNodes       = document.getElementById('profile-nodes');
   const profileContradictions = document.getElementById('profile-contradictions');
   const profileCitations   = document.getElementById('profile-citations');
   const profileSummary     = document.getElementById('profile-contrib-summary');
@@ -2094,7 +2091,6 @@ function updateProfileFromSavedSubmissions() {
 
   if (profileNFIndex)       profileNFIndex.textContent       = nfIndex;
   if (profileSubmissions)   profileSubmissions.textContent   = totalSubmissions;
-  if (profileNodes)         profileNodes.textContent         = totalSubmissions;
   if (profileContradictions) profileContradictions.textContent = contradictionCount;
   if (profileCitations)     profileCitations.textContent     = totalCitations;
   if (profileSummary)       profileSummary.textContent       = `${totalSubmissions} submissions · ${totalCitations} total citations`;
@@ -2159,8 +2155,8 @@ function updateProfileFromSavedSubmissions() {
     const citations   = newCitations[idx];
     const contributes = citations >= nfIndex && nfIndex > 0;
     return `
-      <tr>
-        <td>${escapeHtml(sub.title || 'Untitled submission')}</td>
+      <tr class="clickable-row" onclick="openSavedSubmissionById('${String(sub.id).replace(/'/g, "&#39;")}')">
+        <td><a href="javascript:void(0)" class="study-link">${escapeHtml(sub.title || 'Untitled submission')}</a></td>
         <td><span class="trial-type type-${type}">${escapeHtml(typeLabel)}</span></td>
         <td style="color:var(--text3)">${escapeHtml(phase)}</td>
         <td><span class="doi-link">${escapeHtml(sub.doi || '')}</span></td>
@@ -2580,6 +2576,15 @@ function renderResults(query) {
 }
 
 function filterResults(val) { renderResults(val); }
+
+function openSavedSubmissionById(submissionId) {
+  const idx = (savedSubmissions || []).findIndex(sub => String(sub.id) === String(submissionId));
+  if (idx === -1) return;
+  const formatted = formatSavedSubmission(savedSubmissions[idx]);
+  const temp = { ...formatted, raw: savedSubmissions[idx] };
+  window.currentRenderedResults = [temp];
+  openSavedSubmissionModal(0);
+}
 
 function openSavedSubmissionModal(renderedIndex) {
   const result = window.currentRenderedResults?.[renderedIndex];
