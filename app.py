@@ -862,6 +862,8 @@ def extract_study_fields_with_claude(document_text, filenames=''):
 
     prompt = f"""Return ONLY valid JSON with exactly these keys:
 title
+study_type
+phase
 nct
 n
 nplan
@@ -883,6 +885,8 @@ Rules:
 - Use empty string for unknown or not clearly reported values.
 - Keep extracted field values concise but specific.
 - For title, return the study title if clearly available.
+- For study_type, choose the best match from: Randomized clinical trial, Non-randomized controlled trial, Observational (cohort), Observational (case-control), Cross-sectional, Preclinical (in vivo), Preclinical (in vitro), Systematic review / meta-analysis, Basket / platform trial.
+- For phase, choose one of: Phase III, Phase II/III, Phase II, Phase I/II, Phase I, Phase IV, Not applicable.
 - For n, return the enrolled/randomized sample size if available.
 - For nplan, return planned sample size or power calculation wording if available.
 - For intervention, summarize the intervention and comparator/control if available.
@@ -917,13 +921,25 @@ Document text:
 
     data = safe_parse_json(response.content[0].text)
     fields = {
-        'title': '', 'nct': '', 'n': '', 'nplan': '', 'intervention': '', 'population': '',
+        'title': '', 'study_type': '', 'phase': '', 'nct': '', 'n': '', 'nplan': '', 'intervention': '', 'population': '',
         'dropout': '', 'female': '', 'age': '', 'outcome': '', 'pval': '', 'es': '',
         'limits': '', 'area': '', 'design': '', 'result_type': ''
     }
     for key in fields:
         value = data.get(key, '')
         fields[key] = value.strip() if isinstance(value, str) else ''
+
+    allowed_study_types = {
+        'Randomized clinical trial', 'Non-randomized controlled trial', 'Observational (cohort)',
+        'Observational (case-control)', 'Cross-sectional', 'Preclinical (in vivo)',
+        'Preclinical (in vitro)', 'Systematic review / meta-analysis', 'Basket / platform trial'
+    }
+    if fields['study_type'] not in allowed_study_types:
+        fields['study_type'] = ''
+
+    allowed_phases = {'Phase III', 'Phase II/III', 'Phase II', 'Phase I/II', 'Phase I', 'Phase IV', 'Not applicable'}
+    if fields['phase'] not in allowed_phases:
+        fields['phase'] = ''
 
     allowed_areas = {
         'Oncology', 'Neurology', 'Cardiology', 'Immunology', 'Hepatology', 'Psychiatry',
