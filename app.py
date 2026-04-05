@@ -107,16 +107,26 @@ def truncate_label(text, n=24):
     return text if len(text) <= n else text[:n] + "…"
 
 
+def safe_title(value, fallback="Untitled"):
+    value = (value or "").strip()
+    return value if value else fallback
+
+
+def sanitize_graph_value(value, fallback="unspecified"):
+    value = (value or "").strip()
+    return value if value else fallback
+
+
 # ---------------------------
 # Source labels
 # ---------------------------
 
 SOURCE_LABELS = {
     "manual": "Manual submission",
-    "ctgov_imported": "Imported ClinicalTrials.gov",
-    "ctgov_enriched": "Enriched imported trial",
-    "pubmed_imported": "Imported PubMed article",
-    "pubmed_enriched": "Enriched imported article"
+    "ctgov_imported": "Imported CT.gov",
+    "ctgov_enriched": "Imported + AI tagged (CT.gov)",
+    "pubmed_imported": "Imported PubMed",
+    "pubmed_enriched": "Imported + AI tagged (PubMed)"
 }
 
 
@@ -324,20 +334,58 @@ Limitations or context: {short_limitations}
 
 
 # ---------------------------
-# Graph construction
+# Graph helpers
 # ---------------------------
 
-def build_graph_data(submissions, imported_trials=None, pubmed_articles=None):
-    nodes = []
-    edges = []
+def normalize_result_type(value):
+    value = normalize_text(value)
+    if value in {"null", "inconclusive", "opposite"}:
+        return value
+    return "inconclusive"
+
+
+def standardize_graph_tags(tags):
+    tags = tags or {}
+    return {
+        "mechanism": sanitize_graph_value(tags.get("mechanism", "unspecified")),
+        "target": sanitize_graph_value(tags.get("target", "unspecified")),
+        "population": sanitize_graph_value(tags.get("population", "unspecified")),
+        "therapeutic_area": sanitize_graph_value(tags.get("therapeutic_area", "unspecified")),
+    }
+
+
+def contradiction_flag(value):
+    text = normalize_text(value)
+    return bool(text and text != "not assessed from provided information.")
+
+
+def record_to_study_node(record):
+    tags = standardize_graph_tags(record.get("graph_tags", {}))
+    return {
+        "id": record["id"],
+        "kind": "study",
+        "label": truncate_label(record["title"], 24),
+        "title": record["title"],
+        "type": normalize_result_type(record.get("type")),
+        "doi": record.get("doi", ""),
+        "failure_mode": record.get("failure_mode", "unknown"),
+        "contradiction_check": record.get("contradiction_check", ""),
+        "has_contradiction": contradiction_flag(record.get("contradiction_check", "")),
+        "source": record.get("source", ""),
+        "source_label": record.get("source_label", ""),
+        "graph_tags": tags
+    }
+
+
+def collect_all_records(submissions, imported_trials=None, pubmed_articles=None):
     all_records = []
 
-    # Manual
-    for sub in submissions:
+    # Manual submissions
+    for sub in submissions or []:
         all_records.append({
             "id": f"manual-{sub.get('id')}",
-            "title": sub.get("title", "Untitled submission"),
-            "type": normalize_text(sub.get("result_type", "null")),
+            "title": safe_title(sub.get("title"), "Untitled submission"),
+            "type": normalize_result_type(sub.get("result_type", "null")),
             "doi": sub.get("doi", ""),
             "failure_mode": sub.get("summary", {}).get("failure_mode", "unknown"),
             "contradiction_check": sub.get("summary", {}).get("contradiction_check", ""),
@@ -347,7 +395,7 @@ def build_graph_data(submissions, imported_trials=None, pubmed_articles=None):
         })
 
     # CT.gov
-    for trial in (imported_trials or []):
+    for trial in imported_trials or []:
         source = classify_trial_source(trial)
         graph_tags = trial.get("summary", {}).get("graph_tags")
         if not graph_tags:
@@ -355,8 +403,8 @@ def build_graph_data(submissions, imported_trials=None, pubmed_articles=None):
 
         all_records.append({
             "id": f"ctgov-{trial.get('id')}",
-            "title": trial.get("title", "Imported trial"),
-            "type": normalize_text(trial.get("result_type", infer_trial_result_type(trial))),
+            "title": safe_title(trial.get("title"), "Imported trial"),
+            "type": normalize_result_type(trial.get("result_type", infer_trial_result_type(trial))),
             "doi": trial.get("nct_id", ""),
             "failure_mode": trial.get("summary", {}).get("failure_mode", "unknown"),
             "contradiction_check": trial.get("summary", {}).get("contradiction_check", ""),
@@ -366,7 +414,7 @@ def build_graph_data(submissions, imported_trials=None, pubmed_articles=None):
         })
 
     # PubMed
-    for article in (pubmed_articles or []):
+    for article in pubmed_articles or []:
         source = classify_pubmed_source(article)
         graph_tags = article.get("summary", {}).get("graph_tags")
         if not graph_tags:
@@ -374,8 +422,8 @@ def build_graph_data(submissions, imported_trials=None, pubmed_articles=None):
 
         all_records.append({
             "id": f"pubmed-{article.get('id')}",
-            "title": article.get("title", "Imported article"),
-            "type": normalize_text(article.get("result_type", infer_pubmed_result_type(article))),
+            "title": safe_title(article.get("title"), "Imported article"),
+            "type": normalize_result_type(article.get("result_type", infer_pubmed_result_type(article))),
             "doi": article.get("pmid", ""),
             "failure_mode": article.get("summary", {}).get("failure_mode", "unknown"),
             "contradiction_check": article.get("summary", {}).get("contradiction_check", ""),
@@ -384,30 +432,13 @@ def build_graph_data(submissions, imported_trials=None, pubmed_articles=None):
             "source_label": SOURCE_LABELS[source]
         })
 
-    for record in all_records:
-        result_type = record["type"]
-        if result_type not in {"null", "inconclusive", "opposite"}:
-            result_type = "inconclusive"
+    return all_records
 
-        tags = record.get("graph_tags", {}) or {}
 
-        nodes.append({
-            "id": record["id"],
-            "label": truncate_label(record["title"], 24),
-            "title": record["title"],
-            "type": result_type,
-            "doi": record["doi"],
-            "failure_mode": record["failure_mode"],
-            "contradiction_check": record["contradiction_check"],
-            "source": record["source"],
-            "source_label": record["source_label"],
-            "graph_tags": {
-                "mechanism": tags.get("mechanism", "unspecified"),
-                "target": tags.get("target", "unspecified"),
-                "population": tags.get("population", "unspecified"),
-                "therapeutic_area": tags.get("therapeutic_area", "unspecified"),
-            }
-        })
+def build_study_graph(all_records):
+    nodes = [record_to_study_node(record) for record in all_records]
+    edges = []
+    degree_map = {node["id"]: 0 for node in nodes}
 
     for i in range(len(nodes)):
         for j in range(i + 1, len(nodes)):
@@ -422,15 +453,110 @@ def build_graph_data(submissions, imported_trials=None, pubmed_articles=None):
                 if v1 and v2 and v1 == v2 and v1 != "unspecified":
                     shared.append(field)
 
-            if shared:
-                edges.append({
+            # stricter rule so the graph is less hairy
+            strong_link = (
+                "target" in shared or
+                "mechanism" in shared or
+                len(shared) >= 2
+            )
+
+            if strong_link:
+                edge = {
                     "source": n1["id"],
                     "target": n2["id"],
                     "shared_tags": shared,
-                    "weight": len(shared)
-                })
+                    "weight": len(shared),
+                    "kind": "study-study"
+                }
+                edges.append(edge)
+                degree_map[n1["id"]] += 1
+                degree_map[n2["id"]] += 1
+
+    for node in nodes:
+        node["degree"] = degree_map.get(node["id"], 0)
 
     return {"nodes": nodes, "edges": edges}
+
+
+def build_overview_graph(study_nodes):
+    concept_nodes = {}
+    edge_weights = {}
+
+    def add_concept(kind, raw_value, study_node):
+        value = sanitize_graph_value(raw_value, "unspecified")
+        if normalize_text(value) == "unspecified":
+            return None
+
+        concept_id = f"{kind}:{normalize_text(value)}"
+        if concept_id not in concept_nodes:
+            concept_nodes[concept_id] = {
+                "id": concept_id,
+                "kind": kind,
+                "label": truncate_label(value, 28),
+                "title": value,
+                "type": "concept",
+                "count": 0,
+                "sources": set(),
+                "result_type_counts": {"null": 0, "inconclusive": 0, "opposite": 0},
+                "study_ids": []
+            }
+
+        concept_nodes[concept_id]["count"] += 1
+        concept_nodes[concept_id]["sources"].add(study_node["source"])
+        concept_nodes[concept_id]["study_ids"].append(study_node["id"])
+        concept_nodes[concept_id]["result_type_counts"][study_node["type"]] += 1
+        return concept_id
+
+    for node in study_nodes:
+        area_id = add_concept("therapeutic_area", node["graph_tags"]["therapeutic_area"], node)
+        target_id = add_concept("target", node["graph_tags"]["target"], node)
+        mechanism_id = add_concept("mechanism", node["graph_tags"]["mechanism"], node)
+
+        if area_id and target_id:
+            edge_weights[(area_id, target_id)] = edge_weights.get((area_id, target_id), 0) + 1
+        if target_id and mechanism_id:
+            edge_weights[(target_id, mechanism_id)] = edge_weights.get((target_id, mechanism_id), 0) + 1
+
+    overview_nodes = []
+    for node in concept_nodes.values():
+        node["sources"] = sorted(list(node["sources"]))
+        overview_nodes.append(node)
+
+    overview_edges = [
+        {
+            "source": source_id,
+            "target": target_id,
+            "weight": weight,
+            "kind": "concept-concept"
+        }
+        for (source_id, target_id), weight in edge_weights.items()
+    ]
+
+    return {
+        "nodes": overview_nodes,
+        "edges": overview_edges
+    }
+
+
+def build_graph_data(submissions, imported_trials=None, pubmed_articles=None):
+    all_records = collect_all_records(submissions, imported_trials, pubmed_articles)
+    studies = build_study_graph(all_records)
+    overview = build_overview_graph(studies["nodes"])
+
+    # Keep legacy top-level keys so current frontend still works.
+    return {
+        "nodes": studies["nodes"],
+        "edges": studies["edges"],
+        "studies": studies,
+        "overview": overview,
+        "meta": {
+            "default_view": "overview",
+            "study_node_count": len(studies["nodes"]),
+            "study_edge_count": len(studies["edges"]),
+            "overview_node_count": len(overview["nodes"]),
+            "overview_edge_count": len(overview["edges"])
+        }
+    }
 
 
 # ---------------------------
@@ -778,6 +904,10 @@ def get_ctgov_trials():
             "total": len(trials),
             "ctgov_imported": imported_count,
             "ctgov_enriched": enriched_count
+        },
+        "label_map": {
+            "ctgov_imported": SOURCE_LABELS["ctgov_imported"],
+            "ctgov_enriched": SOURCE_LABELS["ctgov_enriched"]
         }
     })
 
@@ -850,6 +980,10 @@ def enrich_ctgov_trials():
             "counts": {
                 "ctgov_imported": imported_count,
                 "ctgov_enriched": enriched_count
+            },
+            "label_map": {
+                "ctgov_imported": SOURCE_LABELS["ctgov_imported"],
+                "ctgov_enriched": SOURCE_LABELS["ctgov_enriched"]
             },
             "errors": errors
         })
@@ -991,6 +1125,10 @@ def get_pubmed_articles():
             "total": len(articles),
             "pubmed_imported": imported_count,
             "pubmed_enriched": enriched_count
+        },
+        "label_map": {
+            "pubmed_imported": SOURCE_LABELS["pubmed_imported"],
+            "pubmed_enriched": SOURCE_LABELS["pubmed_enriched"]
         }
     })
 
@@ -1065,6 +1203,10 @@ def enrich_pubmed_articles():
                 "pubmed_imported": imported_count,
                 "pubmed_enriched": enriched_count
             },
+            "label_map": {
+                "pubmed_imported": SOURCE_LABELS["pubmed_imported"],
+                "pubmed_enriched": SOURCE_LABELS["pubmed_enriched"]
+            },
             "errors": errors
         })
 
@@ -1099,6 +1241,13 @@ def source_counts():
             "pubmed_imported": pubmed_imported,
             "pubmed_enriched": pubmed_enriched,
             "total": len(submissions) + len(trials) + len(articles)
+        },
+        "label_map": {
+            "manual": SOURCE_LABELS["manual"],
+            "ctgov_imported": SOURCE_LABELS["ctgov_imported"],
+            "ctgov_enriched": SOURCE_LABELS["ctgov_enriched"],
+            "pubmed_imported": SOURCE_LABELS["pubmed_imported"],
+            "pubmed_enriched": SOURCE_LABELS["pubmed_enriched"]
         }
     })
 

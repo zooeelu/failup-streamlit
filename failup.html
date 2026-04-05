@@ -839,12 +839,12 @@
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 20px;">
           <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:10px;">🖱️ How to use it</div>
           <div style="font-size:12px;color:var(--text2);line-height:2.0;">
-            <div style="margin-bottom:5px;">• <strong>Filter by area</strong> using the chips below — narrow to oncology, neurology, etc.</div>
-            <div style="margin-bottom:5px;">• <strong>Click any node</strong> to open that study's full summary</div>
-            <div style="margin-bottom:5px;">• <strong>Hover a node</strong> to highlight its direct connections</div>
-            <div style="margin-bottom:5px;">• <strong>Drag</strong> to pan around the graph</div>
-            <div style="margin-bottom:5px;">• <strong>Contradiction nodes</strong> (green) indicate a conflict with prior positive literature — worth investigating</div>
-            <div>• <strong>Submit your own finding</strong> to add a node to this graph</div>
+            <div style="margin-bottom:5px;">• <strong>Overview mode</strong> shows concept nodes — therapeutic areas (left), targets (center), mechanisms (right)</div>
+            <div style="margin-bottom:5px;">• <strong>Click any concept node</strong> to drill in and see the individual studies in that cluster</div>
+            <div style="margin-bottom:5px;">• <strong>Click any study node</strong> to open that study's full summary</div>
+            <div style="margin-bottom:5px;">• <strong>Use the breadcrumb</strong> above the graph to return to overview</div>
+            <div style="margin-bottom:5px;">• <strong>Contradiction nodes</strong> (green glow) indicate a conflict with prior positive literature</div>
+            <div>• <strong>Submit your own finding</strong> to add nodes to this graph</div>
           </div>
         </div>
       </div>
@@ -852,9 +852,12 @@
       <div class="graph-controls">
         <button class="filter-chip active" data-filter="all" onclick="toggleChip(this)">All</button>
         <button class="filter-chip" data-filter="manual" onclick="toggleChip(this)">Manual submissions</button>
-        <button class="filter-chip" data-filter="ctgov_imported" onclick="toggleChip(this)">Imported CT.gov</button>
-        <button class="filter-chip" data-filter="ctgov_enriched" onclick="toggleChip(this)">Enriched imported</button>
+        <button class="filter-chip" data-filter="ctgov_imported" onclick="toggleChip(this)">Imported records</button>
+        <button class="filter-chip" data-filter="ctgov_enriched" onclick="toggleChip(this)">AI-enriched records</button>
         <button class="filter-chip" data-filter="contradictions" onclick="toggleChip(this)">Contradictions</button>
+      </div>
+      <div id="graph-breadcrumb" style="font-size:11px;font-family:var(--font-mono);color:var(--text3);margin-bottom:8px;min-height:16px;">
+        <span style="color:var(--text3)">Overview</span>
       </div>
       <canvas id="graph-canvas" height="440"></canvas>
       <div class="graph-legend">
@@ -862,8 +865,8 @@
         <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div> Inconclusive</div>
         <div class="legend-item"><div class="legend-dot" style="background:#f472b6"></div> Opposite effect</div>
         <div class="legend-item"><span class="source-badge source-manual">Manual</span></div>
-        <div class="legend-item"><span class="source-badge source-ctgov_imported">Imported CT.gov</span></div>
-        <div class="legend-item"><span class="source-badge source-ctgov_enriched">Enriched imported</span></div>
+        <div class="legend-item"><span class="source-badge source-ctgov_imported">Imported records</span></div>
+        <div class="legend-item"><span class="source-badge source-ctgov_enriched">AI-enriched records</span></div>
         <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div> Contradiction flagged</div>
       </div>
       <div style="margin-top:12px;font-size:11px;color:var(--text3);font-style:italic;">
@@ -1552,76 +1555,137 @@ let graphEdges = [];
 let graphNodePositions = [];
 let activeGraphFilter = 'all';
 
+// Overview mode: concept nodes derived from submitted studies
+// Study mode: drill into one concept to see individual studies
+let graphMode = 'overview';          // 'overview' | 'study'
+let activeConceptId  = null;         // which concept node was clicked
+let overviewNodes    = [];           // synthesised concept nodes
+let overviewPositions = [];
+
 const graphColors = {
   null: '#60a5fa',
   inconclusive: '#fbbf24',
   opposite: '#f472b6'
 };
 
-const sourceLabels = {
-  manual: 'Manual submission',
-  ctgov_imported: 'Imported ClinicalTrials.gov',
-  ctgov_enriched: 'Enriched imported trial'
+const conceptColors = {
+  therapeutic_area: '#809bce',
+  target:           '#6aab9a',
+  mechanism:        '#b06080'
 };
 
-function generateGraphPositions(nodes, canvasWidth, canvasHeight) {
-  if (!nodes.length) return [];
+const sourceLabels = {
+  manual:          'Manual submission',
+  ctgov_imported:  'Imported record',
+  ctgov_enriched:  'AI-enriched record'
+};
 
-  const positions = [];
-  const centerX = canvasWidth / 2;
-  const centerY = canvasHeight / 2;
-  const radius = Math.min(canvasWidth, canvasHeight) * 0.32;
-
-  nodes.forEach((node, i) => {
-    const angle = (2 * Math.PI * i) / nodes.length;
-    positions.push({
-      id: node.id,
-      x: centerX + radius * Math.cos(angle),
-      y: centerY + radius * Math.sin(angle)
-    });
-  });
-
-  return positions;
-}
-
+// ── DATA LOADING ────────────────────────────────────────────────
 async function loadGraphData() {
   try {
     const response = await fetch('/graph-data');
     if (!response.ok) {
-      graphNodes = [];
-      graphEdges = [];
+      graphNodes = []; graphEdges = [];
     } else {
-      const contentType = response.headers.get('content-type') || '';
-      if (!contentType.includes('application/json')) {
-        graphNodes = [];
-        graphEdges = [];
+      const ct = response.headers.get('content-type') || '';
+      if (!ct.includes('application/json')) {
+        graphNodes = []; graphEdges = [];
       } else {
         const result = await response.json();
         if (result.success) {
           graphNodes = result.graph.nodes || [];
           graphEdges = result.graph.edges || [];
+          // If the backend supplies pre-built overview nodes, use them directly;
+          // otherwise fall back to client-side synthesis from graph_tags.
+          if (result.graph.overview && result.graph.overview.length) {
+            overviewNodes = result.graph.overview;
+          } else {
+            buildOverviewNodes();
+          }
         } else {
-          graphNodes = [];
-          graphEdges = [];
+          graphNodes = []; graphEdges = []; buildOverviewNodes();
         }
       }
     }
-  } catch (error) {
-    graphNodes = [];
-    graphEdges = [];
+  } catch (_) {
+    graphNodes = []; graphEdges = [];
   }
 
+  // Ensure overviewNodes is always built even when server is unreachable
+  if (!overviewNodes.length) buildOverviewNodes();
   drawGraph();
 }
 
-function getVisibleGraphNodes() {
-  if (activeGraphFilter === 'all') return graphNodes;
-  if (activeGraphFilter === 'contradictions') {
-    return graphNodes.filter(node => (node.contradiction_check || '').toLowerCase() !== 'not assessed from provided information.');
-  }
-  return graphNodes.filter(node => node.source === activeGraphFilter);
+// ── OVERVIEW NODE SYNTHESIS ──────────────────────────────────────
+// Extract unique concept values from graph_tags on each study node,
+// group by kind (therapeutic_area / target / mechanism), dedupe.
+function buildOverviewNodes() {
+  const seen = new Set();
+  overviewNodes = [];
+
+  graphNodes.forEach(node => {
+    const tags = node.graph_tags || {};
+    [
+      { kind: 'therapeutic_area', value: tags.therapeutic_area },
+      { kind: 'target',           value: tags.target           },
+      { kind: 'mechanism',        value: tags.mechanism        }
+    ].forEach(({ kind, value }) => {
+      if (!value || value === 'unspecified') return;
+      const id = `concept:${kind}:${value}`;
+      if (seen.has(id)) return;
+      seen.add(id);
+      // count how many studies share this tag value
+      const count = graphNodes.filter(n => (n.graph_tags || {})[kind] === value).length;
+      overviewNodes.push({ id, kind, value, count });
+    });
+  });
 }
 
+// ── LAYOUT HELPERS ───────────────────────────────────────────────
+function generateOverviewPositions(nodes, W, H) {
+  const groups = { therapeutic_area: [], target: [], mechanism: [] };
+  nodes.forEach(n => { if (groups[n.kind]) groups[n.kind].push(n); });
+
+  const positions = [];
+  function placeColumn(list, x) {
+    const gap = H / (list.length + 1);
+    list.forEach((node, i) => positions.push({ id: node.id, x, y: gap * (i + 1) }));
+  }
+  placeColumn(groups.therapeutic_area, W * 0.18);
+  placeColumn(groups.target,           W * 0.50);
+  placeColumn(groups.mechanism,        W * 0.82);
+  return positions;
+}
+
+function generateStudyPositions(nodes, W, H) {
+  if (!nodes.length) return [];
+  const positions = [];
+  const cx = W / 2, cy = H / 2;
+  const r  = Math.min(W, H) * 0.32;
+  nodes.forEach((node, i) => {
+    const angle = (2 * Math.PI * i) / nodes.length;
+    positions.push({ id: node.id, x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+  });
+  return positions;
+}
+
+// ── FILTER HELPERS ───────────────────────────────────────────────
+function getVisibleStudyNodes() {
+  if (activeConceptId) {
+    // find the concept
+    const concept = overviewNodes.find(n => n.id === activeConceptId);
+    if (!concept) return graphNodes;
+    return graphNodes.filter(n => (n.graph_tags || {})[concept.kind] === concept.value);
+  }
+  if (activeGraphFilter === 'all') return graphNodes;
+  if (activeGraphFilter === 'contradictions') {
+    return graphNodes.filter(n =>
+      (n.contradiction_check || '').toLowerCase() !== 'not assessed from provided information.');
+  }
+  return graphNodes.filter(n => n.source === activeGraphFilter);
+}
+
+// ── DRAW ─────────────────────────────────────────────────────────
 function drawGraph() {
   const canvas = document.getElementById('graph-canvas');
   if (!canvas) return;
@@ -1629,8 +1693,7 @@ function drawGraph() {
   const dpr = window.devicePixelRatio || 1;
   const W = canvas.offsetWidth;
   const H = 440;
-
-  canvas.width = W * dpr;
+  canvas.width  = W * dpr;
   canvas.height = H * dpr;
   canvas.style.height = H + 'px';
 
@@ -1639,48 +1702,152 @@ function drawGraph() {
   ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, W, H);
 
-  const visibleNodes = getVisibleGraphNodes();
-  const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
-  const visibleEdges = graphEdges.filter(edge => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target));
+  if (graphMode === 'overview') {
+    drawOverview(ctx, W, H);
+  } else {
+    drawStudyMode(ctx, W, H);
+  }
+}
 
-  if (!visibleNodes.length) {
+function drawOverview(ctx, W, H) {
+  updateGraphBreadcrumb();
+
+  if (!overviewNodes.length) {
     ctx.fillStyle = '#8a9ab8';
-    ctx.font = "14px Inter, sans-serif";
+    ctx.font = '14px Inter, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('No graph nodes match this filter yet.', W / 2, H / 2);
+    ctx.fillText('No graph data yet. Submit a finding to create nodes.', W / 2, H / 2);
+    overviewPositions = [];
     graphNodePositions = [];
     return;
   }
 
-  graphNodePositions = generateGraphPositions(visibleNodes, W, H);
+  overviewPositions = generateOverviewPositions(overviewNodes, W, H);
+  graphNodePositions = overviewPositions; // shared for click detection
 
-  visibleEdges.forEach(edge => {
-    const source = graphNodePositions.find(n => n.id === edge.source);
-    const target = graphNodePositions.find(n => n.id === edge.target);
+  // Column header labels
+  const headers = [
+    { label: 'Therapeutic Area', x: W * 0.18, color: conceptColors.therapeutic_area },
+    { label: 'Target',           x: W * 0.50, color: conceptColors.target           },
+    { label: 'Mechanism',        x: W * 0.82, color: conceptColors.mechanism        }
+  ];
+  headers.forEach(({ label, x, color }) => {
+    ctx.font = "bold 10px 'JetBrains Mono', monospace";
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.fillText(label.toUpperCase(), x, 18);
+  });
 
-    if (!source || !target) return;
+  // Edges: connect concepts that share at least one study
+  const kindPairs = [
+    ['therapeutic_area', 'target'],
+    ['target', 'mechanism']
+  ];
+  kindPairs.forEach(([kindA, kindB]) => {
+    const aNodes = overviewNodes.filter(n => n.kind === kindA);
+    const bNodes = overviewNodes.filter(n => n.kind === kindB);
+    aNodes.forEach(a => {
+      const studiesA = new Set(
+        graphNodes.filter(n => (n.graph_tags || {})[kindA] === a.value).map(n => n.id)
+      );
+      bNodes.forEach(b => {
+        const shared = graphNodes.filter(n =>
+          (n.graph_tags || {})[kindA] === a.value &&
+          (n.graph_tags || {})[kindB] === b.value
+        ).length;
+        if (!shared) return;
+
+        const posA = overviewPositions.find(p => p.id === a.id);
+        const posB = overviewPositions.find(p => p.id === b.id);
+        if (!posA || !posB) return;
+
+        ctx.beginPath();
+        ctx.moveTo(posA.x, posA.y);
+        ctx.lineTo(posB.x, posB.y);
+        ctx.strokeStyle = `rgba(128,155,206,${Math.min(0.08 + shared * 0.06, 0.35)})`;
+        ctx.lineWidth = 0.8 + shared * 0.4;
+        ctx.stroke();
+      });
+    });
+  });
+
+  // Concept nodes
+  overviewNodes.forEach(node => {
+    const pos = overviewPositions.find(p => p.id === node.id);
+    if (!pos) return;
+
+    const color  = conceptColors[node.kind] || '#809bce';
+    const radius = 14 + Math.min(node.count * 2, 14); // grows with study count
 
     ctx.beginPath();
-    ctx.moveTo(source.x, source.y);
-    ctx.lineTo(target.x, target.y);
+    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = color + '22';
+    ctx.fill();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+
+    // Study count badge
+    ctx.font = `bold 11px Inter, sans-serif`;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.fillText(node.count, pos.x, pos.y + 4);
+
+    // Label below
+    ctx.font = "10px 'JetBrains Mono', monospace";
+    ctx.fillStyle = '#4a5a78';
+    ctx.fillText(
+      node.value.length > 16 ? node.value.substring(0, 15) + '…' : node.value,
+      pos.x, pos.y + radius + 14
+    );
+  });
+}
+
+function drawStudyMode(ctx, W, H) {
+  updateGraphBreadcrumb();
+
+  const studyNodes = getVisibleStudyNodes();
+  const studyNodeIds = new Set(studyNodes.map(n => n.id));
+  const studyEdges   = graphEdges.filter(e => studyNodeIds.has(e.source) && studyNodeIds.has(e.target));
+
+  if (!studyNodes.length) {
+    ctx.fillStyle = '#8a9ab8';
+    ctx.font = '14px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('No studies found for this concept.', W / 2, H / 2);
+    graphNodePositions = [];
+    return;
+  }
+
+  graphNodePositions = generateStudyPositions(studyNodes, W, H);
+
+  // Edges
+  studyEdges.forEach(edge => {
+    const src = graphNodePositions.find(n => n.id === edge.source);
+    const tgt = graphNodePositions.find(n => n.id === edge.target);
+    if (!src || !tgt) return;
+    ctx.beginPath();
+    ctx.moveTo(src.x, src.y);
+    ctx.lineTo(tgt.x, tgt.y);
     ctx.strokeStyle = 'rgba(90,127,181,0.20)';
     ctx.lineWidth = 1 + (edge.weight || 1) * 0.6;
     ctx.stroke();
   });
 
-  visibleNodes.forEach(node => {
+  // Study nodes
+  studyNodes.forEach(node => {
     const pos = graphNodePositions.find(n => n.id === node.id);
     if (!pos) return;
 
     const color = graphColors[node.type] || '#60a5fa';
-    const hasContradiction =
-      (node.contradiction_check || '').toLowerCase() !== 'not assessed from provided information.';
-    const radius = 12 + Math.min(10, (node.failure_mode && node.failure_mode !== 'unknown') ? 3 : 0);
+    const hasContra = (node.contradiction_check || '').toLowerCase() !==
+      'not assessed from provided information.';
+    const radius = 12 + ((node.failure_mode && node.failure_mode !== 'unknown') ? 3 : 0);
 
-    if (hasContradiction) {
+    if (hasContra) {
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, radius + 8, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(52, 211, 153, 0.16)';
+      ctx.fillStyle = 'rgba(52,211,153,0.16)';
       ctx.fill();
     }
 
@@ -1699,20 +1866,81 @@ function drawGraph() {
 
     ctx.font = "9px 'JetBrains Mono', monospace";
     ctx.fillStyle = '#8a9ab8';
-    ctx.fillText(node.source_label || sourceLabels[node.source] || 'Source', pos.x, pos.y + radius + 26);
+    ctx.fillText(
+      node.source_label || sourceLabels[node.source] || '',
+      pos.x, pos.y + radius + 26
+    );
   });
+}
+
+// ── BREADCRUMB / MODE UI ─────────────────────────────────────────
+function updateGraphBreadcrumb() {
+  const bc = document.getElementById('graph-breadcrumb');
+  if (!bc) return;
+  if (graphMode === 'overview') {
+    bc.innerHTML = '<span style="color:var(--text3)">Overview</span>';
+  } else {
+    const concept = overviewNodes.find(n => n.id === activeConceptId);
+    const label   = concept ? concept.value : 'Studies';
+    bc.innerHTML = `
+      <span style="color:var(--accent);cursor:pointer;text-decoration:underline"
+            onclick="exitStudyMode()">Overview</span>
+      <span style="color:var(--text3)"> › ${escapeHtml(label)}</span>`;
+  }
+}
+
+function exitStudyMode() {
+  graphMode       = 'overview';
+  activeConceptId = null;
+  drawGraph();
+}
+
+// ── CLICK HANDLING ───────────────────────────────────────────────
+function handleGraphClick(event) {
+  const canvas = document.getElementById('graph-canvas');
+  if (!canvas) return;
+
+  const rect   = canvas.getBoundingClientRect();
+  const clickX = event.clientX - rect.left;
+  const clickY = event.clientY - rect.top;
+
+  if (graphMode === 'overview') {
+    // Click on a concept node → drill into study mode
+    for (const node of overviewNodes) {
+      const pos = overviewPositions.find(p => p.id === node.id);
+      if (!pos) continue;
+      const radius = 14 + Math.min(node.count * 2, 14);
+      const dx = clickX - pos.x, dy = clickY - pos.y;
+      if (Math.sqrt(dx * dx + dy * dy) <= radius + 4) {
+        graphMode       = 'study';
+        activeConceptId = node.id;
+        drawGraph();
+        return;
+      }
+    }
+  } else {
+    // Click on a study node → open modal
+    const studyNodes = getVisibleStudyNodes();
+    for (const node of studyNodes) {
+      const pos = graphNodePositions.find(p => p.id === node.id);
+      if (!pos) continue;
+      const radius = 12 + ((node.failure_mode && node.failure_mode !== 'unknown') ? 3 : 0);
+      const dx = clickX - pos.x, dy = clickY - pos.y;
+      if (Math.sqrt(dx * dx + dy * dy) <= radius + 4) {
+        openGraphNodeModal(node.id);
+        return;
+      }
+    }
+  }
 }
 
 function openGraphNodeModal(nodeId) {
   const node = graphNodes.find(n => n.id === nodeId);
   if (!node) return;
-
   const tags = node.graph_tags || {};
-
   document.getElementById('modal-title').textContent = node.title || 'Saved submission';
   document.getElementById('modal-sub').textContent =
     `${node.doi || ''} · ${node.type || 'result'} · ${node.failure_mode || 'unknown'}`;
-
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-section">
       <div class="modal-section-label">Source</div>
@@ -1738,34 +1966,8 @@ function openGraphNodeModal(nodeId) {
     <div class="modal-section">
       <div class="modal-section-label">DOI / ID</div>
       <span style="color:var(--accent);font-family:var(--font-mono);font-size:12px">${escapeHtml(node.doi || '')}</span>
-    </div>
-  `;
-
+    </div>`;
   document.getElementById('modal').classList.add('open');
-}
-
-function handleGraphClick(event) {
-  const canvas = document.getElementById('graph-canvas');
-  if (!canvas || !graphNodePositions.length) return;
-
-  const rect = canvas.getBoundingClientRect();
-  const clickX = event.clientX - rect.left;
-  const clickY = event.clientY - rect.top;
-
-  for (const node of graphNodes) {
-    const pos = graphNodePositions.find(n => n.id === node.id);
-    if (!pos) continue;
-
-    const radius = 12 + Math.min(10, (node.failure_mode && node.failure_mode !== 'unknown') ? 3 : 0);
-    const dx = clickX - pos.x;
-    const dy = clickY - pos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance <= radius + 4) {
-      openGraphNodeModal(node.id);
-      return;
-    }
-  }
 }
 
 window.addEventListener('resize', () => {
@@ -1774,9 +1976,7 @@ window.addEventListener('resize', () => {
 
 window.addEventListener('load', () => {
   const canvas = document.getElementById('graph-canvas');
-  if (canvas) {
-    canvas.addEventListener('click', handleGraphClick);
-  }
+  if (canvas) canvas.addEventListener('click', handleGraphClick);
 });
 
 // ── STEP NAVIGATION ──
@@ -2621,6 +2821,9 @@ function toggleChip(el) {
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
   activeGraphFilter = el.dataset.filter || 'all';
+  // Reset to overview whenever a filter chip is changed
+  graphMode = 'overview';
+  activeConceptId = null;
   drawGraph();
 }
 
