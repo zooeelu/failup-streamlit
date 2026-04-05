@@ -1,0 +1,1642 @@
+[
+  {
+    "id": 6,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT05798273",
+    "title": "(68^Ga)-GaPSMA-11 PET/MR-imaging of Malignant Intra-axial Brain Tumors",
+    "study_type": "INTERVENTIONAL",
+    "phase": "NA",
+    "status": "COMPLETED",
+    "conditions": [
+      "Malignant Brain Tumors"
+    ],
+    "interventions": [
+      "PROCEDURE: intra-arterial injection",
+      "DEVICE: synchronous PET/MRI scan",
+      "OTHER: Radiopharmacon Contrast agent"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "tumor SUV (upon intravenous and intra-arterial injection),",
+    "brief_summary": "PSMA is a transmembrane protein specifically expressed in the vascular endothelium of malignant brain tumors, most notably glioblastoma and not in healthy brain parenchyma. It has been shown to be involved in (neo)angiogenesis and endothelial cell invasion. By means of 68Ga-labeled PSMA ligands, investigators are able to non-invasively visualize/quantify PSMA expression in glioblastoma (neo)vasculature in vivo by means of PET.\n\nThe primary aim of this study is to confirm PSMA as suitable diagnostic and potential theranostic target in patients with intra-axial brain tumors by means of \\[68Ga\\]Ga-PSMA-HBEC-CC (\\[68Ga\\]Ga-PSMA-11) PET.\n\nThe secondary aim is to assess whether uptake is increased with intra-arterial injection in those tumors that show uptake after intravenous injection of \\[68Ga\\]Ga-PSMA-11.",
+    "url": "https://clinicaltrials.gov/study/NCT05798273",
+    "imported_at": "2026-04-05T04:40:03.302672Z",
+    "result_type": "null"
+  },
+  {
+    "id": 7,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_enriched",
+    "nct_id": "NCT05476341",
+    "title": "A Phase I Clinical Trial of Bevacizumab Injection",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "COMPLETED",
+    "conditions": [
+      "Rectal Cancer",
+      "Lung Cancer",
+      "Ovarian Cancer",
+      "Cervical Cancer",
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: Bevacizumab injection",
+      "DRUG: Bevacizumab injection（Avastin）"
+    ],
+    "population": "Sex: MALE | Age: 18 Years to 65 Years | Healthy volunteers: True",
+    "primary_outcome": "Plasma concentration-area under time curve（AUC0-t）",
+    "brief_summary": "Recombinant humanized monoclonal antibody injection against human vascular endothelial growth factor (bevacizumab) is Avastin produced by Zhengda Tianqing Pharmaceutical Group Co., Ltd Biological similar drugs. Its mechanism is to prevent VEGF from binding to its natural receptor VEGFR, inhibit the proliferation and activation of vascular endothelial cells, and play an anti angiogenesis and anti-tumor role by binding with VEGF. A randomized, double-blind, single dose, parallel comparison of bevacizumab injection and Avastin is planned The phase I clinical study on the similarity of pharmacokinetics and safety of traditional Chinese medicine in healthy male volunteers aims to compare bevacizumab injection with Avastin The similarity of pharmacokinetics, tolerance, safety and immunogenicity.",
+    "url": "https://clinicaltrials.gov/study/NCT05476341",
+    "imported_at": "2026-04-05T04:40:03.302728Z",
+    "result_type": "null",
+    "summary": {
+      "background": "A Phase I randomized, double-blind, single-dose, parallel-group study comparing a biosimilar bevacizumab injection (Zhengda Tianqing) to the reference product Avastin in healthy male volunteers aged 18–65. The study aimed to assess pharmacokinetic similarity, safety, tolerability, and immunogenicity between the two formulations.",
+      "findings": "The trial is completed but no quantitative results (p-values, effect estimates, or PK parameters such as AUC0-t) are provided in the available record. The outcome type is recorded as null, meaning no efficacy or comparative PK findings can be summarized from the provided information.",
+      "main_limitation": "No results data are available from the provided record. The study appears to be a PK/biosimilarity assessment in healthy volunteers, so it was not designed to assess clinical efficacy. The absence of reported PK parameters (AUC0-t, Cmax, etc.) prevents any conclusion about biosimilarity.",
+      "failure_mode": "unknown",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "Anti-VEGF monoclonal antibody / anti-angiogenesis",
+        "target": "VEGF (vascular endothelial growth factor)",
+        "population": "Healthy male volunteers, ages 18–65",
+        "therapeutic_area": "Oncology (rectal, lung, ovarian, cervical cancer, glioblastoma) – biosimilar PK study"
+      }
+    },
+    "enriched_at": "2026-04-05T04:41:27.679544Z"
+  },
+  {
+    "id": 8,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT05563272",
+    "title": "89Zr-girentuximab for PET Imaging of CAIX Positive Solid Tumors",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "TERMINATED",
+    "conditions": [
+      "Cervical Cancer",
+      "Colorectal Cancer",
+      "Esophageal Cancer",
+      "Gastric Cancer",
+      "Glioblastoma Multiforme",
+      "Cholangiocarcinoma",
+      "Hepatocellular Carcinoma",
+      "Head and Neck Squamous Cell Carcinoma",
+      "Nasopharyngeal Carcinoma",
+      "Non Small Cell Lung Cancer",
+      "Small Cell Lung Cancer",
+      "Epithelial Ovarian Cancer",
+      "Pancreatic Ductal Adenocarcinoma",
+      "Soft Tissue Sarcoma",
+      "Gastric Adenocarcinoma",
+      "Malignant Mesothelioma (MM)",
+      "Von Hippel Lindau",
+      "Bladder Cancer",
+      "Bladder Urothelial Carcinoma"
+    ],
+    "interventions": [
+      "DIAGNOSTIC_TEST: 89Zr-girentuximab for PET/CT imaging of CAIX positive tumors"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 95 Years",
+    "primary_outcome": "Qualitative assessment of 89Zr-girentuximab uptake within individual tumor deposits",
+    "brief_summary": "A prospective, open-label, phase 2 study to explore CAIX expression through 89Zirconium-labelled girentuximab deferoxamine (89Zr-girentuximab) PET/CT imaging in patients with solid tumors.",
+    "url": "https://clinicaltrials.gov/study/NCT05563272",
+    "imported_at": "2026-04-05T04:40:03.302744Z",
+    "result_type": "opposite"
+  },
+  {
+    "id": 9,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_enriched",
+    "nct_id": "NCT00002619",
+    "title": "Chemotherapy Followed by Bone Marrow or Peripheral Stem Cell Transplantation in Treating Patients With Glioblastoma Multiforme or Brain Stem Tumors",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "Brain and Central Nervous System Tumors"
+    ],
+    "interventions": [
+      "BIOLOGICAL: filgrastim",
+      "DRUG: carboplatin",
+      "DRUG: thiotepa",
+      "PROCEDURE: autologous bone marrow transplantation",
+      "PROCEDURE: peripheral blood stem cell transplantation"
+    ],
+    "population": "Sex: ALL | Age: 6 Years to 59 Years",
+    "primary_outcome": "",
+    "brief_summary": "RATIONALE: Drugs used in chemotherapy use different ways to stop tumor cells from dividing so they stop growing or die. Bone marrow or peripheral stem cell transplantation may be able to replace immune cells that were destroyed by chemotherapy used to kill tumor cells.\n\nPURPOSE: Phase II trial to study the effectiveness of chemotherapy followed by autologous bone marrow or peripheral stem cell transplantation in treating patients with glioblastoma multiforme or brain stem tumors.",
+    "url": "https://clinicaltrials.gov/study/NCT00002619",
+    "imported_at": "2026-04-05T04:40:03.302757Z",
+    "result_type": "null",
+    "summary": {
+      "background": "Phase II trial investigating high-dose chemotherapy (carboplatin and thiotepa) followed by autologous bone marrow or peripheral blood stem cell transplantation in patients aged 6–59 years with glioblastoma multiforme or brain stem tumors. Filgrastim was used for stem cell mobilization/support. The rationale was that high-dose chemotherapy could kill tumor cells while stem cell transplantation would rescue destroyed immune/hematopoietic cells.",
+      "findings": "The trial is completed with a null result type. No primary outcome data, p-values, or effect estimates are available from the provided information. The study did not demonstrate sufficient effectiveness to support the intervention based on the null result classification.",
+      "main_limitation": "No quantitative outcome data, effect estimates, or statistical results were provided. It is unclear whether the null result reflects lack of efficacy, toxicity, poor feasibility, or insufficient accrual. The absence of a reported primary outcome metric limits any mechanistic or clinical interpretation.",
+      "failure_mode": "unknown",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "High-dose chemotherapy with autologous hematopoietic stem cell rescue",
+        "target": "DNA replication / alkylating chemotherapy (carboplatin, thiotepa)",
+        "population": "Patients aged 6–59 years with glioblastoma multiforme or brain stem tumors",
+        "therapeutic_area": "Neuro-oncology"
+      }
+    },
+    "enriched_at": "2026-04-05T04:41:44.033527Z"
+  },
+  {
+    "id": 10,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_enriched",
+    "nct_id": "NCT05171127",
+    "title": "Differentiation Between Healthy Cerebral Tissue and Tumor Tissue Using a Tissue Sensing Instrument",
+    "study_type": "OBSERVATIONAL",
+    "phase": "",
+    "status": "COMPLETED",
+    "conditions": [
+      "Glioblastoma",
+      "Surgical Margin"
+    ],
+    "interventions": [
+      "PROCEDURE: Diffuse Reflectance Spectroscopy"
+    ],
+    "population": "Sex: ALL",
+    "primary_outcome": "DRS pattern",
+    "brief_summary": "Differentiation between glioma tumor tissue and normal cerebral tissue using Diffuse Reflectance Spectroscopy (DRS) on surgical tissue samples ex-vivo",
+    "url": "https://clinicaltrials.gov/study/NCT05171127",
+    "imported_at": "2026-04-05T04:40:03.302769Z",
+    "result_type": "null",
+    "summary": {
+      "background": "This observational study investigated whether Diffuse Reflectance Spectroscopy (DRS), a tissue-sensing optical technique, could differentiate between glioma tumor tissue (including glioblastoma) and healthy cerebral tissue in ex vivo surgical samples. The goal was to evaluate DRS as a potential intraoperative tool for identifying surgical margins.",
+      "findings": "The study is classified as a null result. No statistically significant or clinically meaningful DRS spectral pattern was reported that reliably distinguished tumor tissue from normal cerebral tissue in the ex vivo samples. Specific p-values and effect estimates were not provided.",
+      "main_limitation": "The study was conducted ex vivo, limiting direct translation to intraoperative use. The absence of reported quantitative outcomes, p-values, and effect estimates makes it difficult to fully characterize the magnitude or direction of any observed differences. Sample size and tissue heterogeneity details are not provided.",
+      "failure_mode": "outcome measurement",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "Diffuse Reflectance Spectroscopy (optical tissue sensing)",
+        "target": "Tumor vs. normal cerebral tissue optical properties",
+        "population": "Glioblastoma surgical patients (all sexes)",
+        "therapeutic_area": "Neuro-oncology / Surgical oncology"
+      }
+    },
+    "enriched_at": "2026-04-05T04:41:54.026812Z"
+  },
+  {
+    "id": 11,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_enriched",
+    "nct_id": "NCT01281982",
+    "title": "(11C)dLop as a Marker of P-Glycoprotein Function in Patients With Gliomas",
+    "study_type": "OBSERVATIONAL",
+    "phase": "",
+    "status": "TERMINATED",
+    "conditions": [
+      "Low Grade Glioma",
+      "Glioblastoma Multiforme",
+      "Anaplastic Astrocytoma",
+      "Anaplastic Oligodendroglioma",
+      "Oligoastrocytoma"
+    ],
+    "interventions": [],
+    "population": "Sex: ALL | Age: 18 Years to 99 Years",
+    "primary_outcome": "",
+    "brief_summary": "Background:\n\n\\- The blood-brain barrier helps to protect the central nervous system (brain and spinal cord) from harmful toxins, but also prevents potentially useful chemotherapy from reaching brain tumors. The barrier is formed by tight connections between blood vessel cells and molecules found on the surface of brain blood vessels such as Permeability-glycoprotein (Pgp). Pgp may influence whether patients with brain tumors known as gliomas respond to chemotherapy and what side effects they may experience. The compound (11C)N-desmethyl-loperamide ((11C)dLop) reacts to Pgp molecules, and therefore may be used with positron emission tomography (PET) imaging to study the blood brain barrier.\n\nObjectives:\n\n\\- To study the ability of PET imaging with (11C)dLop to evaluate the blood brain barrier in brain tumor patients.\n\nEligibility:\n\n\\- Individuals at least 18 years of age who have a brain tumor with characteristics that may be imaged with techniques such as magnetic resonance imaging (MRI) andPET.\n\nDesign:\n\n* Participants will be screened with a full physical examination and medical history, blood and urine tests, and tumor imaging studies (fluorodeoxyglucose PET and MRI scans with contrast agent).\n* The (11C)dLop scan will take 1 hour to perform. Participants will be asked to return for blood and urine tests approximately 24 hours after the PET scan.\n* Participants will have followup visits at least every 4 months by repeating a complete history and physical exam and brain MRI. Participants may have repeat scans with (11C)dLop at various points in the course of cancer treatment, but will not have these scans more than twice in a 12-month period.\n* Participants will be followed for as long as possible during treatment to see if imaging with (11C)dLop correlates with response to the treatments.",
+    "url": "https://clinicaltrials.gov/study/NCT01281982",
+    "imported_at": "2026-04-05T04:40:03.302778Z",
+    "result_type": "opposite",
+    "summary": {
+      "background": "The blood-brain barrier (BBB) limits delivery of chemotherapy to brain tumors. P-glycoprotein (Pgp) expressed on brain blood vessels is a key efflux transporter that may influence chemotherapy efficacy and toxicity in glioma patients. (11C)N-desmethyl-loperamide ((11C)dLop) is a Pgp substrate that can be used with PET imaging to assess Pgp function and BBB integrity in vivo.",
+      "findings": "The study was observational and assessed whether (11C)dLop PET imaging could evaluate BBB Pgp function in glioma patients. The result type is listed as 'Opposite,' suggesting that the imaging findings did not confirm the expected pattern of Pgp function or BBB integrity in glioma patients—potentially indicating that (11C)dLop did not perform as anticipated as a Pgp marker in this population. Specific quantitative outcomes and p-values were not provided in the available information.",
+      "main_limitation": "The study description is incomplete; primary outcomes, p-values, and effect estimates are not provided. The 'Opposite' result designation suggests unexpected findings, but the nature and direction of the contradiction cannot be fully characterized from the available text. The observational design also limits causal inference.",
+      "failure_mode": "outcome measurement",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "P-glycoprotein efflux transport / BBB integrity imaging",
+        "target": "P-glycoprotein (ABCB1)",
+        "population": "Adult patients (≥18 years) with gliomas",
+        "therapeutic_area": "Neuro-oncology"
+      }
+    },
+    "enriched_at": "2026-04-05T04:42:07.617291Z"
+  },
+  {
+    "id": 12,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_enriched",
+    "nct_id": "NCT00498927",
+    "title": "Temozolomide in Treating Patients With Recurrent Glioblastoma Multiforme or Other Malignant Glioma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "Brain and Central Nervous System Tumors"
+    ],
+    "interventions": [
+      "DRUG: temozolomide",
+      "GENETIC: protein expression analysis",
+      "GENETIC: reverse transcriptase-polymerase chain reaction",
+      "OTHER: diagnostic laboratory biomarker analysis",
+      "OTHER: immunoenzyme technique"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 120 Years",
+    "primary_outcome": "Progression-free Survival (PFS) Rate at 6 Months",
+    "brief_summary": "RATIONALE: Drugs used in chemotherapy, such as temozolomide, work in different ways to stop the growth of tumor cells, either by killing the cells or by stopping them from dividing.\n\nPURPOSE: This phase II trial is studying how well temozolomide works in treating patients with recurrent glioblastoma multiforme or other malignant glioma.",
+    "url": "https://clinicaltrials.gov/study/NCT00498927",
+    "imported_at": "2026-04-05T04:40:03.302791Z",
+    "result_type": "null",
+    "summary": {
+      "background": "This Phase II trial investigated temozolomide, a DNA alkylating chemotherapy agent, in patients with recurrent glioblastoma multiforme (GBM) or other malignant gliomas. Temozolomide works by methylating DNA to inhibit tumor cell proliferation and induce apoptosis. The study included biomarker analyses (protein expression, RT-PCR) to explore molecular correlates of response.",
+      "findings": "The trial is reported as having a null result. The primary endpoint was progression-free survival (PFS) rate at 6 months. No statistically significant or clinically meaningful benefit was demonstrated with temozolomide in this recurrent malignant glioma population based on the available result classification. No p-value or specific effect estimate was provided.",
+      "main_limitation": "No p-value or quantitative effect estimate was reported, limiting interpretation of the magnitude or direction of any observed effect. The null result designation suggests the primary endpoint was not met, but detailed outcome data are not available from the provided information.",
+      "failure_mode": "patient selection",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "DNA alkylation / methylation",
+        "target": "DNA methyltransferase / MGMT",
+        "population": "Adults with recurrent GBM or malignant glioma",
+        "therapeutic_area": "Neuro-oncology"
+      }
+    },
+    "enriched_at": "2026-04-05T04:42:15.550857Z"
+  },
+  {
+    "id": 13,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT01209442",
+    "title": "Hypofractionated Intensity-Modulated Radiation Therapy With Temozolomide and Bevacizumab for Glioblastoma Multiforme",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "Glioblastoma Multiforme"
+    ],
+    "interventions": [
+      "DRUG: Bevacizumab",
+      "DRUG: Temozolomide",
+      "RADIATION: RT (Radiation Therapy)"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "6-month Progression-free Survival",
+    "brief_summary": "The purpose of this study is to find out whether Hypofractionated Intensity-Modulated Radiation Therapy (Hypo-IMRT) combining with temozolomide chemotherapy can be safely given with a targeted agent, bevacizumab, and how effective this study treatment will be in controlling your brain tumor.",
+    "url": "https://clinicaltrials.gov/study/NCT01209442",
+    "imported_at": "2026-04-05T04:40:03.302802Z",
+    "result_type": "null"
+  },
+  {
+    "id": 14,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT04715620",
+    "title": "Niraparib Combined With Radiotherapy in rGBM",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Recurrent Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: Niraparib"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 70 Years",
+    "primary_outcome": "PFS-6",
+    "brief_summary": "Thirty patients were enrolled in this study, mainly patients with first recurrence of glioblastoma, and the requirement is that they can receive secondary radiotherapy. Regardless of whether the patient has received a second operation or the MGMT promoter is methylated, they can be included in this study. After enrollment, patients were given niraparib 300mg/day (body weight ≥77Kg and baseline platelet count ≥150,000/µL) or 200mg/day (body weight \\<77Kg or baseline platelet count \\<150,000/µL), combined with radiotherapy (total dose 55Gy), follow-up Time 1 year. Until the patient has disease progression or intolerance or voluntarily withdraw from the study.",
+    "url": "https://clinicaltrials.gov/study/NCT04715620",
+    "imported_at": "2026-04-05T04:40:03.302813Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 15,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00276783",
+    "title": "Pemetrexed Disodium in Treating Patients With Recurrent Malignant Gliomas, Primary CNS Lymphoma, or Brain Metastases",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Brain and Central Nervous System Tumors",
+      "Lymphoma",
+      "Metastatic Cancer"
+    ],
+    "interventions": [
+      "DRUG: pemetrexed"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 120 Years",
+    "primary_outcome": "Progression free survival at 6 months and time to disease progression",
+    "brief_summary": "RATIONALE: Pemetrexed disodium may stop the growth of tumor cells by blocking some of the enzymes needed for cell growth.\n\nPURPOSE: This phase II trial is studying how well pemetrexed disodium works in treating patients with recurrent malignant gliomas, primary CNS lymphoma, or brain metastases.",
+    "url": "https://clinicaltrials.gov/study/NCT00276783",
+    "imported_at": "2026-04-05T04:40:03.302825Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 16,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT06860594",
+    "title": "Testing the Addition of an Anti-Cancer Drug, Triapine, to the Usual Radiation Therapy for Recurrent Glioblastoma or Astrocytoma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "RECRUITING",
+    "conditions": [
+      "Astrocytoma, IDH-Mutant, Grade 2",
+      "Recurrent Adult Diffuse Hemispheric Glioma, H3 G34-Mutant",
+      "Recurrent Adult Diffuse Midline Glioma, H3 K27-Mutant",
+      "Recurrent Astrocytoma, IDH-Mutant",
+      "Recurrent Astrocytoma, IDH-Mutant, Grade 3",
+      "Recurrent Astrocytoma, IDH-Mutant, Grade 4",
+      "Recurrent Glioblastoma, IDH-Wildtype"
+    ],
+    "interventions": [
+      "PROCEDURE: Biospecimen Collection",
+      "PROCEDURE: Computed Tomography",
+      "RADIATION: Intensity-Modulated Radiation Therapy",
+      "PROCEDURE: Magnetic Resonance Imaging",
+      "DRUG: Triapine"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Incidence of dose-limiting toxicity",
+    "brief_summary": "This phase I trial tests the safety, side effects, and best dose of triapine in combination with radiation therapy in treating patients with glioblastoma or astrocytoma that has come back after a period of improvement (recurrent). Triapine may stop the growth of tumor cells by blocking some of the enzymes needed for cell growth. Radiation therapy uses high energy x-rays, particles, or radioactive seeds to kill cancer cells and shrink tumors. Giving triapine in combination with radiation therapy may be safe, tolerable, and/or effective in treating patients with recurrent glioblastoma or astrocytoma.",
+    "url": "https://clinicaltrials.gov/study/NCT06860594",
+    "imported_at": "2026-04-05T04:40:03.302836Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 17,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT01269853",
+    "title": "Repeated Super-selective Intraarterial Cerebral Infusion of Bevacizumab (Avastin) for Treatment of Relapsed GBM and AA",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1, PHASE2",
+    "status": "RECRUITING",
+    "conditions": [
+      "Glioblastoma Multiforme",
+      "Anaplastic Astrocytoma"
+    ],
+    "interventions": [
+      "DRUG: Bevacizumab",
+      "DRUG: Bevacizumab"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Composite overall response rate (CORR)",
+    "brief_summary": "The high-grade malignant brain tumors, glioblastoma multiforme (GBM) and anaplastic astrocytoma (AA), comprise the majority of all primary brain tumors in adults. This group of tumors also exhibits the most aggressive behavior, resulting in median overall survival durations of only 9-12 months for GBM, and 3-4 years for AA. Initial therapy consists of either surgical resection, external beam radiation or both. All patients experience a recurrence after first-line therapy, so improvements in both first-line and salvage therapy are critical to enhancing quality-of-life and prolonging survival. It is unknown if currently used intravenous (IV) therapies even cross the blood brain barrier (BBB). The investigators have shown in a previous phase I trial that a single Super-selective Intraarterial Cerebral Infusion (SIACI) of Bevacizumab (up to 15mg/kg) is safe and effective in the treatment of recurrent GBM. Therefore, this phase I/II clinical research trial is an extension of that trial in that the investigators seek to test the hypothesis that repeated dosing of intraarterial Bevacizumab is safe and effective in the treatment of recurrent malignant glioma. By achieving the aims of this study the investigators will also determine if IV therapy with Bevacizumab should be combined with repeated selected intraarterial Bevacizumab to improve progression free and overall survival. The investigators expect that this project will provide important information regarding the utility of repeated SIACI Bevacizumab therapy for malignant glioma, and may alter the way these drugs are delivered to the patients in the near future.",
+    "url": "https://clinicaltrials.gov/study/NCT01269853",
+    "imported_at": "2026-04-05T04:40:03.302847Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 18,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT06160596",
+    "title": "Analyzing and Solving Exceptional Long-term Survivors in Solid Tumors With Poor Prognosis",
+    "study_type": "OBSERVATIONAL",
+    "phase": "",
+    "status": "RECRUITING",
+    "conditions": [
+      "Pancreas Adenocarcinoma",
+      "Small-cell Lung Cancer",
+      "Glioblastoma, IDH-wildtype"
+    ],
+    "interventions": [
+      "GENETIC: Long term survival multimodal analysis"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "EXCEPTIONAL SURVIVAL",
+    "brief_summary": "This is a retrospective, exploratory, multi-center, translational, 3 cohorts case control matched study conducted in patients harboring a solid tumor with poor prognosis who presented a long-term (case) and standard (standard) survival.\n\nPatients with:\n\n* Cohort A: metastatic pancreatic ductal adenocarcinoma\n* Cohort B: glioblastoma IDHwt\n* Cohort C: extensive small cell lung cancer\n\nThis research aims to integrate data generated from clinical records, imaging, multi-omics and bioinformatics approaches to discriminate case and control and then to identify new therapeutic targets. Analyses will be performed depending on the tumor samples available with at least 3 omics levels and according to scientific advances; genomic, epigenomic, proteomics, metabolomics, transcriptomic, microbiomic.",
+    "url": "https://clinicaltrials.gov/study/NCT06160596",
+    "imported_at": "2026-04-05T04:40:03.302858Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 19,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT04439331",
+    "title": "Testing VS-6063 (Defactinib) as a Potential Targeted Treatment in Cancers With NF2 Genetic Changes (MATCH-Subprotocol U)",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "ACTIVE_NOT_RECRUITING",
+    "conditions": [
+      "Advanced Lymphoma",
+      "Advanced Malignant Solid Neoplasm",
+      "Hematopoietic and Lymphoid Cell Neoplasm",
+      "Refractory Lymphoma",
+      "Refractory Malignant Solid Neoplasm",
+      "Refractory Multiple Myeloma"
+    ],
+    "interventions": [
+      "DRUG: Defactinib Hydrochloride"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Objective Response Rate (ORR)",
+    "brief_summary": "This phase II MATCH treatment trial identifies the effects of VS-6063 (defactinib) in patients whose cancer has a genetic change called NF2 mutation. Defactinib may block a protein called FAK, which may be needed for cancer cell growth when NF2 mutations are present. Researchers hope to learn if defactinib will shrink this type of cancer or stop its growth.",
+    "url": "https://clinicaltrials.gov/study/NCT04439331",
+    "imported_at": "2026-04-05T04:40:03.302868Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 20,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT01011231",
+    "title": "Study of Gamma-Knife Radiosurgery Using Magnetic Resonance Imaging (MRI) Spectroscopy for Recurrent Glioma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "TERMINATED",
+    "conditions": [
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "PROCEDURE: Gamma Knife Radiosurgery"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "To assess the efficacy, as measured by progression-free survival at six months (PFS-6), of treating patients with recurrent glioblastoma using GKS to target a tumor volume defined by a combination of gadolinium enhancement and MRS.",
+    "brief_summary": "The purpose of this study is to assess the efficacy, of treating patients with recurrent glioblastoma using Gamma-Knife Radiosurgery (GKS) to target a tumor volume defined by a combination of gadolinium enhancement and magnetic resonance spectroscopy (MRS). This is a single center, Phase II trial. A total of 40 glioblastoma patients will be enrolled into the primary arm of the trial. In addition, a minimum of 10 patients with recurrent anaplastic (grade III) gliomas and a minimum of 10 patients with recurrent low-grade (grade II) gliomas will be enrolled into exploratory arms.\n\nThe investigators hypothesize that the use of a combination of gadolinium enhancement and elevated Cho:NAA ratio via MRS to determine the treatment target volume for Gamma Knife may be an effective way to treat focally-recurrent glioblastoma.",
+    "url": "https://clinicaltrials.gov/study/NCT01011231",
+    "imported_at": "2026-04-05T04:40:03.302880Z",
+    "result_type": "opposite"
+  },
+  {
+    "id": 21,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00597402",
+    "title": "Avastin in Combination With Radiation (XRT) & Temozolomide, Followed by Avastin, Temozolomide and Irinotecan for Glioblastoma (GBM) and Gliosarcomas",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "Glioblastoma",
+      "Gliosarcoma",
+      "Brain Tumor"
+    ],
+    "interventions": [
+      "DRUG: Avastin",
+      "DRUG: Temozolomide",
+      "RADIATION: Radiation Therapy (XRT)",
+      "DRUG: Irinotecan"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "16-month Overall Survival (OS)",
+    "brief_summary": "Primary objective: To use overall survival to assess the efficacy of the combination of radiation therapy, temozolomide and Avastin followed by Avastin, temozolomide, and irinotecan in the treatment of grade IV malignant glioma patients following surgical resection.\n\nSecondary objective: To determine the progression-free survival following the combination of radiation therapy, temozolomide and Avastin followed by Avastin, temozolomide, and irinotecan.\n\nExploratory Objective: To explore the relationship between biomarkers and outcome (overall survival and progression-free survival) among patients with grade IV malignant glioma treated with radiation therapy, temozolomide and Avastin followed by Avastin, temozolomide, and irinotecan.\n\nTo describe the toxicity of radiation therapy,temozolomide and Avastin followed by Avastin, temozolomide, and irinotecan.",
+    "url": "https://clinicaltrials.gov/study/NCT00597402",
+    "imported_at": "2026-04-05T04:40:03.691478Z",
+    "result_type": "null"
+  },
+  {
+    "id": 22,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00002753",
+    "title": "Monoclonal Antibody Therapy in Treating Patients With Recurrent Gliomas",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "COMPLETED",
+    "conditions": [
+      "Brain and Central Nervous System Tumors"
+    ],
+    "interventions": [
+      "RADIATION: iodine I 131 monoclonal antibody 81C6"
+    ],
+    "population": "Sex: ALL | Age: 3 Years to",
+    "primary_outcome": "",
+    "brief_summary": "RATIONALE: Monoclonal antibodies can locate tumor cells and either kill them or deliver tumor-killing substances to them without harming normal cells.\n\nPURPOSE: Phase I trial to determine the effectiveness of monoclonal antibody in treating patients with recurrent gliomas.",
+    "url": "https://clinicaltrials.gov/study/NCT00002753",
+    "imported_at": "2026-04-05T04:40:03.691504Z",
+    "result_type": "null"
+  },
+  {
+    "id": 23,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT05120960",
+    "title": "A Phase 1a/1b Study to Determine the Recommended Phase 2 Dose, of Tepotinib in Participants With MET Alterations and Brain Tumors",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "WITHDRAWN",
+    "conditions": [
+      "Brain Tumor"
+    ],
+    "interventions": [
+      "DRUG: tepotinib",
+      "DRUG: tepotinib plus osimertinib"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "To determine the recommended phase II dose (RP2D) of tepotinib for patients with brain metastasis and MET alterations (Group A)",
+    "brief_summary": "This is a single center, multi-arm, biomarker-driven phase 1 study to assess the RP2D, PK/PD, safety, and activity of tepotinib in participants with MET alterations and brain tumors. Eligible patients include those with brain metastases or glioblastoma, including patients who are surgical candidates. In patients with EGFR+ NSCLC with EGFR-TKI resistance and MET amplification, tepotinib will be given in combination with osimertinib. This phase 1 study will be conducted in 2 parts, Phase 1a (dose exploration) and Phase 1b (dose expansion). Phase 1a will include a surgical resection window of opportunity component. Phase 1b (dose expansion) can open once the relevant RP2D has been estimated in Phase 1a (dose exploration). Phase 1a (Dose Exploration): Patients will be assigned to dose levels within a Group as outlined in the Statistical Analysis Plan. Group A will be comprised of patients who are surgical resection candidates with newly-diagnosed or recurrent brain metastases and MET alteration. Group B will be comprised of patients who are surgical resection candidates with recurrent glioblastoma and MET alteration. Group C will be comprised of patients with newly-diagnosed or recurrent brain metastases and epidermal growth factor receptor mutated (EGFR+) non-small cell lung cancer (NSCLC). Phase 1b (Dose Expansion): Upon completion of the Phase 1a (dose exploration) component and estimation of a RP2D, dose expansion may proceed within Group A (consisting of patients with brain metastasis and MET alteration) and Group C (EGFR+ NSCLC brain metastasis, TKI resistance, and MET amplification). Dose expansion in these 2 groups may be done concurrently, but enrollment in each group does not require completion of the entire Phase 1a component of the study. There will not be a Group B (glioblastoma) in Phase 1b. Patients in Phase 1b will not undergo surgical resection.",
+    "url": "https://clinicaltrials.gov/study/NCT05120960",
+    "imported_at": "2026-04-05T04:40:03.691513Z",
+    "result_type": "opposite"
+  },
+  {
+    "id": 24,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT06336291",
+    "title": "A Study With L19TNF in Combination With Lomustine in Patients With Glioblastoma at Progression or Recurrence",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "RECRUITING",
+    "conditions": [
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: L19TNF",
+      "DRUG: L19TNF",
+      "DRUG: L19TNF",
+      "DRUG: Lomustine",
+      "DRUG: Lomustine"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Adverse Events",
+    "brief_summary": "The trial aims to collect safety, efficacy, exposure, dose- response, pharmacokinetic and pharmacodynamic information of the combination of L19TNF and lomustine at different dose levels in patients with Glioblastoma at progression or recurrence",
+    "url": "https://clinicaltrials.gov/study/NCT06336291",
+    "imported_at": "2026-04-05T04:40:03.691521Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 25,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00498979",
+    "title": "Sodium Stibogluconate and IFNa-2b Followed By CDDP, VLB and DTIC Treating Pts.With Advanced Melanoma or Other Cancers",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "COMPLETED",
+    "conditions": [
+      "Stage IV Melanoma"
+    ],
+    "interventions": [
+      "BIOLOGICAL: recombinant interferon alfa-2b",
+      "DRUG: cisplatin",
+      "DRUG: sodium stibogluconate",
+      "DRUG: dacarbazine",
+      "DRUG: vinblastine"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Safety of the combination of sodium stibogluconate and interferon alfa-2b with chemotherapy",
+    "brief_summary": "RATIONALE: Sodium stibogluconate may stop the growth of tumor cells by blocking some of the enzymes needed for cell growth. Interferon alfa-2b may interfere with the growth of tumor cells and slow the growth of melanoma and other cancers. Drugs used in chemotherapy, such as cisplatin, vinblastine, and dacarbazine, work in different ways to stop the growth of tumor cells, either by killing the cells or by stopping them from dividing. Giving sodium stibogluconate and interferon alfa-2b together with combination chemotherapy may kill more tumor cells.\n\nPURPOSE: This phase I trial is studying the side effects and best dose of sodium stibogluconate when given together with interferon alfa-2b, cisplatin, vinblastine, and dacarbazine in treating patients with advanced melanoma or other cancer.",
+    "url": "https://clinicaltrials.gov/study/NCT00498979",
+    "imported_at": "2026-04-05T04:40:03.691530Z",
+    "result_type": "null"
+  },
+  {
+    "id": 26,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT05902169",
+    "title": "Sonocloud-9 in Association With Carboplatin Versus Standard-of-Care Chemotherapies (CCNU or TMZ) in Recurrent GBM",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE3",
+    "status": "ACTIVE_NOT_RECRUITING",
+    "conditions": [
+      "Glioblastoma",
+      "Recurrent Glioblastoma",
+      "GBM"
+    ],
+    "interventions": [
+      "DEVICE: SonoCloud-9 (SC9)",
+      "DRUG: Carboplatin",
+      "DRUG: Lomustine",
+      "DRUG: Temozolomide"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Overall survival (OS)",
+    "brief_summary": "The brain is protected from any toxic or inflammatory molecule by the blood-brain barrier (BBB). This physical barrier is located at the level of the blood vessel walls. Because of these barrier properties, the blood vessels are also impermeable to the passage of therapeutic molecules from the blood to the brain. The development of effective treatments against glioblastoma is thus limited due to the BBB that prevents most drugs injected in the bloodstream from getting into brain tissue where the tumour is seated. The SonoCloud-9 (SC9) is an investigational device using ultrasound technology and specially developed to open the BBB in the area of and surrounding the tumour. The transient opening of the BBB allows more drugs to reach the brain tumour tissue. Carboplatin is a chemotherapy that is approved to treat different cancer types alone or in combination with other drugs, and has been used in the treatment of glioblastoma. Despite its proven efficacy in the laboratory on glioblastoma cells, carboplatin does not readily cross the BBB in humans. A clinical trial has shown that in combination with the SonoCloud-9, more carboplatin can reach the brain tumour tissue. The objective of the proposed trial is to show that the association - carboplatin with the SonoCloud-9 - will increase efficacy of the drug in patients with recurrent glioblastoma.",
+    "url": "https://clinicaltrials.gov/study/NCT05902169",
+    "imported_at": "2026-04-05T04:40:03.691537Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 27,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00940498",
+    "title": "Study of PF-05212384 (Also Known as PKI-587)Administered Intravenously To Subjects With Solid Tumors",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "COMPLETED",
+    "conditions": [
+      "Neoplasms"
+    ],
+    "interventions": [
+      "DRUG: PF-05212384 (also known as PKI-587)"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 99 Years",
+    "primary_outcome": "Number of Participants With Treatment-Emergent Adverse Events (AEs) or Serious Adverse Events (SAEs)",
+    "brief_summary": "This is a two-part study of a compound called PF-05212384 (also known as PKI-587). The purpose of part 1 is to identify the Maximum Tolerated Dose (MTD) of PF-05212384 using a Continual Reassessment Method (CRM). Part 1 will include subjects with any solid tumor. In Part 2 two cohorts will be enrolled. One cohort will assess safety, tolerability and preliminary efficacy in 20 subjects at the MTD and will include subjects with breast cancer, ovarian cancer, endometrial cancer, colorectal cancer renal cancer or glioblastoma (a type of brain tumor). The other cohort will include 5 to 15 subjects with any type of tumor who consent to provide tumor biopsies while participating in the study.",
+    "url": "https://clinicaltrials.gov/study/NCT00940498",
+    "imported_at": "2026-04-05T04:40:03.691544Z",
+    "result_type": "null"
+  },
+  {
+    "id": 28,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT07472387",
+    "title": "Impact of Androgen Signaling on the Composition of the Immune Microenvironment in Glioblastomas",
+    "study_type": "INTERVENTIONAL",
+    "phase": "NA",
+    "status": "NOT_YET_RECRUITING",
+    "conditions": [
+      "Glioblastoma (GBM)"
+    ],
+    "interventions": [
+      "OTHER: blood sampling",
+      "OTHER: saliva sampling",
+      "OTHER: stool sampling",
+      "OTHER: Tumor sampling"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 55 Years",
+    "primary_outcome": "Mean expression of AR, ER, and other hormone signaling pathway genes in the tumor",
+    "brief_summary": "Glioblastoma (GBM) is the most common and most aggressive primary brain cancer in adults. GBM is more common in men than in women, with a male-to-female ratio of 1.6. Furthermore, being male is associated with a poorer prognosis. These data suggest that sex and/or sexual hormones and more specifically androgens may play a role in the initiation, the growth, and the resistance to treatments of GBM.",
+    "url": "https://clinicaltrials.gov/study/NCT07472387",
+    "imported_at": "2026-04-05T04:40:03.691551Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 29,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00049387",
+    "title": "Tipifarnib, Temozolomide, and Radiation Therapy in Treating Patients With Newly Diagnosed Glioblastoma Multiforme or Gliosarcoma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "COMPLETED",
+    "conditions": [
+      "Adult Giant Cell Glioblastoma",
+      "Adult Glioblastoma",
+      "Adult Gliosarcoma"
+    ],
+    "interventions": [
+      "DRUG: tipifarnib",
+      "DRUG: temozolomide",
+      "RADIATION: radiation therapy"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "MTD of tipifarnib",
+    "brief_summary": "This phase I trial is studying the side effects and best dose of tipifarnib when given together with temozolomide and radiation therapy in treating patients with newly diagnosed glioblastoma multiforme or gliosarcoma. Tipifarnib may stop the growth of tumor cells by blocking the enzymes necessary for tumor cell growth. Drugs used in chemotherapy, such as temozolomide, work in different ways to stop the growth of tumor cells, either by killing the cells or by stopping them from dividing. Radiation therapy uses high-energy x-rays to damage tumor cells. Combining tipifarnib, temozolomide, and radiation therapy may kill more tumor cells.",
+    "url": "https://clinicaltrials.gov/study/NCT00049387",
+    "imported_at": "2026-04-05T04:40:03.691557Z",
+    "result_type": "null"
+  },
+  {
+    "id": 30,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT03452579",
+    "title": "Nivolumab Plus Standard Dose Bevacizumab Versus Nivolumab Plus Low Dose Bevacizumab in GBM",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "ACTIVE_NOT_RECRUITING",
+    "conditions": [
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: Nivolumab",
+      "DRUG: Standard Dose Bevacizumab",
+      "DRUG: Low Dose Bevacizumab"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Overall Survival at 12 Months (OS-12)",
+    "brief_summary": "The purpose of this study is to test the effectiveness (how well the drug works), safety and tolerability of an investigational drug called nivolumab (also known as BMS-936558) in glioblastoma (a malignant tumor, or GBM), when added to bevacizumab.\n\nNivolumab is an antibody (a kind of human protein) that is being tested to see if it will allow the body's immune system to work against glioblastoma tumors. Opdivo (nivolumab ) is currently FDA approved in the United States for melanoma (a type of skin cancer), non-small cell lung cancer, renal cell cancer (a type of kidney cancer), Hodgkin's lymphoma but is not approved in glioblastoma. nivolumab may help your immune system detect and attack cancer cells.\n\nBevacizumab is a drug which works on the blood vessel that supply the tumor and potentially can starve the tumor by cutting off the blood supply to these tumors. Bevacizumab is commercially available and FDA approved for individuals with recurrent glioblastoma.\n\nThis study has two study groups. Arm 1 will receive the study drug nivolumab 240mg and bevacizumab 10 mg (standard dose) every 2 weeks and Arm 2 will receive the study drug nivolumab 240 mg and bevacizumab 3 mg (low dose) every 2 weeks. A process will be used to assign participants, by chance, to one of the study groups. Neither participants nor doctors can choose which group participants are in. This is done by chance because no one knows if one study group is better or worse than the other. 90 total participants are expected to participate in this study (45 participants in each arm).\n\nYour total participation in this study from the time you have signed the informed consent to your last visit, including follow-up visits, may be more than three years (depending on what effect the treatment has on your cancer, and how well you tolerate the treatment).",
+    "url": "https://clinicaltrials.gov/study/NCT03452579",
+    "imported_at": "2026-04-05T04:40:03.691568Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 31,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT04802447",
+    "title": "SurVaxM Expanded Access Protocol",
+    "study_type": "EXPANDED_ACCESS",
+    "phase": "",
+    "status": "NO_LONGER_AVAILABLE",
+    "conditions": [
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: SurVaxM"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "",
+    "brief_summary": "Data from clinical trials suggest that SurVaxM administered as a single agent, or in combination with standard glioblastoma chemotherapy treatment regimens to patients with recurrent or newly diagnosed glioblastoma, is generally well tolerated and may increase progression free survival and overall survival in some patients",
+    "url": "https://clinicaltrials.gov/study/NCT04802447",
+    "imported_at": "2026-04-05T04:40:03.691575Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 32,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT04365647",
+    "title": "Intra-operative Variation in Size of Brain Tumors After Craniotomy",
+    "study_type": "OBSERVATIONAL",
+    "phase": "",
+    "status": "COMPLETED",
+    "conditions": [
+      "Brain Tumor, Primary"
+    ],
+    "interventions": [],
+    "population": "Sex: ALL | Age: 15 Years to 75 Years",
+    "primary_outcome": "Tumor dimension change",
+    "brief_summary": "We planned to evaluate the change in tumor dimensions of intraaxial parenchymal tumors after craniotomy by comparing the tumor size on intraoperative ultrasonography (IOUSG) with pre-operative CECT and CEMRI brain.",
+    "url": "https://clinicaltrials.gov/study/NCT04365647",
+    "imported_at": "2026-04-05T04:40:03.691582Z",
+    "result_type": "null"
+  },
+  {
+    "id": 33,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT03567135",
+    "title": "Temozolomide Plus Anti-angiogenesis Drugs and Radiotherapy as a Treatment for Glioblastoma",
+    "study_type": "OBSERVATIONAL",
+    "phase": "",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: Apatinib",
+      "DRUG: Temozolomide（TMZ）"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 70 Years",
+    "primary_outcome": "Progression-Free-Survival(PFS)",
+    "brief_summary": "Temozolomide (TMZ) is an oral chemotherapy drug. It is an alkylating agent used as a first-line treatment for glioblastoma. This methylation damages the DNA and triggers the death of tumor cells. According to the results of several clinical studies, TMZ synchronous plus radiotherapy and subsequent as adjuvant therapy can significantly improve the survival rate of newly diagnosed glioblastoma patients.",
+    "url": "https://clinicaltrials.gov/study/NCT03567135",
+    "imported_at": "2026-04-05T04:40:03.691589Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 34,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT04671459",
+    "title": "TTFields and Radiosurgery of Recurrent Glioblastoma +/- 18F-Fluoro-Ethyl-Thyrosine",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Glioblastoma Multiforme",
+      "Recurrent Glioblastoma"
+    ],
+    "interventions": [
+      "COMBINATION_PRODUCT: TTFields and SRS"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "1-year survival rate",
+    "brief_summary": "All patients will receive TTFields therapy and additionally Stereotactic Radiosurgery . Radiosurgery will be based on MRI and FET-PET or MRI alone. Addition of FET-PET will be preferred option.",
+    "url": "https://clinicaltrials.gov/study/NCT04671459",
+    "imported_at": "2026-04-05T04:40:03.691596Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 35,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00087061",
+    "title": "Gimatecan in Treating Patients With Recurrent or Progressive Primary Malignant Glioma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1, PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "Brain and Central Nervous System Tumors"
+    ],
+    "interventions": [
+      "DRUG: gimatecan"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "",
+    "brief_summary": "RATIONALE: Drugs used in chemotherapy, such as gimatecan, work in different ways to stop tumor cells from dividing so they stop growing or die.\n\nPURPOSE: This phase I/II trial is studying the side effects and best dose of gimatecan in treating patients with recurrent or progressive primary malignant glioma.",
+    "url": "https://clinicaltrials.gov/study/NCT00087061",
+    "imported_at": "2026-04-05T04:40:03.691602Z",
+    "result_type": "null"
+  },
+  {
+    "id": 36,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00098761",
+    "title": "VNP40101M in Treating Young Patients With Recurrent, Progressive, or Refractory Primary Brain Tumors",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "COMPLETED",
+    "conditions": [
+      "Brain and Central Nervous System Tumors"
+    ],
+    "interventions": [
+      "DRUG: laromustine"
+    ],
+    "population": "Sex: ALL | Age:  to 21 Years",
+    "primary_outcome": "Estimate the maximum tolerated dose",
+    "brief_summary": "RATIONALE: Drugs used in chemotherapy, such as VNP40101M, work in different ways to stop tumor cells from dividing so they stop growing or die.\n\nPURPOSE: This phase I trial is studying the side effects and best dose of VNP40101M in treating young patients with recurrent, progressive, or refractory primary brain tumors.",
+    "url": "https://clinicaltrials.gov/study/NCT00098761",
+    "imported_at": "2026-04-05T04:40:03.691608Z",
+    "result_type": "null"
+  },
+  {
+    "id": 37,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00003241",
+    "title": "Phenylacetate in Treating Children With Recurrent or Progressive Brain Tumors",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "Brain and Central Nervous System Tumors"
+    ],
+    "interventions": [
+      "DRUG: phenylacetate"
+    ],
+    "population": "Sex: ALL | Age: 2 Years to 21 Years",
+    "primary_outcome": "",
+    "brief_summary": "RATIONALE: Drugs used in chemotherapy use different ways to stop tumor cells from dividing so they stop growing or die.\n\nPURPOSE: Phase II trial to study the effectiveness of phenylacetate in treating children with recurrent or progressive brain tumors.",
+    "url": "https://clinicaltrials.gov/study/NCT00003241",
+    "imported_at": "2026-04-05T04:40:03.691614Z",
+    "result_type": "null"
+  },
+  {
+    "id": 38,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT05086497",
+    "title": "WBSI Guided Personalized Delivery of TTFields",
+    "study_type": "INTERVENTIONAL",
+    "phase": "NA",
+    "status": "RECRUITING",
+    "conditions": [
+      "GBM",
+      "Glioma Glioblastoma Multiforme",
+      "Tumor, Brain"
+    ],
+    "interventions": [
+      "DIAGNOSTIC_TEST: Whole Brain Spectroscopy Imaging Array Mapping Layout"
+    ],
+    "population": "Sex: ALL | Age: 22 Years to",
+    "primary_outcome": "Time to Progression",
+    "brief_summary": "This research study is for Glioblastoma (GBM) patients who will be beginning Optune as part of their clinical care, which is a novel treatment that utilizes - tumor treating fields (TTFields), (aka, electrical therapy), which has shown to improve overall survival in large multi-center trials. As a part of this study, participants will either receive Optune with \"standard array mapping\" (based on regular contrast enhanced MRI) or an \"alternative (more precise) array mapping\" based on sophisticated state of the art MRI techniques including \"whole brain spectroscopy\". Whole brain MRI spectroscopy provides additional metabolic information to map out the full extent of tumor spreading within the brain (far beyond from what is seen on regular MRI), by identifying certain metabolites that are present in cancer cells versus healthy tissue. This study is being performed to show whether alternative array mapping improves treatment outcomes, as opposed to the standard array mapping, by maximizing delivery of TTFields dose, thereby achieving more effective tumor cell killing, decreasing the rate of local recurrence, and improving the overall survival as well as quality of life measures.",
+    "url": "https://clinicaltrials.gov/study/NCT05086497",
+    "imported_at": "2026-04-05T04:40:03.691620Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 39,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00650923",
+    "title": "Aflibercept, Radiation Therapy, and Temozolomide in Treating Patients With Newly Diagnosed or Recurrent Glioblastoma Multiforme, Gliosarcoma, or Other Malignant Glioma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "COMPLETED",
+    "conditions": [
+      "Adult Anaplastic Astrocytoma",
+      "Adult Anaplastic Oligodendroglioma",
+      "Adult Giant Cell Glioblastoma",
+      "Adult Glioblastoma",
+      "Adult Gliosarcoma",
+      "Adult Mixed Glioma",
+      "Recurrent Adult Brain Tumor"
+    ],
+    "interventions": [
+      "DRUG: ziv-aflibercept",
+      "PROCEDURE: radiation therapy",
+      "DRUG: temozolomide",
+      "PROCEDURE: pharmacological study",
+      "PROCEDURE: laboratory biomarker analysis"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Maximum tolerated dose of aflibercept defined as the dose at which fewer than one-third of patients experience DLT based on the CTC severity grading",
+    "brief_summary": "This phase I trial is studying the side effects and best dose of aflibercept when given together with radiation therapy and temozolomide in treating patients with newly diagnosed or recurrent glioblastoma multiforme, gliosarcoma, or other malignant glioma. Aflibercept may stop the growth of tumor cells by blocking blood flow to the tumor. Radiation therapy uses high-energy x-rays to kill tumor cells. Drugs used in chemotherapy, such as temozolomide, work in different ways to stop the growth of tumor cells, either by killing the cells or by stopping them from dividing. Giving aflibercept together with radiation therapy and temozolomide may kill more tumor cells.",
+    "url": "https://clinicaltrials.gov/study/NCT00650923",
+    "imported_at": "2026-04-05T04:40:03.691627Z",
+    "result_type": "null"
+  },
+  {
+    "id": 40,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT02345824",
+    "title": "Early-Phase Study to Assess Inhibitor Ribociclib in Patients With Recurrent Glioblastoma or Anaplastic Glioma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Glioblastoma",
+      "Glioma"
+    ],
+    "interventions": [
+      "DRUG: Ribociclib"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 85 Years",
+    "primary_outcome": "Inhibition of CDK4/CDK6 Signaling Pathway in Cell Proliferation",
+    "brief_summary": "This is a single-institution, open-label, early-phase study to assess the ability of ribociclib (LEE011) to inhibit CDK4/CDK6/Rb/E2F signaling and cell proliferation/viability in core and infiltrating tumor tissues obtained from patients with recurrent glioblastoma or anaplastic glioma compared to the baseline/primary pathologic tumor specimen. Abundant preclinical evidence indicates that Rb-deficient cancer cells are resistant to CDK4/6 inhibition and ongoing trials with CDK4/6 inhibitors exclude patients with Rb-deficient tumors. The investigators will evaluate 10 patients with Rb-positive glioblastoma or anaplastic glioma in this study. Given that a minority of glioblastomas ha Rb loss the investigators anticipate enrolling a maximum of 20 patients, to meet our goal of 10 patients with Rb-positive tumors.",
+    "url": "https://clinicaltrials.gov/study/NCT02345824",
+    "imported_at": "2026-04-05T04:40:03.691633Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 41,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT04222309",
+    "title": "Laparoscopically Harvested Omental Free Tissue Autograft to Bypass the Blood Brain Barrier (BBB) in Human Recurrent Glioblastoma Multiforme (rGBM)",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "SUSPENDED",
+    "conditions": [
+      "Glioma",
+      "Glioma, Malignant",
+      "Glioblastoma",
+      "Glioblastoma Multiforme",
+      "Glioblastoma Multiforme of Brain",
+      "GBM",
+      "Brain Cancer"
+    ],
+    "interventions": [
+      "PROCEDURE: Laparoscopically harvested omental free flap"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Safety parameter: proportion of patients experiencing rapidly progressive disease as indicated by MRI using RANO Criteria",
+    "brief_summary": "This single center, single arm, open-label, phase I study will assess the safety of a laparoscopically harvested omental free flap into the resection cavity of recurrent glioblastoma multiforme (GBM) patients.\n\nAll participants included in the study will undergo standard surgical resection for diagnosed recurrent GBM. Following the resection, the surgical cavity will be lined with a laparoscopically harvested omental free flap. The participant's dura, bone and scalp will be closed as is customary. The participant will be followed for side effects within 72 hours, 7 days, 30 days, 90 days and 180 days. Risk assessment will include seizure, stroke, infection, tumor progression, and death.",
+    "url": "https://clinicaltrials.gov/study/NCT04222309",
+    "imported_at": "2026-04-05T04:40:04.131662Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 42,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT01861990",
+    "title": "Valproic Acid in Childhood Progressive Brain Tumors",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "WITHDRAWN",
+    "conditions": [
+      "Pediatric Brain Tumor",
+      "Glioma",
+      "Anaplastic Astrocytoma",
+      "Medulloblastoma",
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: Valproic Acid"
+    ],
+    "population": "Sex: ALL | Age: 1 Year to",
+    "primary_outcome": "Completion of protocol",
+    "brief_summary": "The study investigates valproic acid added to radiation and temozolomide therapy (standard of care) for progressive or recurrent pediatric brain tumors.",
+    "url": "https://clinicaltrials.gov/study/NCT01861990",
+    "imported_at": "2026-04-05T04:40:04.131696Z",
+    "result_type": "opposite"
+  },
+  {
+    "id": 43,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT04657146",
+    "title": "Longitudinal Assessment of Marrow and Blood in Patients With Glioblastoma",
+    "study_type": "OBSERVATIONAL",
+    "phase": "",
+    "status": "SUSPENDED",
+    "conditions": [
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "OTHER: Biorepository"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Variations in blood and bone marrow T cell counts",
+    "brief_summary": "The main goal of this study is to provide foundational data to drive translational approaches for an entirely novel category of immunotherapy.",
+    "url": "https://clinicaltrials.gov/study/NCT04657146",
+    "imported_at": "2026-04-05T04:40:04.131705Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 44,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00238303",
+    "title": "Vorinostat in Treating Patients With Progressive or Recurrent Glioblastoma Multiforme",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "Adult Giant Cell Glioblastoma",
+      "Adult Glioblastoma",
+      "Adult Gliosarcoma",
+      "Recurrent Adult Brain Tumor"
+    ],
+    "interventions": [
+      "DRUG: vorinostat",
+      "PROCEDURE: conventional surgery"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Proportion of Successes (Patients Alive and Progression-free)",
+    "brief_summary": "This phase II trial is studying how well vorinostat works in treating patients with progressive or recurrent glioblastoma multiforme. Drugs used in chemotherapy, such as vorinostat, work in different ways to stop the growth of tumor cells, either by killing the cells or by stopping them from dividing. Vorinostat may also stop the growth of tumor cells by blocking some of the enzymes needed for cell growth. Giving vorinostat before surgery may make the tumor smaller and reduce the amount of normal tissue that needs to be removed. Giving it after surgery may kill any remaining tumor cells.",
+    "url": "https://clinicaltrials.gov/study/NCT00238303",
+    "imported_at": "2026-04-05T04:40:04.131715Z",
+    "result_type": "null"
+  },
+  {
+    "id": 45,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT06360588",
+    "title": "Testing Copanlisib as Potentially Targeting Treatment in Cancers With PTEN Loss (MATCH - Subprotocol Z1G)",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "ACTIVE_NOT_RECRUITING",
+    "conditions": [
+      "Malignant Solid Neoplasm"
+    ],
+    "interventions": [
+      "PROCEDURE: Biopsy Procedure",
+      "PROCEDURE: Biospecimen Collection",
+      "DRUG: Copanlisib",
+      "PROCEDURE: Radiologic Examination"
+    ],
+    "population": "Sex: ALL",
+    "primary_outcome": "Objective Response Rate (ORR)",
+    "brief_summary": "The phase II MATCH treatment trial tests how well copanlisib works to treat patients with cancer with PTEN loss. Copanlisib may stop the growth of tumor cells and may kill them by blocking some of the enzymes needed for cell growth.",
+    "url": "https://clinicaltrials.gov/study/NCT06360588",
+    "imported_at": "2026-04-05T04:40:04.131724Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 46,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT04933942",
+    "title": "Phase II Trial of Romiplostim for Thrombocytopenia Induced by Lomustine at First Progression of MGMT Promoter-meth Glioblastoma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "WITHDRAWN",
+    "conditions": [
+      "First Progression of MGMT Promoter-methylated Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: Lomustine",
+      "DRUG: Romiplostim"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Progression Free Survival (PFS)",
+    "brief_summary": "Romiplostim for low platelets caused by lomustine chemotherapy in patients with first recurrence (growing back) of a brain tumor, glioblastoma that is MGMT methylated.\n\nLomustine is an anticancer drug often used to treat glioblastoma that grows back after initial treatment. This anticancer drug can cause side effects. The most frequent and potentially serious side effect of all is lowering of the blood platelets. Low platelets can cause bleedings in the the stomach and intestines, the skin, the brain and other systems and tissues.\n\nLow platelets are also the main cause of delaying or prematurely (ending treatment before the planned end) stopping chemotherapy. There is no treatment for low platelets except platelet transfusions. Romiplostim is a drug that stimulates the production of platelets in the bone marrow. It is an approved drug in USA, Europe, Australia and Switzerland for a special type of blood disease in which the body breaks down its own blood platelets.\n\nThe purpose of the study is to start the treatment with romiplostim once low platelets are diagnosed in order to restore the platelet count and to prevent the platelet count from dropping again during the lomustine treatment.",
+    "url": "https://clinicaltrials.gov/study/NCT04933942",
+    "imported_at": "2026-04-05T04:40:04.131735Z",
+    "result_type": "opposite"
+  },
+  {
+    "id": 47,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT05977322",
+    "title": "A Phase I Study of [177Lu]Lu-FF58 in Patients With Advanced Solid Tumors.",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "TERMINATED",
+    "conditions": [
+      "Pancreatic Ductal Adenocarcinoma",
+      "Gastroesophageal Adenocarcinoma",
+      "Glioblastoma Multiforme"
+    ],
+    "interventions": [
+      "DRUG: 68Ga-FF58",
+      "DRUG: 177Lu-FF58"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 100 Years",
+    "primary_outcome": "Incidence and severity of dose limiting toxicities of 177Lu-FF58",
+    "brief_summary": "The purpose of the study is to test the safety and dosing of \\[177Lu\\]Lu-FF58, a radioligand therapy for patients with advanced or metastatic tumors that express proteins known as integrins: alpha-v beta-3 integrin (αvβ3) and alpha-v beta-5 integrin (αvβ5). The study will also further characterize the radioligand imaging agent \\[68Ga\\]Ga-FF58 including its ability to identify tumor lesions and its safety profile.",
+    "url": "https://clinicaltrials.gov/study/NCT05977322",
+    "imported_at": "2026-04-05T04:40:04.131745Z",
+    "result_type": "opposite"
+  },
+  {
+    "id": 48,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00433472",
+    "title": "MRI in Evaluating the Effect of Efaproxiral on the Brain in Patients With Recurrent or Progressive Glioma Enrolled on Clinical Trial NABTT-9806",
+    "study_type": "INTERVENTIONAL",
+    "phase": "NA",
+    "status": "WITHDRAWN",
+    "conditions": [
+      "Brain and Central Nervous System Tumors"
+    ],
+    "interventions": [
+      "DEVICE: magnetic resonance imaging (MRI)"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Measurable effect of efaproxiral on the brain as measured by T2 and/or T2* MRI",
+    "brief_summary": "RATIONALE: Diagnostic procedures, such as MRI, may help doctors learn how efaproxiral works in the brain and help plan the best treatment.\n\nPURPOSE: This clinical trial is using MRI to evaluate the effect of efaproxiral on the brain in patients with recurrent or progressive glioma receiving treatment on clinical trial NABTT-9806.",
+    "url": "https://clinicaltrials.gov/study/NCT00433472",
+    "imported_at": "2026-04-05T04:40:04.131754Z",
+    "result_type": "opposite"
+  },
+  {
+    "id": 49,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT01854099",
+    "title": "Peptide Vaccine for Glioblastoma Against Cytomegalovirus Antigens",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "WITHDRAWN",
+    "conditions": [
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "BIOLOGICAL: PEP-CMV",
+      "BIOLOGICAL: PEP-CMV",
+      "BIOLOGICAL: PEP-CMV"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Safety",
+    "brief_summary": "Eligible adult patients with new diagnosis of gliobastoma are enrolled to receive 3 weekly vaccinations of the study drug PEP-CMV 1-3 days following standard of care chemoradiation. Patients will then be randomized to one of three arms: 1). standard temozolomide (TMZ)(200mg/m\\^2 for 5 days) with vaccine on day 6-8 of each monthly TMZ cycle. 2). standard TMZ (200mg/m\\^2 for 5 days) with vaccine on day 22-24 of each monthly TMZ cycle. 3). dose-intensified TMZ (100 mg./m\\^2 for 21 days) with vaccine on day 22-24 of each monthly cycle. All vaccines will be given intradermally (i.d.) and will be given with monthly TMZ cycles and continue after TMZ cycles until progression or death.",
+    "url": "https://clinicaltrials.gov/study/NCT01854099",
+    "imported_at": "2026-04-05T04:40:04.131763Z",
+    "result_type": "opposite"
+  },
+  {
+    "id": 50,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT06975332",
+    "title": "Local, Targeted Therapy With Alpha Emitter [225Ac]Ac-DOTA-SP (TAT) in Glioma (WHO G3-G4) Progression",
+    "study_type": "INTERVENTIONAL",
+    "phase": "NA",
+    "status": "RECRUITING",
+    "conditions": [
+      "Glioblastoma",
+      "High-Grade Gliomas",
+      "Grade III Astrocytoma",
+      "Grade III Glioma"
+    ],
+    "interventions": [
+      "RADIATION: Local, targeted therapy with alpha emitter [225Ac]Ac-DOTA-SP (TAT)"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 80 Years",
+    "primary_outcome": "Number of patients experiencing clinical progression (as defined below)",
+    "brief_summary": "Brain tumors account for 1.35% of all cancers and cause 2.2% of cancer-related deaths. Gliomas are the most common type, comprising 40-90% of central nervous system tumors in different age groups. The incidence of malignant gliomas is approximately 0.5-2 per 100,000 people annually. Standard treatments include surgical resection, radiotherapy, and chemotherapy, yet overall survival remains low, typically 1-3 years post-diagnosis. The study highlights the pressing need for novel treatment strategies, particularly given the infiltrative nature of gliomas and the potential for targeted therapies using neuropeptides.\n\nThe aim of this study is to assess the efficacy and safety of local targeted therapy with \\[225Ac\\]Ac-DOTA-SP in recurrent glioblastoma.\n\nIt is an interventional study without a control group, initiated by the researcher. Patients included are aged 18-80 with recurrent WHO G3-G4 glioma post-first-line treatment, not requiring immediate surgery and meeting specific MRI progression criteria.\n\nPatients will receive a maximum of six cycles of \\[225Ac\\]Ac-DOTA-SP, involving pre-treatment assessments, local administration of the agent after ensuring catheter patency, and continuous monitoring. Blood tests and neurological evaluations will be performed regularly.\n\nOutcome will be assessed by measuring overall survival (OS) and progression-free survival (PFS). The study anticipates improvements in both OS and PFS when compared to current treatments, contributing to critical insights into targeted alpha therapy's effectiveness in glioblastoma.\n\nTreatment with \\[225Ac\\]Ac-DOTA-SP previously indicated few significant side effects, primarily transient issues like seizures. Patients will be closely monitored throughout the study to identify any adverse effects promptly.\n\nThe estimated study duration is three years, with biological material collected for histopathological and genetic analysis during surgical reoperation.\n\nData will be anonymized to protect patient confidentiality, stored securely, and made available only for the scope of the study.\n\nLed by Prof. Przemysław Kunert, the research team includes multiple co-investigators from neurosurgery and nuclear medicine departments.",
+    "url": "https://clinicaltrials.gov/study/NCT06975332",
+    "imported_at": "2026-04-05T04:40:04.131772Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 51,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT02101905",
+    "title": "Lapatinib Ditosylate Before Surgery in Treating Patients With Recurrent High-Grade Glioma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "COMPLETED",
+    "conditions": [
+      "Anaplastic Astrocytoma",
+      "Anaplastic Ependymoma",
+      "Anaplastic Oligodendroglioma",
+      "Gliosarcoma",
+      "Mixed Glioma",
+      "Recurrent Adult Brain Neoplasm",
+      "Recurrent Glioblastoma"
+    ],
+    "interventions": [
+      "OTHER: Laboratory Biomarker Analysis",
+      "DRUG: Lapatinib",
+      "DRUG: Lapatinib Ditosylate",
+      "OTHER: Pharmacological Study",
+      "PROCEDURE: Therapeutic Conventional Surgery"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "To Determine the Lapatinib Ditosylate Intratumoral Concentration (Pharmacokinetics)",
+    "brief_summary": "This pilot phase I clinical trial studies how well lapatinib ditosylate before surgery works in treating patients with high-grade glioma that has come back after a period of time during which the tumor could not be detected. Lapatinib ditosylate may stop the growth of tumor cells by blocking some of the enzymes needed for cell growth.",
+    "url": "https://clinicaltrials.gov/study/NCT02101905",
+    "imported_at": "2026-04-05T04:40:04.131781Z",
+    "result_type": "null"
+  },
+  {
+    "id": 52,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT00022256",
+    "title": "Motexafin Gadolinium Plus Radiation Therapy to the Brain in Treating Patients With Newly Diagnosed Glioblastoma Multiforme",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "Brain and Central Nervous System Tumors"
+    ],
+    "interventions": [
+      "DRUG: motexafin gadolinium",
+      "RADIATION: radiation therapy"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "",
+    "brief_summary": "RATIONALE: Radiation therapy uses high-energy x-rays to damage tumor cells. Drugs such as motexafin gadolinium may make tumor cells more sensitive to radiation therapy.\n\nPURPOSE: Phase II trial to study the effectiveness of motexafin gadolinium plus radiation therapy to the brain in treating patients who have newly diagnosed glioblastoma multiforme.",
+    "url": "https://clinicaltrials.gov/study/NCT00022256",
+    "imported_at": "2026-04-05T04:40:04.131789Z",
+    "result_type": "null"
+  },
+  {
+    "id": 53,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT07392957",
+    "title": "Safety and Efficacy of CTX-009 With or Without CTX-471 for Recurrent Glioblastoma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1, PHASE2",
+    "status": "NOT_YET_RECRUITING",
+    "conditions": [
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: CTX-009",
+      "DRUG: CTX-471"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Phase IB Arm 1: Toxicity as measured by number of participants with adverse events",
+    "brief_summary": "This is a phase IB/II, open-label study evaluating CTX-009 as monotherapy and in combination with CTX-471. The study evaluates the safety and efficacy of the monotherapy and the combination in patients with recurrent glioblastoma. The study tests the hypothesis that treatment with CTX-009 alone or in combination with CTX-471 will lead to enhanced tumor control and prolongation of overall survival of patients with recurrent glioblastoma.\n\nCTX-009 expands on existing anti-angiogenic therapies by ablating key compensatory and resistance mechanisms to bevacizumab, CTX-471 restores local immune reactivity through activation of costimulatory immune mediators. Combination of these two agents may further impair tumor proliferation through synergistic effects on the tumor microenvironment",
+    "url": "https://clinicaltrials.gov/study/NCT07392957",
+    "imported_at": "2026-04-05T04:40:04.131798Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 54,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT03707457",
+    "title": "Biomarker-Driven Therapy Using Immune Activators With Nivolumab in Patients With First Recurrence of Glioblastoma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "TERMINATED",
+    "conditions": [
+      "Glioblastoma",
+      "Glioblastoma Multiforme"
+    ],
+    "interventions": [
+      "DRUG: Nivolumab",
+      "DRUG: Anti-GITR Monoclonal Antibody MK-4166",
+      "DRUG: IDO1 inhibitor INCB024360",
+      "DRUG: Ipilimumab"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Proportion of subjects with dose limiting toxicities evaluated according to National Cancer Institute (NCI) Common Terminology Criteria for Adverse Events (CTCAE) version 5.0",
+    "brief_summary": "This research is being done to test if it is safe to give nivolumab with targeted immunotherapy drugs for recurrent glioblastoma (GBM), a type of brain tumor. The study doctors believe that giving immunotherapy drugs that match the biomarkers in a tumor will help the immune system fight the tumor. Tumor tissue collected during surgery will be tested for certain biomarkers to determine which immunotherapy might best target the tumor.\n\nThe combination immunotherapy arms include:\n\nArm A: Nivolumab + anti-GITR Arm B: Nivolumab + IDO1 inhibitor Arm C: Nivolumab + Ipilimumab",
+    "url": "https://clinicaltrials.gov/study/NCT03707457",
+    "imported_at": "2026-04-05T04:40:04.131807Z",
+    "result_type": "opposite"
+  },
+  {
+    "id": 55,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT03463265",
+    "title": "Nab-sirolimus in Recurrent High Grade Glioma and Newly Diagnosed Glioblastoma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "High Grade Recurrent Glioma and Newly Diagnosed Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: nab-sirolimus",
+      "DRUG: nab-sirolimus + temozolomide",
+      "DRUG: nab-sirolimus + bevacizumab",
+      "DRUG: nab-sirolimus + lomustine",
+      "DRUG: nab-sirolimus + marizomib (MRZ)",
+      "DRUG: nab-sirolimus + temozolomide + radiotherapy"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "ORR",
+    "brief_summary": "Phase 2, open-label study of nab-sirolimus in patients with recurrent high grade glioma following prior therapy and patients with newly diagnosed glioblastoma. nab-Sirolimus was administered as single agent or in combination therapies.",
+    "url": "https://clinicaltrials.gov/study/NCT03463265",
+    "imported_at": "2026-04-05T04:40:04.131817Z",
+    "result_type": "null"
+  },
+  {
+    "id": 56,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT03581292",
+    "title": "Veliparib, Radiation Therapy, and Temozolomide in Treating Patients With Newly Diagnosed Malignant Glioma Without H3 K27M or BRAFV600 Mutations",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "ACTIVE_NOT_RECRUITING",
+    "conditions": [
+      "Anaplastic Astrocytoma",
+      "Glioblastoma",
+      "Malignant Glioma"
+    ],
+    "interventions": [
+      "RADIATION: Radiation Therapy",
+      "DRUG: Temozolomide",
+      "DRUG: Veliparib"
+    ],
+    "population": "Sex: ALL | Age: 3 Years to 25 Years",
+    "primary_outcome": "Event Free Survival (EFS)",
+    "brief_summary": "This phase II trial studies how well veliparib, radiation therapy, and temozolomide work in treating patients with newly diagnosed malignant glioma without H3 K27M or BRAFV600 mutations. Poly adenosine diphosphate (ADP) ribose polymerases (PARPs) are proteins that help repair DNA mutations. PARP inhibitors, such as veliparib, can keep PARP from working, so tumor cells can't repair themselves, and they may stop growing. Radiation therapy uses high energy x-rays to kill tumor cells and shrink tumors. Drugs used in chemotherapy, such as temozolomide, work in different ways to stop the growth of tumor cells, either by killing the cells, by stopping them from dividing, or by stopping them from spreading. Giving veliparib, radiation therapy, and temozolomide may work better in treating patients with newly diagnosed malignant glioma without H3 K27M or BRAFV600 mutations compared to radiation therapy and temozolomide alone.",
+    "url": "https://clinicaltrials.gov/study/NCT03581292",
+    "imported_at": "2026-04-05T04:40:04.131826Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 57,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT04044937",
+    "title": "Fluoroethyltyrosine for Evaluation of Intracranial Neoplasms",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "Intracranial Neoplasm",
+      "Low Grade Glioma",
+      "Recurrent Glioblastoma",
+      "Recurrent World Health Organization (WHO) Grade II Glioma",
+      "Recurrent WHO Grade III Glioma"
+    ],
+    "interventions": [
+      "DRUG: F-18 Fluoroethyltyrosine (FET)",
+      "PROCEDURE: Positron Emission Tomography (PET)"
+    ],
+    "population": "Sex: ALL | Age: 3 Years to",
+    "primary_outcome": "Sensitivity of Fluoroethyltyrosine (FET) PET using a composite standard of truth (CSOT) (subject-level)",
+    "brief_summary": "This phase II trial studies how well F-18 fluoroethyltyrosine (fluoroethyltyrosine) works in detecting tumors in participants with intracranial tumors that have come back. FET accumulates in malignant cells within intracranial neoplasms and can be used to detect recurrent disease and characterize the grade of glial neoplasms. Imaging agents such as FET can help oncologist to see the tumor better during a positron emission tomography (PET) scan.",
+    "url": "https://clinicaltrials.gov/study/NCT04044937",
+    "imported_at": "2026-04-05T04:40:04.131835Z",
+    "result_type": "null"
+  },
+  {
+    "id": 58,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT05353530",
+    "title": "IL-8 Receptor-modified CD70 CAR T Cell Therapy in CD70+ Adult Glioblastoma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE1",
+    "status": "ACTIVE_NOT_RECRUITING",
+    "conditions": [
+      "Glioblastoma Multiforme",
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "BIOLOGICAL: Ex-Vivo expanded autologous IL-8 receptor (CXCR2) modified CD70 CAR (8R-70CAR) T cells"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to 80 Years",
+    "primary_outcome": "Safety of 8R-70CAR T-cell therapy in adult patients with de novo CD70+ GBM",
+    "brief_summary": "This is a phase I study to assess the safety and feasibility of IL-8 receptor modified patient-derived activated CD70 CAR T cell therapy in CD70+ adult glioblastoma",
+    "url": "https://clinicaltrials.gov/study/NCT05353530",
+    "imported_at": "2026-04-05T04:40:04.131845Z",
+    "result_type": "inconclusive"
+  },
+  {
+    "id": 59,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT03778294",
+    "title": "18F-DOPA-PET/MRI Scan in Imaging Elderly Patients With Newly Diagnosed Grade IV Malignant Glioma or Glioblastoma During Planning for a Short Course of Proton Beam Radiation Therapy",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "COMPLETED",
+    "conditions": [
+      "Glioblastoma",
+      "Malignant Glioma"
+    ],
+    "interventions": [
+      "PROCEDURE: Computed Tomography",
+      "OTHER: Fluorodopa F 18",
+      "PROCEDURE: Magnetic Resonance Imaging",
+      "PROCEDURE: Positron Emission Tomography",
+      "RADIATION: Proton Beam Radiation Therapy",
+      "OTHER: Quality-of-Life Assessment",
+      "OTHER: Questionnaire Administration",
+      "DRUG: Temozolomide"
+    ],
+    "population": "Sex: ALL | Age: 65 Years to",
+    "primary_outcome": "Overall Survival (OS)",
+    "brief_summary": "This phase II trial studies how well fluorodopa F 18-positron emission tomography/magnetic resonance imaging scan (18F-DOPA-PET/MRI) works in imaging elderly patients with newly diagnosed grade IV malignant glioma or glioblastoma during planning for a short course of proton beam radiation therapy. 18F-DOPA is a chemical tracer that highlights certain cells during imaging. PET scan, is a metabolic imaging technique which takes advantage of how tumor cells take up nutrients differently than normal tissue. MRI scans are used to guide radiation therapy for most brain tumors. Hypofractionated proton beam therapy delivers higher doses of radiation therapy over a shorter period of time and may kill more tumor cells and have fewer side effects. Using 18FDOPA-PET scans along with MRI scans may be able to provide the radiation doctor with information on tumor tissue versus normal, healthy tissue and may help the doctor more accurately plan the radiation treatment.",
+    "url": "https://clinicaltrials.gov/study/NCT03778294",
+    "imported_at": "2026-04-05T04:40:04.131858Z",
+    "result_type": "null"
+  },
+  {
+    "id": 60,
+    "source": "clinicaltrials.gov",
+    "source_status": "ctgov_imported",
+    "nct_id": "NCT02410577",
+    "title": "89Zr-J591 Anti-Prostate-Specific Membrane Antigen Monoclonal Antibody in Patients With Glioblastoma Multiforme",
+    "study_type": "INTERVENTIONAL",
+    "phase": "NA",
+    "status": "COMPLETED",
+    "conditions": [
+      "Glioblastoma"
+    ],
+    "interventions": [
+      "DRUG: 89Zr-J591",
+      "DEVICE: PET/CT Scan",
+      "DEVICE: MRI",
+      "OTHER: Blood draw"
+    ],
+    "population": "Sex: ALL | Age: 26 Years to 79 Years",
+    "primary_outcome": "Binding of 89Zr-J591",
+    "brief_summary": "The purpose of this study is to test a new imaging agent called 89Zr-J591 (stands for humanized antibody called J591, that is attached to a radioactive material called Zirconium-89) in patients with glioblastoma multiforme.",
+    "url": "https://clinicaltrials.gov/study/NCT02410577",
+    "imported_at": "2026-04-05T04:40:04.131869Z",
+    "result_type": "null"
+  },
+  {
+    "id": 1,
+    "source": "clinicaltrials.gov",
+    "nct_id": "NCT06989086",
+    "title": "FearLess in NeuroOncology",
+    "study_type": "INTERVENTIONAL",
+    "phase": "NA",
+    "status": "RECRUITING",
+    "conditions": [
+      "Primary Malignant Brain Tumor",
+      "Glioblastoma (GBM)",
+      "Astrocytoma",
+      "Oligodendroglioma",
+      "Caregiver"
+    ],
+    "interventions": [
+      "BEHAVIORAL: Fearless in Neuro-Oncology"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Feasibility - Study Enrollment",
+    "brief_summary": "The overarching goal of this project is to assess the feasibility, acceptability, and appropriateness of recruitment methods, target population, and a waitlist design to finalize the protocol of FearLess in primary malignant brain tumor patients and caregivers",
+    "url": "https://clinicaltrials.gov/study/NCT06989086",
+    "imported_at": "2026-04-05T04:11:31.062544Z",
+    "result_type": "Inconclusive",
+    "summary": {
+      "background": "This interventional study aimed to evaluate the feasibility, acceptability, and appropriateness of a behavioral intervention called FearLess in patients with primary malignant brain tumors and their caregivers. The study sought to assess recruitment methods, target population suitability, and a waitlist design to inform protocol finalization.",
+      "findings": "The result type is classified as inconclusive. No p-value or effect estimate was reported. The primary outcome was feasibility as measured by study enrollment, and sufficient quantitative data to determine success or failure of this outcome were not provided.",
+      "main_limitation": "The overarching goal was to assess feasibility, acceptability, and appropriateness of recruitment methods, the target population, and a waitlist design in order to finalize the FearLess protocol for primary malignant brain tumor patients and caregivers. No additional limitations were explicitly stated.",
+      "failure_mode": "underpowered",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "behavioral intervention",
+        "target": "fear/psychological distress",
+        "population": "adults with primary malignant brain tumors and caregivers",
+        "therapeutic_area": "neuro-oncology"
+      }
+    },
+    "enriched_at": "2026-04-05T04:22:10.960779Z"
+  },
+  {
+    "id": 2,
+    "source": "clinicaltrials.gov",
+    "nct_id": "NCT03526822",
+    "title": "Prospective Cohort of Patients With Newly Diagnosed Glioblastoma: Analysis of MMP2 and MMP9 Expression and Correlation to Neuro-imaging Features.",
+    "study_type": "INTERVENTIONAL",
+    "phase": "NA",
+    "status": "RECRUITING",
+    "conditions": [
+      "Brain Tumor"
+    ],
+    "interventions": [
+      "BIOLOGICAL: Blood sample",
+      "BIOLOGICAL: Tumor sample"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "correlate the plasma levels of MMP2 and MMP9 to their RNA and protein tissue expression by ELISA",
+    "brief_summary": "Glioblastoma is the most frequent and aggressive primary brain tumor in adults. A team recently showed that baseline plasma levels of matrix metalloproteinase-2 (MMP2) and matrix metalloproteinase-9 (MMP9) were correlated to bevacizumab activity in patients with recurrent glioblastoma. To date, the biological rationale of this results remains unknown but MMP2 could be involved in classical angiogenesis while MMP9 could promote vasculogenesis.\n\nThe objectives are to correlate the plasma levels of MMP2 and MMP9 to their Ribonucleic acid (RNA) and protein tissue expression, activity and to patient neuro-imaging features. To analyze the changes of MMP2 and MMP9 plasma levels during peri-operative period and after radio-chemotherapy.\n\nMethods: Plasmatic levels of MMP2, MMP9, vascular endothelial growth factor-A (VEGFA), vascular endothelial growth factor-R2 (VEGFR2), stromal cell-derived factor 1 (SDF1) and chemokine receptor-4 (CXCR4) will be analyzed by enzyme-linked immunosorbent assay (ELISA) in pre-, post-operative period, before radiotherapy, before adjuvant temozolomide and at relapse in newly diagnosed glioblastoma. RNA expression of these factors will be analyzed by reverse transcription-Polymerase chain reaction (RT-qPCR) on frozen tumor samples, whereas protein expression will be analyzed by ELISA and immunohistochemistry. Enzymatic activity of MMP2 and MMP9 will be analyzed by zymography. Tumor volume, infiltration and perfusion degrees will be analyzed on Magnetic Resonance Imaging (MRI) performed before and after surgery and before adjuvant temozolomide. Neuro-imaging characteristics will be correlated to plasma and tissue expressions of these factors.\n\nThe expected results are to better define the expression profile of MMP2, MMP9 and the change in their plasma level during treatment, a prerequisite for their clinical use.",
+    "url": "https://clinicaltrials.gov/study/NCT03526822",
+    "imported_at": "2026-04-05T04:11:31.062588Z",
+    "result_type": "Inconclusive",
+    "summary": {
+      "background": "A team had previously observed that baseline plasma levels of MMP2 and MMP9 correlated with bevacizumab activity in recurrent glioblastoma, but the biological rationale remained unknown. This prospective cohort study was designed to correlate plasma levels of MMP2 and MMP9 with their RNA and protein tissue expression, enzymatic activity, and neuro-imaging features in newly diagnosed glioblastoma patients, and to track changes in plasma levels across the peri-operative and radio-chemotherapy periods.",
+      "findings": "The result type is reported as inconclusive. No p-values or effect estimates were provided in the available information. The study intended to characterize expression profiles of MMP2, MMP9, VEGFA, VEGFR2, SDF1, and CXCR4 across multiple timepoints using ELISA, RT-qPCR, immunohistochemistry, and zymography, and to correlate these with MRI-derived tumor features, but definitive correlations were not established based on the provided data.",
+      "main_limitation": "No explicit limitation was provided in the study record. The background notes that the biological rationale for the prior MMP2/MMP9 findings remains unknown, and the current study was framed as a prerequisite step for clinical use rather than a confirmatory trial.",
+      "failure_mode": "unknown",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "MMP2/MMP9 expression and angiogenesis/vasculogenesis",
+        "target": "MMP2, MMP9, VEGFA, VEGFR2, SDF1, CXCR4",
+        "population": "Newly diagnosed glioblastoma, adults 18+",
+        "therapeutic_area": "Neuro-oncology"
+      }
+    },
+    "enriched_at": "2026-04-05T04:22:17.847949Z"
+  },
+  {
+    "id": 3,
+    "source": "clinicaltrials.gov",
+    "nct_id": "NCT00535379",
+    "title": "SUTENT (SUNITINIB, SU11248)in Patients With Recurrent or Progressive Glioblastoma Multiforme",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Glioblastoma Multiforme"
+    ],
+    "interventions": [
+      "DRUG: Sunitinib"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Progression-free survival rate at 6 months",
+    "brief_summary": "Clinical Part:\n\nThe objective of this study is to determine the efficacy and safety of SUTENT in patients with recurrent or progressive glioblastoma multiforme.Patients with tissue based diagnosis of intracranial glioblastoma multiforme, above 18 years of age and of both genders, who have a first tumor recurrence or progress after surgery, radiation- and chemotherapy will be included. The hypothesis is that SUTENT will significantly increase the progression free survival rate at 6 months in the study population.",
+    "url": "https://clinicaltrials.gov/study/NCT00535379",
+    "imported_at": "2026-04-05T04:11:31.062615Z",
+    "result_type": "Inconclusive",
+    "summary": {
+      "background": "Sunitinib (SUTENT, SU11248) was investigated in patients with recurrent or progressive glioblastoma multiforme (GBM) who had previously undergone surgery, radiation, and chemotherapy. The hypothesis was that sunitinib would significantly increase the progression-free survival (PFS) rate at 6 months in this population.",
+      "findings": "The result type is listed as inconclusive. No p-value or effect estimate was reported in the provided information. The primary outcome was progression-free survival rate at 6 months, but no quantitative results were included.",
+      "main_limitation": "No explicit limitation was provided in the study record. The stated objective and inclusion criteria are described, but no discussion of limitations was included.",
+      "failure_mode": "unknown",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "multi-targeted receptor tyrosine kinase inhibition",
+        "target": "VEGFR, PDGFR, KIT (sunitinib targets)",
+        "population": "adults with recurrent or progressive glioblastoma multiforme, post-surgery/radiation/chemotherapy",
+        "therapeutic_area": "neuro-oncology"
+      }
+    },
+    "enriched_at": "2026-04-05T04:22:23.890221Z"
+  },
+  {
+    "id": 4,
+    "source": "clinicaltrials.gov",
+    "nct_id": "NCT03251027",
+    "title": "Intensity-Modulated Stereotactic Radiation Therapy in Treating Patients With Grade II-IV Glioma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "NA",
+    "status": "ACTIVE_NOT_RECRUITING",
+    "conditions": [
+      "Glioblastoma",
+      "WHO Grade II Glioma",
+      "WHO Grade III Glioma"
+    ],
+    "interventions": [
+      "RADIATION: Intensity-Modulated Radiation Therapy",
+      "OTHER: Quality-of-Life"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Incidence of wound infection or wound dehiscence",
+    "brief_summary": "This phase II trial studies how well intensity-modulated stereotactic radiation therapy works in treating patients with grade II-IV glioma. Stereotactic radiosurgery is a specialized radiation therapy that delivers a single, high dose of radiation directly to the tumor and may cause less damage to normal tissue.",
+    "url": "https://clinicaltrials.gov/study/NCT03251027",
+    "imported_at": "2026-04-05T04:11:31.062628Z",
+    "result_type": "Inconclusive",
+    "summary": {
+      "background": "This phase II interventional study investigated intensity-modulated stereotactic radiation therapy (IMRT) in patients aged 18 years and older with grade II-IV glioma. The rationale was that stereotactic radiosurgery, by delivering a high dose of radiation precisely to the tumor, may reduce damage to surrounding normal tissue compared to conventional approaches.",
+      "findings": "The result type is reported as inconclusive. No p-value or effect estimate was provided. The primary outcome was the incidence of wound infection or wound dehiscence. Insufficient quantitative data were provided to characterize the direction or magnitude of any effect.",
+      "main_limitation": "No explicit study limitation was provided in the submission. The text provided under 'Limitations' appears to be a study description rather than a stated limitation.",
+      "failure_mode": "unknown",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "intensity-modulated stereotactic radiation therapy",
+        "target": "glioma tumor tissue",
+        "population": "adults aged 18+ with grade II-IV glioma",
+        "therapeutic_area": "neuro-oncology"
+      }
+    },
+    "enriched_at": "2026-04-05T04:23:25.649309Z"
+  },
+  {
+    "id": 5,
+    "source": "clinicaltrials.gov",
+    "nct_id": "NCT01095094",
+    "title": "Ritonavir and Lopinavir in Treating Patients With Progressive or Recurrent High-Grade Glioma",
+    "study_type": "INTERVENTIONAL",
+    "phase": "PHASE2",
+    "status": "TERMINATED",
+    "conditions": [
+      "Brain Tumor",
+      "Anaplastic Astrocytoma",
+      "Anaplastic Ependymoma",
+      "Anaplastic Oligodendroglioma",
+      "Brain Stem Glioma",
+      "Giant Cell Glioblastoma",
+      "Glioblastoma",
+      "Gliosarcoma",
+      "Mixed Glioma"
+    ],
+    "interventions": [
+      "DRUG: ritonavir",
+      "DRUG: lopinavir"
+    ],
+    "population": "Sex: ALL | Age: 18 Years to",
+    "primary_outcome": "Progression-free Survival",
+    "brief_summary": "RATIONALE: Ritonavir and lopinavir may stop the growth of gliomas by blocking some of the enzymes needed for cell growth and by blocking blood flow to the tumor. PURPOSE: This phase II trial is studying how well giving ritonavir together with lopinavir works in treating patients with progressive or recurrent high-grade glioma.",
+    "url": "https://clinicaltrials.gov/study/NCT01095094",
+    "imported_at": "2026-04-05T04:11:31.062640Z",
+    "result_type": "Opposite",
+    "summary": {
+      "background": "This phase II trial investigated whether the HIV protease inhibitors ritonavir and lopinavir could treat progressive or recurrent high-grade glioma. The rationale was that these agents may inhibit enzymes required for tumor cell growth and disrupt tumor angiogenesis, offering a repurposed antiviral approach to neuro-oncology.",
+      "findings": "The trial reported an opposite result to what was expected for progression-free survival in adults with progressive or recurrent high-grade glioma (including glioblastoma, anaplastic astrocytoma, gliosarcoma, and related histologies). No quantitative effect estimate or p-value was provided in the available data.",
+      "main_limitation": "No numerical efficacy data (p-value or effect estimate) were provided, making it impossible to quantify the degree of failure. The study was a single-arm phase II trial without a concurrent control, limiting causal inference. The biological rationale relied on preclinical enzyme-inhibition and anti-angiogenic mechanisms that may not translate to sufficient intratumoral drug concentrations in glioma patients.",
+      "failure_mode": "target validity",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "HIV protease inhibitor / enzyme inhibition / anti-angiogenesis (repurposed antiviral)",
+        "target": "Protease enzymes / angiogenic pathways in glioma cells",
+        "population": "Adults (≥18 years) with progressive or recurrent high-grade glioma",
+        "therapeutic_area": "Neuro-oncology / CNS tumors"
+      }
+    },
+    "enriched_at": "2026-04-05T04:26:59.127511Z"
+  }
+]

@@ -1,0 +1,83 @@
+[
+  {
+    "id": 3,
+    "doi": "10.5281/fu.1000003",
+    "submitted_at": "2026-04-05T03:32:01.529703Z",
+    "title": "Happiness pill",
+    "study_type": "Cross-sectional",
+    "result_type": "Opposite",
+    "intervention": "happiness pill",
+    "population": "young adults in the united states",
+    "primary_outcome": "happiness score",
+    "p_value": "0.5",
+    "effect_estimate": "RR: 1.3",
+    "limitations": "not enough people enrolled into study, loss to followup",
+    "summary": {
+      "background": "A cross-sectional study was conducted to evaluate whether a 'happiness pill' intervention was associated with improved happiness scores in young adults in the United States.",
+      "findings": "The study found an opposite-direction result. The reported relative risk was 1.3, with a p-value of 0.5, indicating no statistically significant association between the happiness pill and happiness scores. The effect estimate does not support a beneficial effect of the intervention.",
+      "main_limitation": "The authors identified two limitations: insufficient enrollment of participants and loss to follow-up.",
+      "failure_mode": "underpowered",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "unspecified",
+        "target": "happiness/mood",
+        "population": "young adults, United States",
+        "therapeutic_area": "mental health/well-being"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "doi": "10.5281/fu.1000002",
+    "submitted_at": "2026-04-05T03:24:21.270257Z",
+    "title": "test",
+    "study_type": "Randomized clinical trial",
+    "result_type": "Inconclusive",
+    "intervention": "happiness score",
+    "population": "women",
+    "primary_outcome": "happiness score",
+    "p_value": "0.40",
+    "effect_estimate": "HR: 1.2",
+    "limitations": "",
+    "summary": {
+      "background": "A randomized clinical trial was conducted to evaluate a happiness score intervention in women, with the primary outcome being the happiness score itself. No additional rationale was provided.",
+      "findings": "The trial yielded inconclusive results. The primary outcome of happiness score showed no statistically significant effect, with a p-value of 0.40 and a hazard ratio of 1.2. These results do not support a meaningful intervention effect based on the provided statistical information.",
+      "main_limitation": "No limitation was explicitly provided.",
+      "failure_mode": "unknown",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "unspecified",
+        "target": "happiness score",
+        "population": "women",
+        "therapeutic_area": "unspecified"
+      }
+    }
+  },
+  {
+    "id": 1,
+    "doi": "10.5281/fu.1000001",
+    "submitted_at": "2026-04-05T03:14:56.596378Z",
+    "title": "test study ",
+    "study_type": "Observational (cohort)",
+    "result_type": "Null",
+    "intervention": "happiness pill",
+    "population": "women 28 and older",
+    "primary_outcome": "happiness score",
+    "p_value": "0.45",
+    "effect_estimate": "SMD: 20",
+    "limitations": "",
+    "summary": {
+      "background": "An observational cohort study was conducted to assess the effect of a happiness pill on happiness scores in women aged 28 and older. No further rationale was provided.",
+      "findings": "The study reported a null result. The primary outcome of happiness score did not reach statistical significance (p = 0.45). The effect estimate was reported as SMD: 20, though the clinical interpretation of this value is unclear given the non-significant p-value.",
+      "main_limitation": "No limitation was explicitly provided.",
+      "failure_mode": "unknown",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "unspecified",
+        "target": "unspecified",
+        "population": "women aged 28 and older",
+        "therapeutic_area": "mental health/well-being"
+      }
+    }
+  }
+]
