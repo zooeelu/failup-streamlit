@@ -461,9 +461,6 @@
   .contributions-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
   .contributions-table tr:last-child td { border-bottom: none; }
   .contributions-table tr:hover td { color: var(--text); background: var(--accent-glow); }
-  .contributions-table tr.clickable-row { cursor: pointer; }
-  .contributions-table .study-link { color: var(--accent); text-decoration: none; font-weight: 500; }
-  .contributions-table .study-link:hover { text-decoration: underline; }
   .doi-link { font-family: var(--font-mono); color: var(--accent); font-size: 10px; }
 
   /* ── NOTIFICATION TOAST ── */
@@ -1399,7 +1396,7 @@
 </div>
 
       <!-- Stats grid -->
-      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+      <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px">
         <div class="metric-card accent">
           <div class="metric-label">NF-index</div>
           <div class="metric-val" id="profile-nf-index">4</div>
@@ -1414,6 +1411,11 @@
           <div class="metric-label">Total citations</div>
           <div class="metric-val" id="profile-citations">26</div>
           <div class="metric-sub">across all submissions</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Graph nodes</div>
+          <div class="metric-val" style="color:var(--teal)" id="profile-nodes">4</div>
+          <div class="metric-sub">created from your data</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">Contradictions found</div>
@@ -1552,76 +1554,12 @@ const demoSummaryData = [
   { title:'Tau-targeting immunotherapy in early Alzheimer\'s disease', result_type:'inconclusive', therapeutic_area:'Neurology', failure_mode:'Outcome measurement — endpoint did not capture true biological effect', background:'Anti-tau antibody in early Alzheimer\'s disease. Phase II, n=280. CSF tau used as pharmacodynamic marker.', findings:'CSF tau reduced 18% (p=0.04) but cognitive endpoints (ADAS-Cog) showed no improvement at 18 months.', main_limitation:'Biomarker-clinical dissociation — target engagement confirmed but cognitive benefit unclear. Trial duration may have been insufficient.', contradiction_check:'No contradictions detected.', graph_tags:{ mechanism:'Tau immunotherapy', target:'Tau protein', population:'Early AD, MCI stage', therapeutic_area:'Neurology' } },
 ];
 
-function canonicalFailureMode(rawMode) {
-  const raw = (rawMode || '').trim();
-  const value = raw.toLowerCase();
-
-  if (!value) return 'unknown';
-  if (value.includes('target validity')) return 'target validity';
-  if (value.includes('patient selection')) return 'patient selection';
-  if (value.includes('dosing') || value.includes('pk') || value.includes('pharmacokinetic')) return 'dosing/pk';
-  if (value.includes('underpowered') || value.includes('power')) return 'underpowered';
-  if (value.includes('outcome measurement') || value.includes('endpoint')) return 'outcome measurement';
-  if (value.includes('off-target')) return 'off-target effects';
-  if (value.includes('unknown') || value.includes('unclear')) return 'unknown';
-
-  return 'unknown';
-}
-
-function failureModeMeta(rawMode) {
-  const canonical = canonicalFailureMode(rawMode);
-  const meta = {
-    'target validity': {
-      label: 'Target validity',
-      description: 'Mechanism may not be rate-limiting in this disease setting.'
-    },
-    'patient selection': {
-      label: 'Patient selection',
-      description: 'Wrong subgroup, biomarker strategy, or overly heterogeneous population.'
-    },
-    'dosing/pk': {
-      label: 'Dosing / PK',
-      description: 'Dose, exposure, schedule, or target-site delivery may have been inadequate.'
-    },
-    'underpowered': {
-      label: 'Underpowered',
-      description: 'Sample size or event count may have been too small for a reliable conclusion.'
-    },
-    'outcome measurement': {
-      label: 'Outcome measurement',
-      description: 'Chosen endpoint may not have captured the relevant treatment effect.'
-    },
-    'off-target effects': {
-      label: 'Off-target effects',
-      description: 'Unexpected biology or toxicity may have altered the observed result.'
-    },
-    'unknown': {
-      label: 'Unknown',
-      description: 'Failure mode is unclear or needs manual review.'
-    }
-  };
-
-  return {
-    key: canonical,
-    ...(meta[canonical] || meta['unknown'])
-  };
-}
-
-function sectionTypeCounts(studies) {
-  return studies.reduce((acc, study) => {
-    const type = normalizeType(study.result_type);
-    acc[type] = (acc[type] || 0) + 1;
-    return acc;
-  }, { null: 0, inconclusive: 0, opposite: 0 });
-}
-
 function getAllSummaryData() {
   const fromSaved = (savedSubmissions || []).map(sub => ({
     title: sub.title || 'Untitled',
     result_type: (sub.result_type || 'null').toLowerCase(),
     therapeutic_area: sub.summary?.graph_tags?.therapeutic_area || 'Unspecified',
     failure_mode: sub.summary?.failure_mode || 'Unknown / unclear',
-    canonical_failure_mode: canonicalFailureMode(sub.summary?.failure_mode || 'Unknown / unclear'),
     background: sub.summary?.background || '',
     findings: sub.summary?.findings || '',
     main_limitation: sub.summary?.main_limitation || '',
@@ -1640,7 +1578,6 @@ function getAllSummaryData() {
       result_type: (trial.curation?.failure_class || trial.result_type || 'inconclusive').toLowerCase(),
       therapeutic_area: trial.summary?.graph_tags?.therapeutic_area || (trial.conditions || [])[0] || 'Unspecified',
       failure_mode: trial.summary?.failure_mode || 'Unknown / unclear',
-      canonical_failure_mode: canonicalFailureMode(trial.summary?.failure_mode || 'Unknown / unclear'),
       background: trial.summary?.background || trial.brief_summary || '',
       findings: trial.summary?.findings || trial.brief_summary || '',
       main_limitation: trial.summary?.main_limitation || '',
@@ -1659,7 +1596,6 @@ function getAllSummaryData() {
       result_type: (article.curation?.failure_class || article.result_type || 'inconclusive').toLowerCase(),
       therapeutic_area: article.summary?.graph_tags?.therapeutic_area || (article.mesh_terms || [])[0] || 'Unspecified',
       failure_mode: article.summary?.failure_mode || 'Unknown / unclear',
-      canonical_failure_mode: canonicalFailureMode(article.summary?.failure_mode || 'Unknown / unclear'),
       background: article.summary?.background || article.abstract || '',
       findings: article.summary?.findings || article.abstract || '',
       main_limitation: article.summary?.main_limitation || '',
@@ -1668,12 +1604,7 @@ function getAllSummaryData() {
       source: 'pubmed_curated'
     }));
 
-  const normalizedDemo = demoSummaryData.map(item => ({
-    ...item,
-    canonical_failure_mode: canonicalFailureMode(item.failure_mode)
-  }));
-
-  return [...fromSaved, ...fromCtgov, ...fromPubmed, ...normalizedDemo];
+  return [...fromSaved, ...fromCtgov, ...fromPubmed, ...demoSummaryData];
 }
 
 function renderFailureSummary() {
@@ -1682,10 +1613,12 @@ function renderFailureSummary() {
     ? all
     : all.filter(s => normalizeType(s.result_type) === activeSummaryFilter);
 
+  // Stats row
   const statsEl = document.getElementById('summary-stats');
   if (statsEl) {
     const counts = { null:0, inconclusive:0, opposite:0 };
     all.forEach(s => { const t = normalizeType(s.result_type); if (counts[t] !== undefined) counts[t]++; });
+    const contradictions = all.filter(s => s.contradiction_check && !s.contradiction_check.toLowerCase().includes('no contradiction')).length;
     statsEl.innerHTML = [
       { label:'Total studies', val: all.length, color:'var(--accent)' },
       { label:'Null results', val: counts.null, color:'#60a5fa' },
@@ -1698,6 +1631,7 @@ function renderFailureSummary() {
       </div>`).join('');
   }
 
+  // Group by failure mode
   const groupsEl = document.getElementById('summary-groups');
   if (!groupsEl) return;
 
@@ -1706,69 +1640,46 @@ function renderFailureSummary() {
     return;
   }
 
-  const grouped = {};
+  const groups = {};
   filtered.forEach(s => {
-    const key = s.canonical_failure_mode || canonicalFailureMode(s.failure_mode);
-    if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(s);
+    const mode = s.failure_mode || 'Unknown / unclear';
+    if (!groups[mode]) groups[mode] = [];
+    groups[mode].push(s);
   });
-
-  const orderedModes = [
-    'target validity',
-    'patient selection',
-    'dosing/pk',
-    'underpowered',
-    'outcome measurement',
-    'off-target effects',
-    'unknown'
-  ];
 
   const typeColors = { null:'#60a5fa', inconclusive:'#e6a817', opposite:'#c47090' };
   const typeLabels = { null:'Null', inconclusive:'Inconclusive', opposite:'Opposite' };
 
-  groupsEl.innerHTML = orderedModes
-    .filter(mode => grouped[mode] && grouped[mode].length)
-    .map(mode => {
-      const studies = grouped[mode];
-      const meta = failureModeMeta(mode);
-      const counts = sectionTypeCounts(studies);
-      return `
-      <div style="margin-bottom:24px;">
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--border);flex-wrap:wrap;">
-          <div style="background:var(--accent-dim);border:1px solid var(--border2);border-radius:var(--radius);padding:4px 10px;font-family:var(--font-mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;">
-            ${escapeHtml(meta.label)}
-          </div>
-          <div style="font-size:12px;font-weight:600;color:var(--text);">${escapeHtml(meta.description)}</div>
-          <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">${studies.length} study${studies.length !== 1 ? ' | studies' : ''}</span>
-            <span style="padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;background:${typeColors.null}22;color:${typeColors.null};border:1px solid ${typeColors.null}44;">Null ${counts.null}</span>
-            <span style="padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;background:${typeColors.inconclusive}22;color:${typeColors.inconclusive};border:1px solid ${typeColors.inconclusive}44;">Inconclusive ${counts.inconclusive}</span>
-            <span style="padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;background:${typeColors.opposite}22;color:${typeColors.opposite};border:1px solid ${typeColors.opposite}44;">Opposite ${counts.opposite}</span>
-          </div>
+  groupsEl.innerHTML = Object.entries(groups).map(([mode, studies]) => `
+    <div style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--border);">
+        <div style="background:var(--accent-dim);border:1px solid var(--border2);border-radius:var(--radius);padding:4px 10px;font-family:var(--font-mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;">
+          ${escapeHtml(mode.split('—')[0].trim())}
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;">
-          ${studies.map(s => {
-            const type = normalizeType(s.result_type);
-            const color = typeColors[type] || '#8a9ab8';
-            const contradictionText = (s.contradiction_check || '').toLowerCase();
-            const hasContradiction = contradictionText && !contradictionText.startsWith('no contradiction') && !contradictionText.includes('not assessed');
-            return `
-            <div onclick="openSummaryCard(${JSON.stringify(s).replace(/"/g, '&quot;')})" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s;" onmouseover="this.style.borderColor='${color}';this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
-              <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
-                <span style="flex-shrink:0;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:0.07em;background:${color}22;color:${color};border:1px solid ${color}44;">${typeLabels[type] || type}</span>
-                ${hasContradiction ? '<span style="flex-shrink:0;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;background:rgba(176,96,128,0.12);color:var(--red);border:1px solid rgba(176,96,128,0.25);">⚠ Contradiction</span>' : ''}
-              </div>
-              <div style="font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.4;">${escapeHtml(s.title)}</div>
-              <div style="font-size:11.5px;color:var(--text2);line-height:1.7;margin-bottom:10px;">${escapeHtml((s.findings || '').substring(0, 160))}${(s.findings || '').length > 160 ? '…' : ''}</div>
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-                <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3);">${escapeHtml(s.graph_tags?.therapeutic_area || s.therapeutic_area || '')}</span>
-                <span style="font-size:11px;color:var(--accent);white-space:nowrap;">Read summary →</span>
-              </div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`;
-    }).join('');
+        <div style="font-size:12px;font-weight:600;color:var(--text);">${escapeHtml(mode)}</div>
+        <div style="margin-left:auto;font-size:11px;color:var(--text3);font-family:var(--font-mono);">${studies.length} study${studies.length !== 1 ? ' | studies' : ''}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;">
+        ${studies.map((s, i) => {
+          const type = normalizeType(s.result_type);
+          const color = typeColors[type] || '#8a9ab8';
+          const hasContradiction = s.contradiction_check && !s.contradiction_check.toLowerCase().startsWith('no contradiction') && !s.contradiction_check.toLowerCase().includes('not assessed');
+          return `
+          <div onclick="openSummaryCard(${JSON.stringify(s).replace(/"/g, '&quot;')})" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s;" onmouseover="this.style.borderColor='${color}';this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+            <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;">
+              <span style="flex-shrink:0;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:0.07em;background:${color}22;color:${color};border:1px solid ${color}44;">${typeLabels[type] || type}</span>
+              ${hasContradiction ? '<span style="flex-shrink:0;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:9px;background:rgba(176,96,128,0.12);color:var(--red);border:1px solid rgba(176,96,128,0.25);">⚠ Contradiction</span>' : ''}
+            </div>
+            <div style="font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.4;">${escapeHtml(s.title)}</div>
+            <div style="font-size:11.5px;color:var(--text2);line-height:1.7;margin-bottom:10px;">${escapeHtml((s.findings || '').substring(0, 160))}${(s.findings || '').length > 160 ? '…' : ''}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3);">${escapeHtml(s.graph_tags?.therapeutic_area || s.therapeutic_area || '')}</span>
+              <span style="font-size:11px;color:var(--accent);">Read summary →</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
 }
 
 function openSummaryCard(s) {
@@ -1777,8 +1688,7 @@ function openSummaryCard(s) {
   const typeColors = { null:'#60a5fa', inconclusive:'#e6a817', opposite:'#c47090' };
   const color = typeColors[type] || '#8a9ab8';
   document.getElementById('modal-title').textContent = s.title || 'Study summary';
-  const meta = failureModeMeta(s.failure_mode || 'Unknown / unclear');
-  document.getElementById('modal-sub').textContent = `${s.therapeutic_area || ''} · ${meta.label} · ${s.result_type || ''} result`;
+  document.getElementById('modal-sub').textContent = `${s.therapeutic_area || ''} · ${s.result_type || ''} result`;
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-section"><div class="modal-section-label">Background</div>${escapeHtml(s.background || 'Not available.')}</div>
     <div class="modal-section"><div class="modal-section-label">Key findings</div>${escapeHtml(s.findings || 'Not available.')}</div>
@@ -1878,84 +1788,171 @@ function addFiles(files, listId) {
 }
 
 // ── AUTOFILL FROM DOCUMENT ──
-const autofillData = {
-  title: 'VEGF-A inhibition plus standard of care vs placebo in treatment-resistant glioblastoma: a Phase III RCT',
-  nct: 'NCT04821944',
-  n: '340',
-  nplan: '400 (80% power, α=0.05)',
-  intervention: 'Bevacizumab 10mg/kg IV q2w + temozolomide 150mg/m² vs temozolomide + placebo. 12-month treatment period.',
-  population: 'Adults with recurrent GBM, ECOG PS 0–2, bevacizumab-naive, measurable disease per RANO criteria. 18 sites across USA and Europe.',
-  dropout: '14% overall (9% intervention, 19% placebo)',
-  female: '46%',
-  age: '58 years',
-  outcome: 'Overall survival at 24 months',
-  pval: 'p = 0.43',
-  es: 'HR 1.02 (95% CI 0.88–1.18)',
-  limits: 'Underpowered — 340 enrolled vs 400 required. Dropout disproportionate in placebo arm. Heterogeneous tumour grade. Blood–brain barrier penetration not assessed.',
-};
-
 const afSteps = [
-  { pct: 15, text: 'Parsing document structure…' },
-  { pct: 32, text: 'Extracting study metadata…' },
-  { pct: 52, text: 'Identifying trial design & population…' },
-  { pct: 71, text: 'Extracting statistical results…' },
-  { pct: 88, text: 'Cross-referencing ClinicalTrials.gov…' },
-  { pct: 100, text: 'Complete — review highlighted fields' },
+  { pct: 12, text: 'Uploading documents…' },
+  { pct: 28, text: 'Extracting text from files…' },
+  { pct: 48, text: 'Identifying study metadata…' },
+  { pct: 68, text: 'Extracting methods and outcomes…' },
+  { pct: 86, text: 'Finalising structured fields…' },
 ];
+
+let afProgressTimer = null;
+
+function formatAutofillFileLabel(files) {
+  const names = Array.from(files || []).map(f => f.name).filter(Boolean);
+  if (!names.length) return 'Drop PDF or DOCX files here, or click to browse — multiple files accepted';
+  if (names.length === 1) return `📄 ${names[0]}`;
+  if (names.length === 2) return `📄 ${names[0]} + ${names[1]}`;
+  return `📄 ${names[0]} + ${names.length - 1} more files`;
+}
 
 function afDrop(e) {
   e.preventDefault();
   document.getElementById('af-dz').classList.remove('drag-over');
-  if (e.dataTransfer.files[0]) runAutofill(e.dataTransfer.files[0]);
+  if (e.dataTransfer.files && e.dataTransfer.files.length) runAutofill(e.dataTransfer.files);
 }
+
 function afFileChosen(input) {
-  if (input.files[0]) runAutofill(input.files[0]);
+  if (input.files && input.files.length) runAutofill(input.files);
 }
-function runAutofill(file) {
+
+function startAutofillProgress() {
   const statusDiv = document.getElementById('af-status');
   const bar = document.getElementById('af-bar');
   const statusText = document.getElementById('af-status-text');
-  document.getElementById('af-dz-text').textContent = '📄 ' + file.name;
   statusDiv.style.display = 'block';
   bar.style.width = '0%';
   let step = 0;
-  function next() {
-    if (step >= afSteps.length) { applyAutofill(); return; }
+  if (afProgressTimer) clearInterval(afProgressTimer);
+  afProgressTimer = setInterval(() => {
+    if (step >= afSteps.length) {
+      clearInterval(afProgressTimer);
+      afProgressTimer = null;
+      return;
+    }
     bar.style.width = afSteps[step].pct + '%';
     statusText.textContent = afSteps[step].text;
     step++;
-    setTimeout(next, step === afSteps.length ? 500 : 400);
-  }
-  next();
+  }, 550);
 }
-function applyAutofill() {
-  const map = {
-    'f-title': autofillData.title, 'f-nct': autofillData.nct,
-    'f-n': autofillData.n, 'f-nplan': autofillData.nplan,
-    'f-intervention': autofillData.intervention, 'f-population': autofillData.population,
-    'f-dropout': autofillData.dropout, 'f-female': autofillData.female,
-    'f-age': autofillData.age, 'f-outcome': autofillData.outcome,
-    'f-pval': autofillData.pval, 'f-es': autofillData.es, 'f-limits': autofillData.limits,
-  };
-  Object.keys(map).forEach((id, i) => {
-    setTimeout(() => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.value = map[id];
-      el.classList.add('autofilled');
-      el.dispatchEvent(new Event('input'));
-    }, i * 70);
-  });
-  setTimeout(() => {
-    const areaEl = document.getElementById('f-area');
-    if (areaEl) { areaEl.value = 'Oncology'; areaEl.classList.add('autofilled'); areaEl.dispatchEvent(new Event('change')); }
+
+function stopAutofillProgress(successText) {
+  const bar = document.getElementById('af-bar');
+  const statusText = document.getElementById('af-status-text');
+  if (afProgressTimer) {
+    clearInterval(afProgressTimer);
+    afProgressTimer = null;
+  }
+  bar.style.width = '100%';
+  statusText.textContent = successText || 'Complete — review highlighted fields';
+}
+
+function setFieldValue(id, value, eventName='input') {
+  const el = document.getElementById(id);
+  if (!el || value === undefined || value === null || value === '') return;
+  el.value = value;
+  el.classList.add('autofilled');
+  el.dispatchEvent(new Event(eventName, { bubbles: true }));
+}
+
+function setSelectIfOptionExists(id, value) {
+  const el = document.getElementById(id);
+  if (!el || !value) return;
+  const optionExists = Array.from(el.options).some(opt => opt.value === value || opt.text === value);
+  if (!optionExists) return;
+  el.value = value;
+  el.classList.add('autofilled');
+  el.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function applySelectedResult(type) {
+  if (!type) return;
+  const optionMap = { null: 0, inconclusive: 1, opposite: 2 };
+  const options = document.querySelectorAll('#result-selector .result-opt');
+  const idx = optionMap[type];
+  if (idx === undefined || !options[idx]) return;
+  selectResult(type, options[idx]);
+}
+
+async function runAutofill(fileList) {
+  const files = Array.from(fileList || []).filter(Boolean);
+  if (!files.length) return;
+
+  document.getElementById('af-dz-text').textContent = formatAutofillFileLabel(files);
+  document.getElementById('af-done').style.display = 'none';
+  startAutofillProgress();
+
+  const formData = new FormData();
+  files.forEach(file => formData.append('files', file));
+
+  try {
+    const response = await fetch('/extract-study-fields', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Unable to extract study fields from the uploaded files.');
+    }
+
+    stopAutofillProgress('Complete — review highlighted fields');
+    applyAutofill(result.fields || {}, result.file_names || files.map(f => f.name));
+  } catch (error) {
+    console.error(error);
+    if (afProgressTimer) {
+      clearInterval(afProgressTimer);
+      afProgressTimer = null;
+    }
     document.getElementById('af-status').style.display = 'none';
-    const doneEl = document.getElementById('af-done');
-    if (doneEl) doneEl.style.display = 'flex';
-    documentsUploaded = true;
+    documentsUploaded = false;
     updatePreviewDisclaimer();
-    updatePreview();
-  }, Object.keys(map).length * 70 + 200);
+    showToast('Upload autofill failed', error.message || 'Could not read those files.');
+  }
+}
+
+function applyAutofill(fields, fileNames) {
+  setFieldValue('f-title', fields.title || '');
+  setFieldValue('f-nct', fields.nct || '');
+  setFieldValue('f-n', fields.n || '');
+  setFieldValue('f-nplan', fields.nplan || '');
+  setFieldValue('f-intervention', fields.intervention || '');
+  setFieldValue('f-population', fields.population || '');
+  setFieldValue('f-dropout', fields.dropout || '');
+  setFieldValue('f-female', fields.female || '');
+  setFieldValue('f-age', fields.age || '');
+  setFieldValue('f-outcome', fields.outcome || '');
+  setFieldValue('f-pval', fields.pval || '');
+  setFieldValue('f-es', fields.effect_estimate || '');
+  setFieldValue('f-limits', fields.limitations || '');
+
+  setSelectIfOptionExists('f-type', fields.study_type || '');
+  setSelectIfOptionExists('f-phase', fields.phase || '');
+  setSelectIfOptionExists('f-design', fields.design || '');
+  setSelectIfOptionExists('f-area', fields.therapeutic_area || '');
+  setSelectIfOptionExists('f-es-type', fields.effect_estimate_type || '');
+
+  if ((fields.effect_estimate_type || '') === 'other') {
+    toggleEsOther();
+    setFieldValue('f-es-other', fields.effect_estimate_other || '');
+  } else {
+    toggleEsOther();
+  }
+
+  applySelectedResult((fields.result_type || '').toLowerCase());
+
+  document.getElementById('af-status').style.display = 'none';
+  const doneEl = document.getElementById('af-done');
+  if (doneEl) {
+    const uploadedSummary = (fileNames || []).length
+      ? `✓ ${fileNames.length} document${fileNames.length !== 1 ? 's' : ''} read — fields in Step 3 were pre-populated. Review and correct them before submitting.`
+      : '✓ Documents uploaded — fields in Step 3 were pre-populated. Review and correct them before submitting.';
+    doneEl.textContent = uploadedSummary;
+    doneEl.style.display = 'flex';
+  }
+  documentsUploaded = true;
+  updatePreviewDisclaimer();
+  updatePreview();
 }
 
 let selectedResult = null;
@@ -2084,6 +2081,7 @@ function updateProfileFromSavedSubmissions() {
   // Top stat cards
   const profileNFIndex     = document.getElementById('profile-nf-index');
   const profileSubmissions = document.getElementById('profile-submissions');
+  const profileNodes       = document.getElementById('profile-nodes');
   const profileContradictions = document.getElementById('profile-contradictions');
   const profileCitations   = document.getElementById('profile-citations');
   const profileSummary     = document.getElementById('profile-contrib-summary');
@@ -2091,6 +2089,7 @@ function updateProfileFromSavedSubmissions() {
 
   if (profileNFIndex)       profileNFIndex.textContent       = nfIndex;
   if (profileSubmissions)   profileSubmissions.textContent   = totalSubmissions;
+  if (profileNodes)         profileNodes.textContent         = totalSubmissions;
   if (profileContradictions) profileContradictions.textContent = contradictionCount;
   if (profileCitations)     profileCitations.textContent     = totalCitations;
   if (profileSummary)       profileSummary.textContent       = `${totalSubmissions} submissions · ${totalCitations} total citations`;
@@ -2155,8 +2154,8 @@ function updateProfileFromSavedSubmissions() {
     const citations   = newCitations[idx];
     const contributes = citations >= nfIndex && nfIndex > 0;
     return `
-      <tr class="clickable-row" onclick="openSavedSubmissionById('${String(sub.id).replace(/'/g, "&#39;")}')">
-        <td><a href="javascript:void(0)" class="study-link">${escapeHtml(sub.title || 'Untitled submission')}</a></td>
+      <tr>
+        <td>${escapeHtml(sub.title || 'Untitled submission')}</td>
         <td><span class="trial-type type-${type}">${escapeHtml(typeLabel)}</span></td>
         <td style="color:var(--text3)">${escapeHtml(phase)}</td>
         <td><span class="doi-link">${escapeHtml(sub.doi || '')}</span></td>
@@ -2576,15 +2575,6 @@ function renderResults(query) {
 }
 
 function filterResults(val) { renderResults(val); }
-
-function openSavedSubmissionById(submissionId) {
-  const idx = (savedSubmissions || []).findIndex(sub => String(sub.id) === String(submissionId));
-  if (idx === -1) return;
-  const formatted = formatSavedSubmission(savedSubmissions[idx]);
-  const temp = { ...formatted, raw: savedSubmissions[idx] };
-  window.currentRenderedResults = [temp];
-  openSavedSubmissionModal(0);
-}
 
 function openSavedSubmissionModal(renderedIndex) {
   const result = window.currentRenderedResults?.[renderedIndex];
