@@ -658,9 +658,9 @@
       </div>
     </nav>
     <div class="sidebar-stats">
-      <div class="stat-row"><span class="stat-label">Trials indexed</span><span class="stat-val">4,812</span></div>
+      <div class="stat-row"><span class="stat-label">Studies indexed</span><span class="stat-val">4,812</span></div>
       <div class="stat-row"><span class="stat-label">Null results</span><span class="stat-val">3,204</span></div>
-      <div class="stat-row"><span class="stat-label">Graph nodes</span><span class="stat-val">18,440</span></div>
+      <div class="stat-row"><span class="stat-label">Curated records</span><span class="stat-val">18,440</span></div>
       <div class="stat-row"><span class="stat-label">Contradictions</span><span class="stat-val" style="color:var(--red)">127</span></div>
     </div>
   </aside>
@@ -703,12 +703,12 @@
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;">
             <div style="font-size:22px;margin-bottom:8px;">🤖</div>
             <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;">2. AI summarizes & classifies</div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.7;">Claude classifies the failure mode (target validity, underpowering, dosing, etc.), checks for contradictions with prior positive literature, and tags the study with ontology-based graph labels.</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7;">Claude writes a structured repository summary with background, study plan, methods, results, limitations, and standardized study tags, while also checking for contradictions with prior positive literature.</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;">
             <div style="font-size:22px;margin-bottom:8px;">🔗</div>
-            <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;">3. Connects to the graph</div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.7;">Your finding is added to the Failure Summary — grouped alongside related trials by shared mechanisms, targets, and populations. Patterns across failures become visible as the repository grows.</div>
+            <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;">3. Connects to the repository</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7;">Your finding is added to the Failure Summary — grouped alongside related studies by shared mechanisms, targets, and populations. Patterns across failures become visible as the repository grows.</div>
           </div>
         </div>
       </div>
@@ -729,7 +729,7 @@
               <span style="font-size:16px;">↑</span>
               <span style="font-size:12.5px;font-weight:700;color:var(--accent);">Submit a Finding →</span>
             </div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.6;">Deposit a negative, null, or inconclusive result. Takes ~5–10 minutes. You'll receive a citable DOI and contribute to the shared knowledge graph.</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;">Deposit a negative, null, or inconclusive result. Takes ~5–10 minutes. You'll receive a citable DOI and contribute to the shared knowledge repository.</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;cursor:pointer;transition:border-color 0.15s;" onclick="navigate('graph')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
@@ -750,7 +750,7 @@
 
       <!-- Beta note -->
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;font-size:12px;color:var(--text3);line-height:1.7;">
-        <strong style="color:var(--text2);">🔬 Beta v0.1 — prototype note:</strong> FailUp is currently an early-stage prototype. The data, graph, and AI summaries shown are illustrative examples. API integration for live AI summarization is coming in the next development phase. All feedback is welcome.
+        <strong style="color:var(--text2);">🔬 Beta v0.1 — prototype note:</strong> FailUp is currently an early-stage prototype. The data, repository patterns, and AI summaries shown are illustrative examples. API integration for live AI summarization is coming in the next development phase. All feedback is welcome.
       </div>
     </div>
 
@@ -1174,7 +1174,7 @@
                   <option>Public — immediately visible to all FailUp users</option>
                   <option>Institutional — visible to verified researchers only</option>
                   <option>Embargoed — metadata public, full data after embargo period</option>
-                  <option>Private — indexed in graph but details restricted</option>
+                  <option>Private — indexed in the repository but details restricted</option>
                 </select>
               </div>
               <div class="field">
@@ -1211,7 +1211,7 @@
                 <div style="font-family:var(--font-mono);font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">On submission you will receive</div>
                 <div style="font-size:12px;color:var(--text2);line-height:2.1">
                   ✓ Citable DOI (10.5281/fu.xxxxxxx) &nbsp;&nbsp; ✓ ORCID credit entry<br/>
-                  ✓ Failure graph node created &nbsp;&nbsp; ✓ Transparency badge<br/>
+                  ✓ Repository summary entry created &nbsp;&nbsp; ✓ Transparency badge<br/>
                   ✓ NF-index incremented &nbsp;&nbsp; ✓ AI summary draft generated<br/>
                   ✓ Contradiction scan initiated &nbsp;&nbsp; ✓ Ontology auto-tagging
                 </div>
@@ -1260,7 +1260,15 @@
                     <div id="result-background" class="summary-block-text" style="background:var(--surface2);border-radius:var(--radius);padding:12px 16px;line-height:1.9;font-size:13px;"></div>
                   </div>
                   <div>
-                    <div class="summary-block-label" style="margin-bottom:6px;">Key findings</div>
+                    <div class="summary-block-label" style="margin-bottom:6px;">Study plan</div>
+                    <div id="result-study-plan" class="summary-block-text" style="background:var(--surface2);border-radius:var(--radius);padding:12px 16px;line-height:1.9;font-size:13px;"></div>
+                  </div>
+                  <div>
+                    <div class="summary-block-label" style="margin-bottom:6px;">Methods</div>
+                    <div id="result-methods" class="summary-block-text" style="background:var(--surface2);border-radius:var(--radius);padding:12px 16px;line-height:1.9;font-size:13px;"></div>
+                  </div>
+                  <div>
+                    <div class="summary-block-label" style="margin-bottom:6px;">Results summary</div>
                     <div id="result-findings" class="summary-block-text" style="background:var(--surface2);border-radius:var(--radius);padding:12px 16px;line-height:1.9;font-size:13px;"></div>
                   </div>
                 </div>
@@ -1282,7 +1290,7 @@
                 </div>
 
                 <div style="margin-bottom:20px;">
-                  <div class="summary-block-label" style="margin-bottom:6px;">Graph tags (auto-generated)</div>
+                  <div class="summary-block-label" style="margin-bottom:6px;">Study tags (auto-generated)</div>
                   <div id="result-tags" class="summary-block-text" style="background:var(--accent-dim);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 16px;font-family:var(--font-mono);font-size:12px;color:var(--accent);"></div>
                 </div>
 
@@ -1314,7 +1322,7 @@
               <div class="summary-block-text" id="prev-findings"><span class="summary-placeholder">Result classification and statistics will appear here.</span></div>
             </div>
             <div class="summary-block">
-              <div class="summary-block-label">Failure mode classification</div>
+              <div class="summary-block-label">Repository classification</div>
               <div class="summary-block-text" id="prev-failure"><span class="summary-placeholder">FailUp will auto-tag by mechanism, target, and population.</span></div>
             </div>
             <div class="summary-block">
@@ -1322,8 +1330,8 @@
               <div class="summary-block-text" id="prev-contradiction"><span class="summary-placeholder">AI will scan for conflicting prior positive results.</span></div>
             </div>
             <div class="summary-block">
-              <div class="summary-block-label">Graph tags (auto-generated)</div>
-              <div class="summary-block-text" id="prev-tags"><span class="summary-placeholder">MeSH terms, ontology IDs, and graph links will appear here.</span></div>
+              <div class="summary-block-label">Study tags (auto-generated)</div>
+              <div class="summary-block-text" id="prev-tags"><span class="summary-placeholder">MeSH terms, ontology IDs, and repository tags and indexing details will appear here.</span></div>
             </div>
             <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
               <div class="summary-block-label" style="margin-bottom:6px">NF-index impact</div>
@@ -1365,7 +1373,7 @@
             <div class="badge earned"><span class="badge-icon">↑</span> Early Adopter</div>
             <div class="badge earned"><span class="badge-icon">◉</span> Contradiction Hunter</div>
             <div class="badge"><span class="badge-icon">◎</span> 10 Null Results</div>
-            <div class="badge"><span class="badge-icon">★</span> Graph Builder</div>
+            <div class="badge"><span class="badge-icon">★</span> Repository Contributor</div>
           </div>
         </div>
       </div>
@@ -1396,7 +1404,7 @@
 </div>
 
       <!-- Stats grid -->
-      <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px">
+      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
         <div class="metric-card accent">
           <div class="metric-label">NF-index</div>
           <div class="metric-val" id="profile-nf-index">4</div>
@@ -1411,11 +1419,6 @@
           <div class="metric-label">Total citations</div>
           <div class="metric-val" id="profile-citations">26</div>
           <div class="metric-sub">across all submissions</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Graph nodes</div>
-          <div class="metric-val" style="color:var(--teal)" id="profile-nodes">4</div>
-          <div class="metric-sub">created from your data</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">Contradictions found</div>
@@ -1467,7 +1470,7 @@
               <span class="trial-meta" style="color:var(--red)">5 months ago</span>
             </div>
             <div class="trial-row">
-              <span class="trial-name" style="font-size:12px">mTOR/HR+ submission added to Oncology failure cluster — 12 nodes</span>
+              <span class="trial-name" style="font-size:12px">mTOR/HR+ submission added to an Oncology failure cluster — 12 related studies</span>
               <span class="trial-meta">6 months ago</span>
             </div>
           </div>
@@ -1546,9 +1549,9 @@ const sourceLabels = {
 };
 
 const demoSummaryData = [
-  { title:'VEGF-A inhibition in treatment-resistant glioblastoma', result_type:'null', therapeutic_area:'Oncology', failure_mode:'Target validity — mechanism not rate-limiting in this indication', background:'Bevacizumab plus standard of care was hypothesised to sustain anti-angiogenic pressure in recurrent GBM. Phase III RCT, n=340.', findings:'Primary endpoint (OS at 24 months) not met: HR 1.02 (95% CI 0.88–1.18), p=0.43. No significant difference in PFS or ORR.', main_limitation:'Anti-angiogenic effect did not translate across the blood–brain barrier in this population. Study may have been underpowered (n=340 vs planned n=400).', contradiction_check:'No contradictions detected. Consistent with two prior Phase II null results in this population.', graph_tags:{ mechanism:'Anti-angiogenesis', target:'VEGF-A', population:'Recurrent GBM adults', therapeutic_area:'Oncology' } },
-  { title:'β-glucan supplementation in post-COVID fatigue syndrome', result_type:'opposite', therapeutic_area:'Immunology', failure_mode:'Off-target effects — confounding mechanism', background:'β-glucan was hypothesised to reduce fatigue via immunomodulation in post-COVID syndrome. Crossover RCT, n=120.', findings:'Opposite effect observed: 12% worsening of fatigue scores at 12 weeks in β-glucan arm (p=0.03).', main_limitation:'Possible immune overstimulation in post-COVID neuroinflammatory context. Crossover design may have introduced carry-over bias.', contradiction_check:'Contradiction flagged — three prior observational studies reported benefit in healthy populations. AI flagged for editorial review.', graph_tags:{ mechanism:'Immunomodulation', target:'β-glucan receptor', population:'Post-COVID adults', therapeutic_area:'Immunology' } },
-  { title:'Ketamine micro-dosing in treatment-resistant bipolar depression', result_type:'inconclusive', therapeutic_area:'Psychiatry', failure_mode:'Underpowered — type II error likely', background:'Micro-dose ketamine (0.1mg/kg) trialled as mood stabiliser adjunct in bipolar I/II with treatment-resistant depression. Phase II, n=62.', findings:'MADRS improvement trend observed (−4.2 points) but CI crosses null (p=0.11). Study required n=180 for 80% power.', main_limitation:'Critically underpowered — enrolled 62 of 180 required participants. Dropout rate 22% further reduced effective sample.', contradiction_check:'No contradictions detected. Consistent with mixed ketamine literature in this subpopulation.', graph_tags:{ mechanism:'NMDA receptor antagonism', target:'NMDA receptor', population:'Bipolar I/II adults', therapeutic_area:'Psychiatry' } },
+  { title:'VEGF-A inhibition in treatment-resistant glioblastoma', result_type:'null', therapeutic_area:'Oncology', failure_mode:'Target validity — mechanism not rate-limiting in this indication', background:'Bevacizumab plus standard of care was hypothesised to sustain anti-angiogenic pressure in recurrent GBM. Phase III RCT, n=340.', study_plan:'Phase III randomized comparison of bevacizumab plus standard therapy versus placebo plus standard therapy in recurrent GBM.', methods:'Adults with recurrent GBM were randomized and followed for overall survival, with planned comparison of efficacy and secondary tumor-control outcomes.', findings:'Primary endpoint (OS at 24 months) not met: HR 1.02 (95% CI 0.88–1.18), p=0.43. No significant difference in PFS or ORR.', main_limitation:'Anti-angiogenic effect did not translate across the blood–brain barrier in this population. Study may have been underpowered (n=340 vs planned n=400).', contradiction_check:'No contradictions detected. Consistent with two prior Phase II null results in this population.', graph_tags:{ mechanism:'Anti-angiogenesis', target:'VEGF-A', population:'Recurrent GBM adults', therapeutic_area:'Oncology' } },
+  { title:'β-glucan supplementation in post-COVID fatigue syndrome', result_type:'opposite', therapeutic_area:'Immunology', failure_mode:'Off-target effects — confounding mechanism', background:'β-glucan was hypothesised to reduce fatigue via immunomodulation in post-COVID syndrome. Crossover RCT, n=120.', study_plan:'Randomized crossover trial testing β-glucan supplementation against control in adults with post-COVID fatigue.', methods:'Participants crossed between treatment conditions and fatigue scores were assessed over 12 weeks to evaluate symptom improvement.', findings:'Opposite effect observed: 12% worsening of fatigue scores at 12 weeks in β-glucan arm (p=0.03).', main_limitation:'Possible immune overstimulation in post-COVID neuroinflammatory context. Crossover design may have introduced carry-over bias.', contradiction_check:'Contradiction flagged — three prior observational studies reported benefit in healthy populations. AI flagged for editorial review.', graph_tags:{ mechanism:'Immunomodulation', target:'β-glucan receptor', population:'Post-COVID adults', therapeutic_area:'Immunology' } },
+  { title:'Ketamine micro-dosing in treatment-resistant bipolar depression', result_type:'inconclusive', therapeutic_area:'Psychiatry', failure_mode:'Underpowered — type II error likely', background:'Micro-dose ketamine (0.1mg/kg) trialled as mood stabiliser adjunct in bipolar I/II with treatment-resistant depression. Phase II, n=62.', study_plan:'Phase II study designed to test whether adjunctive ketamine micro-dosing improved depressive symptoms in treatment-resistant bipolar disorder.', methods:'Participants with bipolar I/II depression were enrolled into a small efficacy study using MADRS change as a key outcome, but recruitment fell short of the planned sample size.', findings:'MADRS improvement trend observed (−4.2 points) but CI crosses null (p=0.11). Study required n=180 for 80% power.', main_limitation:'Critically underpowered — enrolled 62 of 180 required participants. Dropout rate 22% further reduced effective sample.', contradiction_check:'No contradictions detected. Consistent with mixed ketamine literature in this subpopulation.', graph_tags:{ mechanism:'NMDA receptor antagonism', target:'NMDA receptor', population:'Bipolar I/II adults', therapeutic_area:'Psychiatry' } },
   { title:'IL-6 receptor blockade in non-alcoholic steatohepatitis', result_type:'null', therapeutic_area:'Hepatology', failure_mode:'Target validity — mechanism not rate-limiting in this indication', background:'IL-6 receptor blockade hypothesised to reduce hepatic inflammation and fibrosis in NASH. Phase II, n=210.', findings:'No significant reduction in liver fibrosis at 48 weeks (p=0.38). Histological endpoints unchanged across arms.', main_limitation:'IL-6 pathway may not be rate-limiting in NASH progression. Biopsy-based endpoints introduce sampling variability.', contradiction_check:'No contradictions detected.', graph_tags:{ mechanism:'IL-6 receptor blockade', target:'IL-6R', population:'NASH adults with F2–F3 fibrosis', therapeutic_area:'Hepatology' } },
   { title:'mTOR pathway inhibition in HR+ breast cancer — adjuvant setting', result_type:'null', therapeutic_area:'Oncology', failure_mode:'Patient selection — population too heterogeneous or wrong biomarker', background:'Everolimus added to standard adjuvant endocrine therapy in unselected HR+ breast cancer. Phase III, n=1,240.', findings:'Disease-free survival HR 0.97 (95% CI 0.84–1.12, p=0.71). No improvement in unselected population.', main_limitation:'Biomarker-unselected population — mTOR pathway activation not confirmed prior to enrolment. Effect may exist in a molecular subgroup.', contradiction_check:'Contradiction flagged — prior Phase II data suggested benefit in PIK3CA-mutant subgroup. AI flagged for subgroup analysis review.', graph_tags:{ mechanism:'mTOR pathway inhibition', target:'mTORC1', population:'HR+ breast cancer, adjuvant', therapeutic_area:'Oncology' } },
   { title:'Tau-targeting immunotherapy in early Alzheimer\'s disease', result_type:'inconclusive', therapeutic_area:'Neurology', failure_mode:'Outcome measurement — endpoint did not capture true biological effect', background:'Anti-tau antibody in early Alzheimer\'s disease. Phase II, n=280. CSF tau used as pharmacodynamic marker.', findings:'CSF tau reduced 18% (p=0.04) but cognitive endpoints (ADAS-Cog) showed no improvement at 18 months.', main_limitation:'Biomarker-clinical dissociation — target engagement confirmed but cognitive benefit unclear. Trial duration may have been insufficient.', contradiction_check:'No contradictions detected.', graph_tags:{ mechanism:'Tau immunotherapy', target:'Tau protein', population:'Early AD, MCI stage', therapeutic_area:'Neurology' } },
@@ -1561,6 +1564,8 @@ function getAllSummaryData() {
     therapeutic_area: sub.summary?.graph_tags?.therapeutic_area || 'Unspecified',
     failure_mode: sub.summary?.failure_mode || 'Unknown / unclear',
     background: sub.summary?.background || '',
+    study_plan: sub.summary?.study_plan || '',
+    methods: sub.summary?.methods || '',
     findings: sub.summary?.findings || '',
     main_limitation: sub.summary?.main_limitation || '',
     contradiction_check: sub.summary?.contradiction_check || '',
@@ -1579,6 +1584,8 @@ function getAllSummaryData() {
       therapeutic_area: trial.summary?.graph_tags?.therapeutic_area || (trial.conditions || [])[0] || 'Unspecified',
       failure_mode: trial.summary?.failure_mode || 'Unknown / unclear',
       background: trial.summary?.background || trial.brief_summary || '',
+      study_plan: trial.summary?.study_plan || '',
+      methods: trial.summary?.methods || '',
       findings: trial.summary?.findings || trial.brief_summary || '',
       main_limitation: trial.summary?.main_limitation || '',
       contradiction_check: trial.summary?.contradiction_check || '',
@@ -1597,6 +1604,8 @@ function getAllSummaryData() {
       therapeutic_area: article.summary?.graph_tags?.therapeutic_area || (article.mesh_terms || [])[0] || 'Unspecified',
       failure_mode: article.summary?.failure_mode || 'Unknown / unclear',
       background: article.summary?.background || article.abstract || '',
+      study_plan: article.summary?.study_plan || '',
+      methods: article.summary?.methods || '',
       findings: article.summary?.findings || article.abstract || '',
       main_limitation: article.summary?.main_limitation || '',
       contradiction_check: article.summary?.contradiction_check || '',
@@ -1691,6 +1700,8 @@ function openSummaryCard(s) {
   document.getElementById('modal-sub').textContent = `${s.therapeutic_area || ''} · ${s.result_type || ''} result`;
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-section"><div class="modal-section-label">Background</div>${escapeHtml(s.background || 'Not available.')}</div>
+    <div class="modal-section"><div class="modal-section-label">Study plan</div>${escapeHtml(s.study_plan || 'Not available.')}</div>
+    <div class="modal-section"><div class="modal-section-label">Methods</div>${escapeHtml(s.methods || 'Not available.')}</div>
     <div class="modal-section"><div class="modal-section-label">Key findings</div>${escapeHtml(s.findings || 'Not available.')}</div>
     <div class="modal-section"><div class="modal-section-label">Main limitation</div>${escapeHtml(s.main_limitation || 'Not available.')}</div>
     <div class="modal-section"><div class="modal-section-label">Failure mode</div>${escapeHtml(s.failure_mode || 'Not available.')}</div>
@@ -1788,171 +1799,84 @@ function addFiles(files, listId) {
 }
 
 // ── AUTOFILL FROM DOCUMENT ──
+const autofillData = {
+  title: 'VEGF-A inhibition plus standard of care vs placebo in treatment-resistant glioblastoma: a Phase III RCT',
+  nct: 'NCT04821944',
+  n: '340',
+  nplan: '400 (80% power, α=0.05)',
+  intervention: 'Bevacizumab 10mg/kg IV q2w + temozolomide 150mg/m² vs temozolomide + placebo. 12-month treatment period.',
+  population: 'Adults with recurrent GBM, ECOG PS 0–2, bevacizumab-naive, measurable disease per RANO criteria. 18 sites across USA and Europe.',
+  dropout: '14% overall (9% intervention, 19% placebo)',
+  female: '46%',
+  age: '58 years',
+  outcome: 'Overall survival at 24 months',
+  pval: 'p = 0.43',
+  es: 'HR 1.02 (95% CI 0.88–1.18)',
+  limits: 'Underpowered — 340 enrolled vs 400 required. Dropout disproportionate in placebo arm. Heterogeneous tumour grade. Blood–brain barrier penetration not assessed.',
+};
+
 const afSteps = [
-  { pct: 12, text: 'Uploading documents…' },
-  { pct: 28, text: 'Extracting text from files…' },
-  { pct: 48, text: 'Identifying study metadata…' },
-  { pct: 68, text: 'Extracting methods and outcomes…' },
-  { pct: 86, text: 'Finalising structured fields…' },
+  { pct: 15, text: 'Parsing document structure…' },
+  { pct: 32, text: 'Extracting study metadata…' },
+  { pct: 52, text: 'Identifying trial design & population…' },
+  { pct: 71, text: 'Extracting statistical results…' },
+  { pct: 88, text: 'Cross-referencing ClinicalTrials.gov…' },
+  { pct: 100, text: 'Complete — review highlighted fields' },
 ];
-
-let afProgressTimer = null;
-
-function formatAutofillFileLabel(files) {
-  const names = Array.from(files || []).map(f => f.name).filter(Boolean);
-  if (!names.length) return 'Drop PDF or DOCX files here, or click to browse — multiple files accepted';
-  if (names.length === 1) return `📄 ${names[0]}`;
-  if (names.length === 2) return `📄 ${names[0]} + ${names[1]}`;
-  return `📄 ${names[0]} + ${names.length - 1} more files`;
-}
 
 function afDrop(e) {
   e.preventDefault();
   document.getElementById('af-dz').classList.remove('drag-over');
-  if (e.dataTransfer.files && e.dataTransfer.files.length) runAutofill(e.dataTransfer.files);
+  if (e.dataTransfer.files[0]) runAutofill(e.dataTransfer.files[0]);
 }
-
 function afFileChosen(input) {
-  if (input.files && input.files.length) runAutofill(input.files);
+  if (input.files[0]) runAutofill(input.files[0]);
 }
-
-function startAutofillProgress() {
+function runAutofill(file) {
   const statusDiv = document.getElementById('af-status');
   const bar = document.getElementById('af-bar');
   const statusText = document.getElementById('af-status-text');
+  document.getElementById('af-dz-text').textContent = '📄 ' + file.name;
   statusDiv.style.display = 'block';
   bar.style.width = '0%';
   let step = 0;
-  if (afProgressTimer) clearInterval(afProgressTimer);
-  afProgressTimer = setInterval(() => {
-    if (step >= afSteps.length) {
-      clearInterval(afProgressTimer);
-      afProgressTimer = null;
-      return;
-    }
+  function next() {
+    if (step >= afSteps.length) { applyAutofill(); return; }
     bar.style.width = afSteps[step].pct + '%';
     statusText.textContent = afSteps[step].text;
     step++;
-  }, 550);
-}
-
-function stopAutofillProgress(successText) {
-  const bar = document.getElementById('af-bar');
-  const statusText = document.getElementById('af-status-text');
-  if (afProgressTimer) {
-    clearInterval(afProgressTimer);
-    afProgressTimer = null;
+    setTimeout(next, step === afSteps.length ? 500 : 400);
   }
-  bar.style.width = '100%';
-  statusText.textContent = successText || 'Complete — review highlighted fields';
+  next();
 }
-
-function setFieldValue(id, value, eventName='input') {
-  const el = document.getElementById(id);
-  if (!el || value === undefined || value === null || value === '') return;
-  el.value = value;
-  el.classList.add('autofilled');
-  el.dispatchEvent(new Event(eventName, { bubbles: true }));
-}
-
-function setSelectIfOptionExists(id, value) {
-  const el = document.getElementById(id);
-  if (!el || !value) return;
-  const optionExists = Array.from(el.options).some(opt => opt.value === value || opt.text === value);
-  if (!optionExists) return;
-  el.value = value;
-  el.classList.add('autofilled');
-  el.dispatchEvent(new Event('change', { bubbles: true }));
-}
-
-function applySelectedResult(type) {
-  if (!type) return;
-  const optionMap = { null: 0, inconclusive: 1, opposite: 2 };
-  const options = document.querySelectorAll('#result-selector .result-opt');
-  const idx = optionMap[type];
-  if (idx === undefined || !options[idx]) return;
-  selectResult(type, options[idx]);
-}
-
-async function runAutofill(fileList) {
-  const files = Array.from(fileList || []).filter(Boolean);
-  if (!files.length) return;
-
-  document.getElementById('af-dz-text').textContent = formatAutofillFileLabel(files);
-  document.getElementById('af-done').style.display = 'none';
-  startAutofillProgress();
-
-  const formData = new FormData();
-  files.forEach(file => formData.append('files', file));
-
-  try {
-    const response = await fetch('/extract-study-fields', {
-      method: 'POST',
-      body: formData
-    });
-
-    const result = await response.json();
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || 'Unable to extract study fields from the uploaded files.');
-    }
-
-    stopAutofillProgress('Complete — review highlighted fields');
-    applyAutofill(result.fields || {}, result.file_names || files.map(f => f.name));
-  } catch (error) {
-    console.error(error);
-    if (afProgressTimer) {
-      clearInterval(afProgressTimer);
-      afProgressTimer = null;
-    }
+function applyAutofill() {
+  const map = {
+    'f-title': autofillData.title, 'f-nct': autofillData.nct,
+    'f-n': autofillData.n, 'f-nplan': autofillData.nplan,
+    'f-intervention': autofillData.intervention, 'f-population': autofillData.population,
+    'f-dropout': autofillData.dropout, 'f-female': autofillData.female,
+    'f-age': autofillData.age, 'f-outcome': autofillData.outcome,
+    'f-pval': autofillData.pval, 'f-es': autofillData.es, 'f-limits': autofillData.limits,
+  };
+  Object.keys(map).forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = map[id];
+      el.classList.add('autofilled');
+      el.dispatchEvent(new Event('input'));
+    }, i * 70);
+  });
+  setTimeout(() => {
+    const areaEl = document.getElementById('f-area');
+    if (areaEl) { areaEl.value = 'Oncology'; areaEl.classList.add('autofilled'); areaEl.dispatchEvent(new Event('change')); }
     document.getElementById('af-status').style.display = 'none';
-    documentsUploaded = false;
+    const doneEl = document.getElementById('af-done');
+    if (doneEl) doneEl.style.display = 'flex';
+    documentsUploaded = true;
     updatePreviewDisclaimer();
-    showToast('Upload autofill failed', error.message || 'Could not read those files.');
-  }
-}
-
-function applyAutofill(fields, fileNames) {
-  setFieldValue('f-title', fields.title || '');
-  setFieldValue('f-nct', fields.nct || '');
-  setFieldValue('f-n', fields.n || '');
-  setFieldValue('f-nplan', fields.nplan || '');
-  setFieldValue('f-intervention', fields.intervention || '');
-  setFieldValue('f-population', fields.population || '');
-  setFieldValue('f-dropout', fields.dropout || '');
-  setFieldValue('f-female', fields.female || '');
-  setFieldValue('f-age', fields.age || '');
-  setFieldValue('f-outcome', fields.outcome || '');
-  setFieldValue('f-pval', fields.pval || '');
-  setFieldValue('f-es', fields.effect_estimate || '');
-  setFieldValue('f-limits', fields.limitations || '');
-
-  setSelectIfOptionExists('f-type', fields.study_type || '');
-  setSelectIfOptionExists('f-phase', fields.phase || '');
-  setSelectIfOptionExists('f-design', fields.design || '');
-  setSelectIfOptionExists('f-area', fields.therapeutic_area || '');
-  setSelectIfOptionExists('f-es-type', fields.effect_estimate_type || '');
-
-  if ((fields.effect_estimate_type || '') === 'other') {
-    toggleEsOther();
-    setFieldValue('f-es-other', fields.effect_estimate_other || '');
-  } else {
-    toggleEsOther();
-  }
-
-  applySelectedResult((fields.result_type || '').toLowerCase());
-
-  document.getElementById('af-status').style.display = 'none';
-  const doneEl = document.getElementById('af-done');
-  if (doneEl) {
-    const uploadedSummary = (fileNames || []).length
-      ? `✓ ${fileNames.length} document${fileNames.length !== 1 ? 's' : ''} read — fields in Step 3 were pre-populated. Review and correct them before submitting.`
-      : '✓ Documents uploaded — fields in Step 3 were pre-populated. Review and correct them before submitting.';
-    doneEl.textContent = uploadedSummary;
-    doneEl.style.display = 'flex';
-  }
-  documentsUploaded = true;
-  updatePreviewDisclaimer();
-  updatePreview();
+    updatePreview();
+  }, Object.keys(map).length * 70 + 200);
 }
 
 let selectedResult = null;
@@ -1993,7 +1917,7 @@ function updatePreview() {
   }
 
   if (title && area) {
-    fa.innerHTML = `AI will classify this as a <em>${area.toLowerCase()}</em> study and tag by molecular target, failure mode, and population subgroup, linking it to related graph nodes.`;
+    fa.innerHTML = `AI will classify this as a <em>${area.toLowerCase()}</em> study and tag it by molecular target, failure mode, and population subgroup for repository indexing and comparison.`;
   } else {
     fa.innerHTML = '<span class="summary-placeholder">FailUp will auto-tag by mechanism, target, and population.</span>';
   }
@@ -2008,9 +1932,9 @@ function updatePreview() {
 
   if (tg) {
     if (title && area) {
-      tg.innerHTML = `MeSH: <em>${area}</em> · Target: auto-detected · Population: from inclusion criteria · Failure mode: from Step 3 · Graph cluster: auto-assigned`;
+      tg.innerHTML = `MeSH: <em>${area}</em> · Target: auto-detected · Population: from inclusion criteria · Failure mode: from Step 3 · Repository indexing: auto-assigned`;
     } else {
-      tg.innerHTML = '<span class="summary-placeholder">MeSH terms, ontology IDs, and graph links will appear here.</span>';
+      tg.innerHTML = '<span class="summary-placeholder">MeSH terms, ontology IDs, and repository tags and indexing details will appear here.</span>';
     }
   }
 }
@@ -2081,15 +2005,13 @@ function updateProfileFromSavedSubmissions() {
   // Top stat cards
   const profileNFIndex     = document.getElementById('profile-nf-index');
   const profileSubmissions = document.getElementById('profile-submissions');
-  const profileNodes       = document.getElementById('profile-nodes');
-  const profileContradictions = document.getElementById('profile-contradictions');
+    const profileContradictions = document.getElementById('profile-contradictions');
   const profileCitations   = document.getElementById('profile-citations');
   const profileSummary     = document.getElementById('profile-contrib-summary');
   const tbody              = document.getElementById('contributions-tbody');
 
   if (profileNFIndex)       profileNFIndex.textContent       = nfIndex;
   if (profileSubmissions)   profileSubmissions.textContent   = totalSubmissions;
-  if (profileNodes)         profileNodes.textContent         = totalSubmissions;
   if (profileContradictions) profileContradictions.textContent = contradictionCount;
   if (profileCitations)     profileCitations.textContent     = totalCitations;
   if (profileSummary)       profileSummary.textContent       = `${totalSubmissions} submissions · ${totalCitations} total citations`;
@@ -2221,7 +2143,7 @@ async function submitForm() {
     { pct:35, text:'Reading study metadata…' },
     { pct:55, text:'Classifying failure mode…' },
     { pct:72, text:'Running contradiction check…' },
-    { pct:88, text:'Generating graph tags…' },
+    { pct:88, text:'Generating study tags…' },
     { pct:95, text:'Finalising summary…' },
   ];
   let gi = 0;
@@ -2265,7 +2187,9 @@ async function submitForm() {
       // Populate results panel
       document.getElementById('result-doi').textContent = doi;
       document.getElementById('result-background').textContent = summary.background || 'No background returned.';
-      document.getElementById('result-findings').textContent = summary.findings || 'No findings returned.';
+      document.getElementById('result-study-plan').textContent = summary.study_plan || 'Study plan not clearly reported from the available information.';
+      document.getElementById('result-methods').textContent = summary.methods || 'Methods were not clearly reported from the available information.';
+      document.getElementById('result-findings').textContent = summary.findings || 'No results summary returned.';
       document.getElementById('result-failure').textContent = summary.failure_mode || 'No failure mode returned.';
       document.getElementById('result-contradiction').textContent = summary.contradiction_check || 'No contradiction check returned.';
       document.getElementById('result-limitation').textContent = summary.main_limitation || 'No main limitation returned.';
@@ -2294,6 +2218,8 @@ async function submitForm() {
       document.getElementById('result-doi').textContent = doi;
       document.getElementById('result-background').textContent =
         `[Demo mode — no server connected] This ${result_type || 'negative'} result study investigated "${title}". ${primary_outcome ? 'The primary outcome was: ' + primary_outcome + '.' : ''}`;
+      document.getElementById('result-study-plan').textContent = `[Demo mode — no server connected] The study appears to have been designed to evaluate whether the intervention improved the primary outcome in the specified population.`;
+      document.getElementById('result-methods').textContent = `Structured methods summary pending — connect the API for a full description of the design, population, intervention, comparator, endpoint, and analysis approach.`;
       document.getElementById('result-findings').textContent =
         `Primary outcome not met. ${p_value ? 'p = ' + p_value + '.' : ''} ${effect_estimate ? 'Effect estimate: ' + effect_estimate + '.' : ''} ${limitations ? 'Key limitations: ' + limitations : ''}`;
       document.getElementById('result-failure').textContent = 'AI classification pending — connect to Claude API for live classification.';
@@ -2565,7 +2491,7 @@ function renderResults(query) {
           <span class="result-card-meta" style="color:var(--accent);margin-left:auto">
             ${isSaved    ? escapeHtml(r.doi || 'Saved submission') :
               isImported ? 'View imported record →' :
-                           'View in graph →'}
+                           'View summary →'}
           </span>
         </div>
       </div>`;
@@ -2588,11 +2514,13 @@ function openSavedSubmissionModal(renderedIndex) {
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-section"><div class="modal-section-label">Source</div>${escapeHtml(result.sourceLabel || sourceLabels.manual)}</div>
     <div class="modal-section"><div class="modal-section-label">Background</div>${escapeHtml(summary.background || 'Not available.')}</div>
+    <div class="modal-section"><div class="modal-section-label">Study plan</div>${escapeHtml(summary.study_plan || 'Not available.')}</div>
+    <div class="modal-section"><div class="modal-section-label">Methods</div>${escapeHtml(summary.methods || 'Not available.')}</div>
     <div class="modal-section"><div class="modal-section-label">Findings</div>${escapeHtml(summary.findings || 'Not available.')}</div>
     <div class="modal-section"><div class="modal-section-label">Main limitation</div>${escapeHtml(summary.main_limitation || 'Not available.')}</div>
     <div class="modal-section"><div class="modal-section-label">Failure mode</div>${escapeHtml(summary.failure_mode || 'Not available.')}</div>
     <div class="modal-section"><div class="modal-section-label">Contradiction check</div>${escapeHtml(summary.contradiction_check || 'Not available.')}</div>
-    <div class="modal-section"><div class="modal-section-label">Graph tags</div>
+    <div class="modal-section"><div class="modal-section-label">Study tags</div>
       <span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">
         Mechanism: ${escapeHtml(tags.mechanism || 'unspecified')} ·
         Target: ${escapeHtml(tags.target || 'unspecified')} ·

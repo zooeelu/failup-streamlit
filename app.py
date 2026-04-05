@@ -286,17 +286,17 @@ def summarize_with_claude(
     effect_estimate,
     limitations
 ):
-    short_limitations = (limitations or "")[:4000]
+    short_limitations = (limitations or "")[:5000]
 
     response = client.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=500,
+        max_tokens=1100,
         system=(
             "You are a scientific summarization assistant for FailUp. "
             "Return only valid raw JSON, with no markdown fences or extra text. "
-            "Be precise, neutral, concise, and cautious. "
-            "Do not speculate beyond what was provided. "
-            "If information is insufficient, say so plainly."
+            "Write a clear, informative, structured study summary suitable for a biomedical repository. "
+            "Be neutral, specific, and evidence-grounded. "
+            "Do not invent details. If information is missing or unclear, say so plainly."
         ),
         messages=[
             {
@@ -304,6 +304,8 @@ def summarize_with_claude(
                 "content": f"""
 Return ONLY valid JSON with these keys:
 background
+study_plan
+methods
 findings
 main_limitation
 failure_mode
@@ -312,7 +314,15 @@ graph_tags
 
 Rules:
 - Return raw JSON only. No markdown. No backticks.
-- Keep each field concise.
+- Write informative, well-structured prose rather than short fragments.
+- Each narrative field should usually be 2-5 sentences when enough information is available.
+- Do not invent sample sizes, endpoints, analyses, or numerical results that were not provided.
+- If a detail is not available from the supplied information, say that it was not clearly reported.
+- background should summarize the clinical or scientific rationale, objective, and why the study was done.
+- study_plan should summarize the study design at a high level: trial phase, planned comparison, setting, and what the investigators aimed to test.
+- methods should summarize the enrolled population, intervention and comparator, key design features, primary endpoint, and any analysis or statistical plan details that can be inferred from the provided information.
+- findings should summarize the results with as much specificity as possible, including whether the primary endpoint was met and any available quantitative details such as sample size, p-value, hazard ratio, confidence interval, response rate, survival result, or direction of effect.
+- main_limitation should identify the most important limitation or interpretive caveat in specific terms.
 - failure_mode must be one of:
   "target validity"
   "patient selection"
@@ -321,12 +331,13 @@ Rules:
   "outcome measurement"
   "off-target effects"
   "unknown"
-- contradiction_check should be "Not assessed from provided information."
-- graph_tags must contain:
+- contradiction_check should reflect only what can be supported from the provided information. If this cannot be assessed from the inputs alone, return exactly: "Not assessed from provided information."
+- graph_tags must contain these keys:
   mechanism
   target
   population
   therapeutic_area
+- graph_tags should be short, specific, and standardized where possible.
 
 Study title: {title}
 Study type: {study_type}
@@ -343,7 +354,18 @@ Limitations or context: {short_limitations}
     )
 
     raw_text = response.content[0].text
-    return safe_parse_json(raw_text)
+    data = safe_parse_json(raw_text)
+
+    data.setdefault("background", "")
+    data.setdefault("study_plan", "")
+    data.setdefault("methods", "")
+    data.setdefault("findings", "")
+    data.setdefault("main_limitation", "")
+    data.setdefault("failure_mode", "unknown")
+    data.setdefault("contradiction_check", "Not assessed from provided information.")
+    data.setdefault("graph_tags", {})
+
+    return data
 
 
 # ---------------------------
