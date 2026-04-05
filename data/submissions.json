@@ -1,5 +1,34 @@
 [
   {
+    "id": 4,
+    "doi": "10.5281/fu.1000004",
+    "submitted_at": "2026-04-05T20:39:02.267531Z",
+    "title": "Smartphone-Delivered Sleep Extension Intervention to Reduce Systolic Blood Pressure in Adults with Prehypertension and Short Sleep: A Randomized, Double-Blind, Sham-Controlled Pilot Trial (SLEEP-HTN-201)",
+    "study_type": "Randomized clinical trial",
+    "result_type": "Null",
+    "intervention": "Active: smartphone app delivering individualized bedtime targets, digital sleep hygiene coaching, reminders, and weekly progress feedback. Comparator: sham app providing generic health education unrelated to sleep extension (hydration, stretching, screen ergonomics). Duration: 12 weeks. Ratio: 1:1.",
+    "population": "Adults aged 30–65 years with clinic systolic BP 120–139 mmHg and self-reported sleep duration <6.5 hours/night on ≥5 nights/week; no antihypertensive medication use; recruited at three outpatient preventive cardiology clinics in the US",
+    "primary_outcome": "Change from baseline to Week 12 in clinic-measured systolic blood pressure (average of three seated readings after 5 minutes of rest)",
+    "p_value": "p=0.67",
+    "effect_estimate": "Adjusted between-group difference in systolic BP change: -0.7 mmHg (95% CI: -3.9 to 2.5)",
+    "limitations": "Modest sample size limiting power; reliance on partial self-report for sleep metrics; potential behavioral co-interventions or trial participation effects (regression to mean); possible contamination across groups; 12-week duration may be insufficient; limited power for subgroup analyses",
+    "summary": {
+      "background": "Short sleep duration has been epidemiologically associated with elevated blood pressure and increased cardiovascular risk. Prehypertension, defined here as clinic systolic BP between 120–139 mmHg, represents a critical intervention window before the development of frank hypertension. The hypothesis underlying this trial is that behaviorally extending sleep duration in habitually short sleepers through a scalable, smartphone-delivered intervention could meaningfully reduce systolic blood pressure and potentially delay or prevent progression to hypertension, offering a low-cost, non-pharmacological approach to cardiovascular risk reduction.",
+      "study_plan": "SLEEP-HTN-201 was a randomized, double-blind, sham-controlled pilot trial conducted at three outpatient preventive cardiology clinics in the United States. The trial enrolled adults with prehypertension and objectively short sleep and randomly assigned them 1:1 to an active sleep extension smartphone app or a sham control app over 12 weeks. The primary aim was to test whether a digitally delivered behavioral sleep extension program could reduce clinic-measured systolic blood pressure compared to a sham comparator providing generic, sleep-unrelated health education.",
+      "methods": "Eligible participants were adults aged 30–65 years with clinic systolic BP of 120–139 mmHg, self-reported sleep duration less than 6.5 hours per night on at least five nights per week, and no current use of antihypertensive medications. The active intervention consisted of a smartphone application delivering individualized bedtime targets, digital sleep hygiene coaching, reminders, and weekly progress feedback. The sham comparator app delivered generic health education content on topics unrelated to sleep extension, including hydration, stretching, and screen ergonomics. Both arms were blinded to maintain concealment. The trial ran for 12 weeks. The primary endpoint was the change from baseline to Week 12 in clinic-measured systolic blood pressure, defined as the average of three seated readings taken after five minutes of rest. Sleep metrics were assessed in part through self-report. The sample size was described as a pilot, limiting the study's statistical power. Specific details about the statistical analysis plan beyond the use of an adjusted between-group difference were not clearly reported.",
+      "findings": "The trial did not meet its primary endpoint. The adjusted between-group difference in systolic blood pressure change from baseline to Week 12 was -0.7 mmHg in favor of the active arm, with a 95% confidence interval of -3.9 to 2.5 mmHg and a p-value of 0.67, indicating no statistically significant effect of the sleep extension intervention on clinic systolic blood pressure. The confidence interval was wide and crossed zero, consistent with the pilot nature of the study and insufficient power to detect small effects. Specific sample sizes and secondary outcome results were not provided in the available information.",
+      "main_limitation": "The most important limitation is the modest pilot sample size, which resulted in insufficient statistical power to detect clinically meaningful but small blood pressure reductions. The wide confidence interval (-3.9 to 2.5 mmHg) cannot rule out a meaningful true effect in either direction. Additionally, reliance on partial self-report for sleep duration measurement raises questions about whether the intervention actually achieved sufficient sleep extension, and the 12-week duration may have been too short for sustained blood pressure changes to manifest. Regression to the mean and behavioral co-interventions associated with trial participation may have further diluted any detectable treatment effect.",
+      "failure_mode": "underpowered",
+      "contradiction_check": "Not assessed from provided information.",
+      "graph_tags": {
+        "mechanism": "Behavioral sleep extension via digital coaching",
+        "target": "Sleep duration / systolic blood pressure",
+        "population": "Adults with prehypertension and short sleep duration",
+        "therapeutic_area": "Preventive cardiology / hypertension"
+      }
+    }
+  },
+  {
     "id": 3,
     "doi": "10.5281/fu.1000003",
     "submitted_at": "2026-04-05T03:32:01.529703Z",
