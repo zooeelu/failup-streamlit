@@ -718,6 +718,173 @@ def fetch_ctgov_page(query, page_size, page_token=None):
 
     return payload.get("studies", []), payload.get("nextPageToken")
 
+def fetch_single_nct(nct_id: str) -> dict:
+    """
+    Fetch one study from the ClinicalTrials.gov v2 API by NCT ID
+    and return a normalised dict matching the shape used by /ingest-ctgov.
+ 
+    Returns the dict on success, raises ValueError if the study is not found,
+    raises requests.HTTPError on network/API errors.
+    """
+    nct_id = nct_id.strip().upper()
+    if not nct_id.startswith("NCT"):
+        raise ValueError(f"'{nct_id}' does not look like a valid NCT ID.")
+ 
+    url = f"{CTGOV_API_URL}/{nct_id}"
+    response = requests.get(url, timeout=15)
+ 
+    if response.status_code == 404:
+        raise ValueError(f"No study found for {nct_id} on ClinicalTrials.gov.")
+ 
+    response.raise_for_status()
+    study = response.json()
+ 
+    protocol = study.get("protocolSection", {})
+    ident       = protocol.get("identificationModule", {})
+    status_mod  = protocol.get("statusModule", {})
+    design_mod  = protocol.get("designModule", {})
+    cond_mod    = protocol.get("conditionsModule", {})
+    arms_mod    = protocol.get("armsInterventionsModule", {})
+    elig_mod    = protocol.get("eligibilityModule", {})
+    outcomes_mod = protocol.get("outcomesModule", {})
+    desc_mod    = protocol.get("descriptionModule", {})
+    contacts_mod = protocol.get("contactsLocationsModule", {})
+ 
+    # --- title ---
+    title = (
+        ident.get("briefTitle")
+        or ident.get("officialTitle")
+        or nct_id
+    )
+ 
+    # --- phase ---
+    phases = design_mod.get("phases", [])
+    phase_str = ", ".join(phases) if phases else "Not applicable"
+ 
+    # --- study type ---
+    study_type_raw = design_mod.get("studyType", "")
+    # Map CT.gov values to our controlled vocabulary where possible
+    study_type_map = {
+        "INTERVENTIONAL": "Randomized clinical trial",
+        "OBSERVATIONAL": "Observational (cohort)",
+        "EXPANDED_ACCESS": "Other",
+    }
+    study_type = study_type_map.get(study_type_raw.upper(), study_type_raw or "")
+ 
+    # --- status ---
+    overall_status = status_mod.get("overallStatus", "")
+ 
+    # --- enrollment ---
+    enrollment_info = design_mod.get("enrollmentInfo", {})
+    n_enrolled = str(enrollment_info.get("count", "")) if enrollment_info else ""
+    enrollment_type = enrollment_info.get("type", "")  # ACTUAL vs ESTIMATED
+    n_label = f"{n_enrolled} ({enrollment_type.lower()})" if n_enrolled and enrollment_type else n_enrolled
+ 
+    # --- interventions ---
+    interventions = []
+    for item in arms_mod.get("interventions", []):
+        name = item.get("name", "")
+        itype = item.get("type", "")
+        if name:
+            interventions.append(f"{itype}: {name}" if itype else name)
+ 
+    # --- conditions ---
+    conditions = cond_mod.get("conditions", [])
+ 
+    # --- primary outcome ---
+    primary_outcomes = outcomes_mod.get("primaryOutcomes", [])
+    primary_outcome = primary_outcomes[0].get("measure", "") if primary_outcomes else ""
+ 
+    # --- secondary outcomes ---
+    secondary_outcomes = outcomes_mod.get("secondaryOutcomes", [])
+    secondary_summary = "; ".join(
+        o.get("measure", "") for o in secondary_outcomes[:3] if o.get("measure")
+    )
+ 
+    # --- population ---
+    population_parts = []
+    sex = elig_mod.get("sex", "")
+    min_age = elig_mod.get("minimumAge", "")
+    max_age = elig_mod.get("maximumAge", "")
+    healthy = elig_mod.get("healthyVolunteers")
+    criteria = elig_mod.get("eligibilityCriteria", "")
+ 
+    if sex:
+        population_parts.append(f"Sex: {sex}")
+    if min_age or max_age:
+        age_range = f"{min_age} to {max_age}".strip(" to")
+        population_parts.append(f"Age: {age_range}")
+    if healthy is not None:
+        population_parts.append(f"Healthy volunteers: {healthy}")
+ 
+    population_str = " | ".join(p for p in population_parts if p)
+    # Append eligibility criteria summary if available (first 400 chars)
+    if criteria:
+        short_criteria = criteria[:400].replace("\n", " ").strip()
+        if short_criteria:
+            population_str = (population_str + " | " + short_criteria).strip(" |")
+ 
+    # --- sponsor / funder ---
+    sponsor_mod = protocol.get("sponsorCollaboratorsModule", {})
+    lead_sponsor = sponsor_mod.get("leadSponsor", {}).get("name", "")
+    funder_type = sponsor_mod.get("leadSponsor", {}).get("class", "")
+ 
+    # Map CT.gov funder class to our controlled vocabulary
+    funder_map = {
+        "NIH": "Academic / government grant",
+        "FED": "Academic / government grant",
+        "OTHER_GOV": "Academic / government grant",
+        "INDIV": "Investigator-initiated",
+        "INDUSTRY": "Industry funded",
+        "NETWORK": "Academic / government grant",
+        "OTHER": "Academic / government grant",
+        "UNKNOWN": "Academic / government grant",
+    }
+    funding_source = funder_map.get(funder_type.upper(), "Academic / government grant")
+ 
+    # --- study dates ---
+    start_date = status_mod.get("startDateStruct", {}).get("date", "")
+    completion_date = (
+        status_mod.get("primaryCompletionDateStruct", {})
+        .get("date", "")
+        or status_mod.get("completionDateStruct", {}).get("date", "")
+    )
+ 
+    # --- brief summary ---
+    brief_summary = desc_mod.get("briefSummary", "")
+ 
+    # --- result type heuristic (reuses existing helper logic) ---
+    result_type = infer_trial_result_type({"status": overall_status})
+ 
+    return {
+        # Core identity
+        "nct_id":           nct_id,
+        "title":            title,
+        "phase":            phase_str,
+        "study_type":       study_type,
+        "status":           overall_status,
+ 
+        # Populated form fields
+        "n":                n_label,
+        "intervention":     "; ".join(interventions),
+        "conditions":       conditions,
+        "population":       population_str,
+        "primary_outcome":  primary_outcome,
+        "secondary_outcomes": secondary_summary,
+ 
+        # Metadata
+        "sponsor":          lead_sponsor,
+        "funding_source":   funding_source,
+        "start_date":       start_date,
+        "completion_date":  completion_date,
+        "brief_summary":    brief_summary,
+        "url":              f"https://clinicaltrials.gov/study/{nct_id}",
+ 
+        # Pre-inferred result type
+        "result_type":      result_type,
+    }
+ 
+ 
 
 # ---------------------------
 # PubMed helpers
@@ -1529,7 +1696,56 @@ def ingest_pubmed():
             "error": str(e)
         }), 500
 
-
+# ---------------------------
+# Route: /nct-lookup
+# ---------------------------
+ 
+@app.route("/nct-lookup", methods=["GET"])
+def nct_lookup():
+    """
+    GET /nct-lookup?nct_id=NCT04821944
+ 
+    Returns structured study metadata from ClinicalTrials.gov v2 for a
+    single NCT ID, ready to populate the Submit Finding form fields.
+ 
+    Response shape:
+    {
+        "success": true,
+        "nct_id": "NCT04821944",
+        "fields": { ...form-ready fields... },
+        "source_url": "https://clinicaltrials.gov/study/NCT04821944"
+    }
+    """
+    nct_id = (request.args.get("nct_id") or "").strip()
+ 
+    if not nct_id:
+        return jsonify({
+            "success": False,
+            "error": "Missing nct_id query parameter. Example: /nct-lookup?nct_id=NCT04821944"
+        }), 400
+ 
+    try:
+        data = fetch_single_nct(nct_id)
+        return jsonify({
+            "success":    True,
+            "nct_id":     data["nct_id"],
+            "fields":     data,
+            "source_url": data["url"]
+        })
+ 
+    except ValueError as e:
+        return jsonify({
+            "success": False,
+            "error":   str(e)
+        }), 404
+ 
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error":   str(e)
+        }), 500
+ 
+ 
 @app.route("/pubmed-articles", methods=["GET"])
 def get_pubmed_articles():
     articles = load_pubmed_articles()

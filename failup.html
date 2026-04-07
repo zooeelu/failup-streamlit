@@ -935,7 +935,7 @@
                 </div>
                 <div class="field">
                   <label>Funding source</label>
-                  <select>
+                  <select id="f-funding">
                     <option>Academic / government grant</option>
                     <option>Industry funded</option>
                     <option>Mixed (academic + industry)</option>
@@ -1930,6 +1930,68 @@ async function runAutofill(files) {
     showToast('Upload autofill failed', error.message || 'Could not extract fields from the uploaded file.');
   }
 }
+
+
+// ── NCT ID LIVE LOOKUP ──
+document.addEventListener("DOMContentLoaded", function() {
+  const nctInput = document.getElementById("f-nct");
+  if (!nctInput) return;
+
+  nctInput.addEventListener("blur", async function() {
+    const nct = this.value.trim().toUpperCase();
+    if (!nct.startsWith("NCT") || nct.length < 10) return;
+
+    const statusDiv = document.getElementById("af-status");
+    const bar = document.getElementById("af-bar");
+    const statusText = document.getElementById("af-status-text");
+    const doneEl = document.getElementById("af-done");
+
+    statusDiv.style.display = "block";
+    if (doneEl) doneEl.style.display = "none";
+    bar.style.width = "40%";
+    statusText.textContent = "Fetching from ClinicalTrials.gov…";
+
+    try {
+      const res = await fetch("/nct-lookup?nct_id=" + encodeURIComponent(nct));
+      const data = await res.json();
+
+      if (!data.success) {
+        bar.style.width = "100%";
+        statusText.textContent = "NCT ID not found on ClinicalTrials.gov.";
+        return;
+      }
+
+      bar.style.width = "80%";
+      statusText.textContent = "Populating fields…";
+
+      const f = data.fields;
+      const directMap = {
+        "f-title":        f.title,
+        "f-n":            f.n,
+        "f-intervention": f.intervention,
+        "f-population":   f.population,
+        "f-outcome":      f.primary_outcome,
+      };
+
+      Object.entries(directMap).forEach(([id, value]) => setFieldValue(id, value));
+      setSelectIfAllowed("f-funding", f.funding_source);
+      if (f.phase)       setSelectIfAllowed("f-phase", f.phase);
+      if (f.study_type)  setSelectIfAllowed("f-type", f.study_type);
+      if (f.result_type) setResultTypeSelection(f.result_type);
+
+      bar.style.width = "100%";
+      statusDiv.style.display = "none";
+      if (doneEl) {
+        doneEl.textContent = "✓ Fields populated from ClinicalTrials.gov (" + nct + ") — review before submitting.";
+        doneEl.style.display = "flex";
+      }
+      updatePreview();
+    } catch (err) {
+      bar.style.width = "100%";
+      statusText.textContent = "Could not reach ClinicalTrials.gov — check connection.";
+    }
+  });
+});
 
 let selectedResult = null;
 function selectResult(type, el) {
